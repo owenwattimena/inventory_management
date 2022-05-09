@@ -11,6 +11,12 @@ class _ProductPageState extends State<ProductPage> {
   final productController = Get.put(ProductController());
 
   @override
+  initState() {
+    super.initState();
+    productController.getProducts();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -32,18 +38,33 @@ class _ProductPageState extends State<ProductPage> {
             ),
           ),
           Expanded(
-            child: ListView(
-              children: [
-                GestureDetector(
-                  onTap: (){
-                    Navigator.pushNamed(context, '/product-detail');
+            child: Obx(
+              () => ListView.builder(
+                itemCount: productController.listProduct.value.length,
+                itemBuilder: (context, index) => GestureDetector(
+                  onTap: () async {
+                    await Navigator.pushNamed(context, '/product-detail');
+                    Get.delete<ProductTransactionController>();
                   },
                   child: ProductTile(
-                    product: products[0],
+                    product: productController.listProduct.value[index],
                   ),
                 ),
-              ],
+              ),
             ),
+            // child: ListView(
+            //   children: [
+            //     GestureDetector(
+            //       onTap: () async{
+            //         await Navigator.pushNamed(context, '/product-detail');
+            //         Get.delete<ProductTransactionController>();
+            //       },
+            //       child: ProductTile(
+            //         product: products[0],
+            //       ),
+            //     ),
+            //   ],
+            // ),
           ),
         ],
       ),
@@ -79,7 +100,12 @@ class _ProductPageState extends State<ProductPage> {
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    await productController.importFile();
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('Import Success'),
+                    ));
+                  },
                   child: const Text('IMPORT FILE'),
                 ),
               ],
@@ -122,8 +148,12 @@ class _ProductPageState extends State<ProductPage> {
                     ? TypeAheadFormField(
                         textFieldConfiguration: TextFieldConfiguration(
                             controller: exportFileController,
-                            decoration:
-                                InputDecoration(labelText: productController.dropdownValue.value == 'SKU' ? 'SKU' : 'Category')),
+                            decoration: InputDecoration(
+                                labelText:
+                                    productController.dropdownValue.value ==
+                                            'SKU'
+                                        ? 'SKU'
+                                        : 'Category')),
                         suggestionsCallback: (pattern) {
                           // return CitiesService.getSuggestions(pattern);
                           return division

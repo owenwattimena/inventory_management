@@ -188,7 +188,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   transactionId: DateFormat('yyyyMMddhhmmss')
                                       .format(datetime),
                                   createdAt: datetime.millisecondsSinceEpoch,
-                                  unit: unitTextController.text,
+                                  division: unitTextController.text,
                                   takeBy: takeInTextController.text,
                                 ),
                               );

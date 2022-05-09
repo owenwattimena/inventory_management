@@ -36,15 +36,16 @@ class DrawerHome extends StatelessWidget {
           title: const Text('Transaction'),
           onTap: () {
             Navigator.pop(context);
-            Navigator.pushNamed(context, '/transaction-detail');
+            // Navigator.pushNamed(context, '/transaction-detail');
           },
         ),
         ListTile(
           leading: const Icon(Icons.apps),
           title: const Text('Product'),
-          onTap: () {
+          onTap: () async {
             Navigator.pop(context);
-            Navigator.pushNamed(context, '/product');
+            await Navigator.pushNamed(context, '/product');
+            Get.delete<ProductController>();
           },
         ),
         ListTile(

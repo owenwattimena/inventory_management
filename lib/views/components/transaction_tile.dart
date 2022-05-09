@@ -32,7 +32,7 @@ class TransactionTile extends StatelessWidget {
                 },
                 transactionType: transaction.type,
                 transactionId: transaction.transactionId,
-                unit: transaction.unit,
+                division: transaction.division,
                 totalItem: transaction.totalItem,
                 takeBy: transaction.takeBy,
                 distributor: transaction.distributor,

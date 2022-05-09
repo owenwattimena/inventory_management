@@ -27,8 +27,10 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  csv: ^5.0.1
   cupertino_icons: ^1.0.2
   datetime_picker_formfield: any
+  encrypt: ^5.0.1
   file_picker: any
   flutter:
     sdk: flutter
@@ -39,6 +41,7 @@ dependencies:
   intl: ^0.17.0
   path_provider: ^2.0.9
   permission_handler: null
+  sqflite: ^2.0.2+1
 
 dev_dependencies:
   flutter_lints: ^1.0.0

@@ -3,14 +3,14 @@ part of 'components.dart';
 class TransactionItem extends StatelessWidget {
   final TransactionType? transactionType;
   final String? transactionId;
-  final String? unit;
+  final String? division;
   final String? warehouse;
   final int? totalItem;
   final String? createdBy;
   final String? takeBy;
   final String? distributor;
   final Function() onTap;
-  const TransactionItem({Key? key, required this.onTap, this.transactionType, this.transactionId, this.unit, this.warehouse, this.totalItem, this.createdBy, this.takeBy, this.distributor}) : super(key: key);
+  const TransactionItem({Key? key, required this.onTap, this.transactionType, this.transactionId, this.division, this.warehouse, this.totalItem, this.createdBy, this.takeBy, this.distributor}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -29,7 +29,7 @@ class TransactionItem extends StatelessWidget {
                   style: primaryTextStyleBold,
                 ),
                 (transactionType == TransactionType.out)
-                    ? Text('$unit')
+                    ? Text('$division')
                     : (transactionType == TransactionType.audit)
                         ? Text('$warehouse')
                         : const SizedBox()

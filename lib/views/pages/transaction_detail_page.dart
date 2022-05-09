@@ -42,7 +42,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
             ),
             Text(
               args.type == TransactionType.out
-                  ? '${args.unit} - ${args.takeBy}'
+                  ? '${args.division} - ${args.takeBy}'
                   : args.type == TransactionType.entry
                       ? '${args.distributor}'
                       : '${args.warehouse} - ${args.createdBy}',

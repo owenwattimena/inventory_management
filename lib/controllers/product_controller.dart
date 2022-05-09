@@ -10,21 +10,18 @@ class ProductController extends GetxController{
   RxString dropdownValue = "All".obs;
   
 
-  void getListItem() {
+  void getProducts() {
     ProductRepository.getProduct().then((value) {
       listProduct.value = value;
     });
   }
-  void importFile() {
-    ProductRepository.importFile(file.value).then((_) {
-        getListItem();
-    });
+  Future<void> importFile() async{
+    await ProductRepository.importFile(file.value);
+    getProducts();
   }
 
    Future<void> openFilePicker() async {
-     print('before');
     FilePickerResult? result = await FilePicker.platform.pickFiles();
-     print('after :' + result.toString());
     if (result != null) {
       file.value = result.files.first;
     } else {

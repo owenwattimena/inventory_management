@@ -1,36 +1,45 @@
 part of "pages.dart";
 
 class ProductDetailPage extends StatefulWidget {
-  ProductDetailPage({Key? key}) : super(key: key);
+  final Product product;
+  const ProductDetailPage(this.product, {Key? key}) : super(key: key);
 
   @override
   State<ProductDetailPage> createState() => _ProductDetailPageState();
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
+  final productTransactionController = Get.put(ProductTransactionController());
+  late Product product;
+  @override
+  initState() {
+    super.initState();
+    product = widget.product;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text("Alas Mouse",
-              style: primaryTextStyleBold.copyWith(color: Colors.white, fontSize: 18)),
+          Text("${product.name}",
+              style: primaryTextStyleBold.copyWith(
+                  color: Colors.white, fontSize: 18)),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Row(
               children: [
-                Text("ATK001 - 123456",
+                Text("${product.sku} - ${product.barcode}",
                     style: primaryTextStyle.copyWith(color: Colors.white)),
               ],
             ),
-            Text('35 Pcs',
+            Text('${product.stock} Pcs',
                 style: primaryTextStyle.copyWith(color: Colors.white)),
           ])
         ]),
       ),
-      body: ListView(
-        children: [
-          ProductHistory(),
-        ],
+      body: ListView.builder(
+        itemCount: productTransactionController.listProductTransaction.value.length,
+        itemBuilder: (context, index) => ProductHistory(),
       ),
     );
   }

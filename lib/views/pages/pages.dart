@@ -15,6 +15,7 @@ import 'package:image_picker/image_picker.dart';
 
 // COMPONENTS
 import '../../controllers/product_controller.dart';
+import '../../controllers/product_transaction_controller.dart';
 import '../components/components.dart';
 
 part 'home_page.dart';

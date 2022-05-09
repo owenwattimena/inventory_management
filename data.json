@@ -5,7 +5,8 @@
         "bar_code": "123",
         "name": "Product 1",
         "uom": "Kg",
-        "category": "Category 1"
+        "category": "Category 1",
+        "price": "100"
     },
     "transaction":[
         {

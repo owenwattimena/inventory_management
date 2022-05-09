@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'models/product.dart';
 import 'models/transaction.dart';
 import 'views/pages/pages.dart';
 
@@ -30,14 +31,19 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const HomePage(),
-        '/product': (context) => ProductPage(),
-        '/product-detail': (context) => ProductDetailPage(),
+        '/product': (context) => const ProductPage(),
+        // '/product-detail': (context) => ProductDetailPage(),
         // '/transaction-detail': (context) => const TransactionDetailPage(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/transaction-detail') {
           return MaterialPageRoute(
             builder: (context) => TransactionDetailPage(settings.arguments as Transaction),
+          );
+        } 
+        else if(settings.name == '/product-detail') {
+          return MaterialPageRoute(
+            builder: (context) => ProductDetailPage(settings.arguments as Product),
           );
         }
         return null;

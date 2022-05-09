@@ -36,7 +36,7 @@ class TransactionRepository {
               : item['transaction_type'] == 'out'
                   ? TransactionType.out
                   : TransactionType.audit,
-          unit: item['unit'],
+          division: item['unit'],
           distributor: item['distributor'],
           takeBy: item['take_by'],
           createdBy: item['created_by'],
@@ -61,7 +61,7 @@ class TransactionRepository {
                   : item['transaction_type'] == 'out'
                       ? TransactionType.out
                       : TransactionType.audit,
-              unit: item['unit'],
+              division: item['unit'],
               distributor: item['distributor'],
               takeBy: item['take_by'],
               createdBy: item['created_by'],
