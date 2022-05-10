@@ -43,7 +43,7 @@ class _ProductPageState extends State<ProductPage> {
                 itemCount: productController.listProduct.value.length,
                 itemBuilder: (context, index) => GestureDetector(
                   onTap: () async {
-                    await Navigator.pushNamed(context, '/product-detail');
+                    await Navigator.pushNamed(context, '/product-detail', arguments: productController.listProduct.value[index]);
                     Get.delete<ProductTransactionController>();
                   },
                   child: ProductTile(

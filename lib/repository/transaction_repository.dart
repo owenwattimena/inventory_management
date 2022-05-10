@@ -6,13 +6,19 @@ import '../models/transaction_list.dart';
 import '../services/transaction_service.dart';
 
 class TransactionRepository {
-  static Future<List<TransactionList>> getGroupTransactionByDate(
-      {TransactionType? type}) async {
+  static Future<List<TransactionList?>> getGroupTransactionByDate(
+      {required TransactionType type}) async {
+    final transactionService = TransactionService();
+
+    String _type = type == TransactionType.entry ? 'entry' : type == TransactionType.out ? 'out' : 'audit';
+
     final _transaction =
-        await TransactionService.getGroupTransactionByDate(type: type);
+        await transactionService.getGroupTransactionByDate(type: _type);
+    if (_transaction.isEmpty) return [];
     List<TransactionList> transactionList = [];
     for (var item in _transaction) {
-      int transactionAt = item['created_at'];
+      int total = await transactionService.getTotalItem(item['transaction_id'].toString());
+      int transactionAt = int.parse(item['created_at'].toString());
       var date = DateTime.fromMicrosecondsSinceEpoch(transactionAt * 1000);
       String sStartDate = DateFormat('yyyy-MM-dd 00:00:00').format(date);
       // String sEndDate = DateFormat('yyyy-MM-dd 23:59:59').format(date);
@@ -29,20 +35,20 @@ class TransactionRepository {
 
       if (_transactionList.timestemp != null) {
         _transactionList.transaction!.add(Transaction(
-          id: item['id'],
-          transactionId: item['transaction_id'],
+          id: int.parse(item['id'].toString()),
+          transactionId: item['transaction_id'].toString(),
           type: item['transaction_type'] == 'entry'
               ? TransactionType.entry
               : item['transaction_type'] == 'out'
                   ? TransactionType.out
                   : TransactionType.audit,
-          division: item['unit'],
-          distributor: item['distributor'],
-          takeBy: item['take_by'],
-          createdBy: item['created_by'],
-          warehouse: item['warehouse'],
-          createdAt: item['created_at'],
-          totalItem: item['total_item'],
+          division: item['division'].toString(),
+          distributor: item['distributor'].toString(),
+          takeBy: item['take_in_by'].toString(),
+          createdBy: item['created_by'].toString(),
+          warehouse: item['warehouse'].toString(),
+          createdAt: int.parse(item['created_at'].toString()),
+          totalItem: total,
           status: item['status'] == 'panding'
               ? TransactionStatus.panding
               : item['status'] == 'finished'
@@ -54,20 +60,20 @@ class TransactionRepository {
           timestemp: tsStartDate,
           transaction: [
             Transaction(
-              id: item['id'],
-              transactionId: item['transaction_id'],
+              id: int.parse(item['id'].toString()),
+              transactionId: item['transaction_id'].toString(),
               type: item['transaction_type'] == 'entry'
                   ? TransactionType.entry
                   : item['transaction_type'] == 'out'
                       ? TransactionType.out
                       : TransactionType.audit,
-              division: item['unit'],
-              distributor: item['distributor'],
-              takeBy: item['take_by'],
-              createdBy: item['created_by'],
-              warehouse: item['warehouse'],
-              createdAt: item['created_at'],
-              totalItem: item['total_item'],
+              division: item['division'].toString(),
+              distributor: item['distributor'].toString(),
+              takeBy: item['take_in_by'].toString(),
+              createdBy: item['created_by'].toString(),
+              warehouse: item['warehouse'].toString(),
+              createdAt: int.parse(item['created_at'].toString()),
+              totalItem: total,
               status: item['status'] == 'panding'
                   ? TransactionStatus.panding
                   : item['status'] == 'finished'

@@ -37,10 +37,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           ])
         ]),
       ),
-      body: ListView.builder(
-        itemCount: productTransactionController.listProductTransaction.value.length,
-        itemBuilder: (context, index) => ProductHistory(),
-      ),
+      body: Obx(() => productTransactionController.listProductTransaction.value.isNotEmpty
+          ? ListView.builder(
+              itemCount: productTransactionController
+                  .listProductTransaction.value.length,
+              itemBuilder: (context, index) => ProductHistory(),
+            )
+          : const Center(
+              child: Text('No data'),
+            ),)
     );
   }
 }

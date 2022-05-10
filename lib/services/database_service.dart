@@ -13,7 +13,7 @@ class DatabaseService {
   static DatabaseService? _databaseService;
   static Database? _database;
 
-  List<String> tables = ['product', 'transaction', 'transaction_detail'];
+  List<String> tables = ['product', 'product_transaction', 'transaction_detail'];
 
   DatabaseService._createInstance();
 
@@ -48,12 +48,13 @@ class DatabaseService {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         created_at INTEGER,
         transaction_id TEXT,
-        transaction_type TEXT,
+        type TEXT,
         distributor TEXT,
         warehouse TEXT,
         take_in_by TEXT,
         division TEXT,
-        transaction_status TEXT)''');
+        created_by TEXT,
+        status TEXT)''');
 
       await db.execute('''
       CREATE TABLE transaction_detail (

@@ -6,9 +6,9 @@ import '../repository/transaction_repository.dart';
 
 class HomeController extends GetxController {
   RxInt selectedIndex = 0.obs;
-  RxList<TransactionList> entryTransactionList = RxList<TransactionList>();
-  RxList<TransactionList> outTransactionList = RxList<TransactionList>();
-  RxList<TransactionList> auditTransactionList = RxList<TransactionList>();
+  Rx<List<TransactionList?>> entryTransactionList = Rx<List<TransactionList>>([]);
+  Rx<List<TransactionList?>> outTransactionList = Rx<List<TransactionList>>([]);
+  Rx<List<TransactionList?>> auditTransactionList = Rx<List<TransactionList>>([]);
 
   set setSelectedIndex(int index) {
     selectedIndex.value = index;

@@ -24,6 +24,24 @@ class ProductService {
     return mapObject;
   }
 
+  Future<Map<String, Object?>?> getLastProductTransaction(String sku) async {
+    Database db = await database.database;
+    var sql = '''
+    SELECT 
+    product_transaction.created_at, product_transaction.transaction_id, transaction_detail.sku, transaction_detail.quantity 
+    FROM transaction_detail 
+    JOIN product_transaction
+    ON transaction_detail.transaction_id = product_transaction.transaction_id 
+    WHERE transaction_detail.sku = ? 
+    AND product_transaction.status = ? 
+    ORDER BY product_transaction.created_at DESC 
+    LIMIT 1
+  ''';
+    List<Map<String, Object?>> data = await db.rawQuery(sql, [sku, "finished"]);
+    if(data.isEmpty) return null;
+    return data[0];
+  }
+
   Future<List<Map<String, Object?>>> getProductTransaction(String sku) async {
     Database db = await database.database;
     List<Map<String, Object?>> mapObject;
@@ -39,11 +57,11 @@ class ProductService {
       t.devision 
       td.quantity
       FROM transaction_detail as td
-      WHERE td.sku = "$sku" AND t.status = "finished"
+      WHERE td.sku = ? AND t.status = ?
       JOIN product_transaction as t
       ON td.transaction_id = t.transaction_id
     ''';
-    mapObject = await db.rawQuery(sql);
+    mapObject = await db.rawQuery(sql, [sku, "finished"]);
 
     return mapObject;
   }

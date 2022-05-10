@@ -43,30 +43,30 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           controller: _tabController,
           physics: const BouncingScrollPhysics(),
           children: [
-            Obx(() => ListView.builder(
-                  itemCount: _homeController.outTransactionList.length,
+            Obx(() => _homeController.outTransactionList.value.isNotEmpty ? ListView.builder(
+                  itemCount: _homeController.outTransactionList.value.length,
                   itemBuilder: (context, index) {
                     return TransactionTile(
                         transactionList:
-                            _homeController.outTransactionList[index]);
+                            _homeController.outTransactionList.value[index]!);
                   },
-                )),
-            Obx(() => ListView.builder(
-                  itemCount: _homeController.entryTransactionList.length,
+                ) : const Center(child: Text('No Data'))),
+            Obx(() => _homeController.entryTransactionList.value.isNotEmpty ? ListView.builder(
+                  itemCount: _homeController.entryTransactionList.value.length,
                   itemBuilder: (context, index) {
                     return TransactionTile(
                         transactionList:
-                            _homeController.entryTransactionList[index]);
+                            _homeController.entryTransactionList.value[index]!);
                   },
-                )),
-            Obx(() => ListView.builder(
-                  itemCount: _homeController.auditTransactionList.length,
+                ) : const Center(child: Text('No Data'))),
+            Obx(() => _homeController.auditTransactionList.value.isNotEmpty ? ListView.builder(
+                  itemCount: _homeController.auditTransactionList.value.length,
                   itemBuilder: (context, index) {
                     return TransactionTile(
                         transactionList:
-                            _homeController.auditTransactionList[index]);
+                            _homeController.auditTransactionList.value[index]!);
                   },
-                )),
+                ): const Center(child: Text('No Data'))),
           ],
         ),
         floatingActionButton: FloatingActionButton(

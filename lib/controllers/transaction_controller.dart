@@ -1,14 +1,13 @@
 import 'dart:io';
 
 import 'package:get/get.dart';
-import 'package:inventory_management/models/product.dart';
-import 'package:inventory_management/repository/transaction_repository.dart';
 import 'package:image/image.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 // import 'package:path_provider/path_provider.dart';
+import 'package:inventory_management/models/product.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:inventory_management/repository/transaction_repository.dart';
 // import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
-
 
 class TransactionController extends GetxController {
   Rx<List<Product>> products = Rx<List<Product>>([]);
@@ -46,9 +45,7 @@ class TransactionController extends GetxController {
       var testdir =
           await Directory('${dir.path}/photo').create(recursive: true);
       final image = decodeImage(file.readAsBytesSync());
-      return File(
-          '${testdir.path}/${DateTime.now().toUtc().toIso8601String()}.png')
-        ..writeAsBytesSync(encodePng(image!));
+      return File('${testdir.path}/${DateTime.now().toUtc().toIso8601String()}.png')..writeAsBytesSync(encodePng(image!));
       // }
       // }
     } catch (e) {
@@ -70,6 +67,4 @@ class TransactionController extends GetxController {
     }
     return false;
   }
-
- 
 }
