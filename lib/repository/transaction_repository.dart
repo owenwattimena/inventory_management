@@ -6,7 +6,42 @@ import '../models/transaction_list.dart';
 import '../services/transaction_service.dart';
 
 class TransactionRepository {
-  static Future<List<TransactionList?>> getGroupTransactionByDate(
+
+
+  static Future<bool> setTransactionProduct(String transactionId, Product product)async{
+    return await TransactionService().setTransactionProduct(transactionId, product);
+  }
+
+  static Future<bool> deleteTransactionProduct(String transactionId, String sku)async{
+    return await TransactionService().deleteTransactionProduct(transactionId, sku);
+  }
+
+
+  static Future<List<String>> getDivision(String query)async{
+    final result = await TransactionService().getDivision(query);
+    List<String> division = [];
+    for(var i = 0; i < result.length; i++){
+      division.add(result[i]['division'].toString());
+    }
+    return division;
+  } 
+  
+  static Future<List<String>> getTakeBy(String query)async{
+    final result = await TransactionService().getTakeBy(query);
+    List<String> division = [];
+    for(var i = 0; i < result.length; i++){
+      division.add(result[i]['take_in_by'].toString());
+    }
+    return division;
+  } 
+
+  static Future<bool> createTransaction(Transaction transaction) async {
+    final transactionService = TransactionService();
+    final result = await transactionService.createTransaction(transaction);
+    return result;
+  }
+
+  static Future<List<TransactionList>> getGroupTransactionByDate(
       {required TransactionType type}) async {
     final transactionService = TransactionService();
 
@@ -37,9 +72,9 @@ class TransactionRepository {
         _transactionList.transaction!.add(Transaction(
           id: int.parse(item['id'].toString()),
           transactionId: item['transaction_id'].toString(),
-          type: item['transaction_type'] == 'entry'
+          type: item['type'] == 'entry'
               ? TransactionType.entry
-              : item['transaction_type'] == 'out'
+              : item['type'] == 'out'
                   ? TransactionType.out
                   : TransactionType.audit,
           division: item['division'].toString(),
@@ -49,8 +84,8 @@ class TransactionRepository {
           warehouse: item['warehouse'].toString(),
           createdAt: int.parse(item['created_at'].toString()),
           totalItem: total,
-          status: item['status'] == 'panding'
-              ? TransactionStatus.panding
+          status: item['status'] == 'pending'
+              ? TransactionStatus.pending
               : item['status'] == 'finished'
                   ? TransactionStatus.finished
                   : TransactionStatus.canceled,
@@ -62,9 +97,9 @@ class TransactionRepository {
             Transaction(
               id: int.parse(item['id'].toString()),
               transactionId: item['transaction_id'].toString(),
-              type: item['transaction_type'] == 'entry'
+              type: item['type'] == 'entry'
                   ? TransactionType.entry
-                  : item['transaction_type'] == 'out'
+                  : item['type'] == 'out'
                       ? TransactionType.out
                       : TransactionType.audit,
               division: item['division'].toString(),
@@ -74,8 +109,8 @@ class TransactionRepository {
               warehouse: item['warehouse'].toString(),
               createdAt: int.parse(item['created_at'].toString()),
               totalItem: total,
-              status: item['status'] == 'panding'
-                  ? TransactionStatus.panding
+              status: item['status'] == 'pending'
+                  ? TransactionStatus.pending
                   : item['status'] == 'finished'
                       ? TransactionStatus.finished
                       : TransactionStatus.canceled,
@@ -89,18 +124,18 @@ class TransactionRepository {
 
   static Future<List<Product>> getTransactionDetail(
       String transactionId) async {
-    final result = await TransactionService.getTransactionDetail(transactionId);
+    final result = await TransactionService().getTransactionDetail(transactionId);
     List<Product> products = [];
 
     for (var item in result) {
       products.add(Product(
-        id: item['id'],
-        sku: item['sku'],
-        barcode: item['barcode'],
-        name: item['name'],
-        uom: item['uom'],
-        category: item['category'],
-        stock: item['stock'],
+        id: int.parse(item['id'].toString()),
+        sku: item['sku'].toString(),
+        barcode: item['barcode'].toString(),
+        name: item['name'].toString(),
+        uom: item['uom'].toString(),
+        category: item['category'].toString(),
+        stock: (item['quantity'] != null) ? int.parse(item['quantity'].toString()) : 0,
       ));
     }
     return products;

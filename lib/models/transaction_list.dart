@@ -17,7 +17,7 @@ List<Map<String, dynamic>> transaction = [
   {
     'id': 1,
     'transaction_id': '2020220427123209',
-    'transaction_type': 'entry',
+    'type': 'entry',
     'unit': null,
     'distributor': 'CV. ANRLANGGA',
     'take_by': null,
@@ -30,7 +30,7 @@ List<Map<String, dynamic>> transaction = [
   {
     'id': 2,
     'transaction_id': '2020220427123209',
-    'transaction_type': 'audit',
+    'type': 'audit',
     'unit': null,
     'distributor': null,
     'take_by': null,
@@ -43,7 +43,7 @@ List<Map<String, dynamic>> transaction = [
   {
     'id': 3,
     'transaction_id': '2020220428123209',
-    'transaction_type': 'out',
+    'type': 'out',
     'unit': 'SDM, Perencanaan & Umum',
     'distributor': null,
     'take_by': 'Owen Wattimena',
@@ -71,7 +71,7 @@ List<Map<String, dynamic>> transactionWithDetail = [
   {
     'id': 1,
     'transaction_id': '2020220427123209',
-    'transaction_type': 'entry',
+    'type': 'entry',
     'unit': null,
     'distributor': 'CV. ANRLANGGA',
     'take_by': null,

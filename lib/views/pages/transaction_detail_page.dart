@@ -53,7 +53,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
       ),
       body: ListView(
         // ignore: prefer_const_literals_to_create_immutables
-        padding: (args.status == TransactionStatus.panding)
+        padding: (args.status == TransactionStatus.pending)
             ? const EdgeInsets.only(bottom: 80)
             : const EdgeInsets.all(0),
         children: [
@@ -61,24 +61,64 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
           InkWell(
             onTap: _showImagePicker,
             child: Obx(() => Container(
-              color: Colors.grey[200],
+                  color: Colors.grey[200],
                   child: transactionController.imagePath.value.isEmpty
                       ? Icon(Icons.supervised_user_circle_outlined,
                           size: 131, color: Colors.grey[400])
-                      : Image.file(File(transactionController.imagePath.value), height: 165,),
+                      : Image.file(
+                          File(transactionController.imagePath.value),
+                          height: 165,
+                        ),
                 )),
           ),
           Obx(
             () => Column(
               children: transactionController.products.value
-                  .map((product) => ProductTile(product: product))
+                  .map(
+                    (product) => Slidable(
+                      key: Key(product.sku!),
+                      direction: Axis.horizontal,
+                      endActionPane: ActionPane(
+                        motion: const ScrollMotion(),
+                        children: [
+                          SlidableAction(
+                            // An action can be bigger than the others.
+                            flex: 2,
+                            onPressed: (_) async {
+                              if (await transactionController
+                                  .deleteTransactionProduct(
+                                      args.transactionId!, product.sku!)) {
+                                        transactionController.getTransaction(args.transactionId!);
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text(
+                                      'Success. Product deleted from transaction.'),
+                                ));
+                              } else {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text(
+                                      'Error. Product not deleted from transaction.'),
+                                ));
+                              }
+                            },
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            icon: Icons.delete,
+                            label: 'DELETE',
+                          ),
+                        ],
+                      ),
+                      child: ProductTile(product: product),
+                    ),
+                  )
                   .toList(),
             ),
           ),
           // ProductTile(product: args.product),
         ],
       ),
-      floatingActionButton: (args.status == TransactionStatus.panding)
+      floatingActionButton: (args.status == TransactionStatus.pending)
           ? Stack(fit: StackFit.expand, children: [
               Positioned(
                 bottom: 0,
@@ -138,8 +178,9 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                   child: const Text('Gallery'),
                   onPressed: () async {
                     // check status permission
-                    if (! await transactionController.checkPermission()) return;
-                    image = await _picker.pickImage(source: ImageSource.gallery);
+                    if (!await transactionController.checkPermission()) return;
+                    image =
+                        await _picker.pickImage(source: ImageSource.gallery);
 
                     File? _file = await transactionController
                         .saveImage(File(image!.path));
@@ -154,7 +195,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                   child: const Text('Camera'),
                   onPressed: () async {
                     // check status permission
-                    if (! await transactionController.checkPermission()) return;
+                    if (!await transactionController.checkPermission()) return;
                     image = await _picker.pickImage(source: ImageSource.camera);
                     File? _file = await transactionController
                         .saveImage(File(image!.path));
@@ -178,18 +219,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
     final TextEditingController quantityController =
         TextEditingController(text: '0');
     late Product selectedProduct;
-    List<Product> products = [];
 
-    for (var i = 0; i < 100; i++) {
-      products.add(Product(
-        id: i,
-        sku: 'SKU-$i',
-        name: 'product $i',
-        category: 'Category $i',
-        uom: 'Unit $i',
-        stock: i,
-      ));
-    }
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -208,9 +238,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                           const InputDecoration(labelText: 'Add Product')),
                   suggestionsCallback: (pattern) {
                     // return CitiesService.getSuggestions(pattern);
-                    return products
-                        .where((element) => element.name!.contains(pattern))
-                        .toList();
+                    return transactionController.searchProduct(pattern);
                   },
                   itemBuilder: (BuildContext context, Product suggestion) {
                     return ListTile(
@@ -237,6 +265,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                     if (value!.isEmpty) {
                       return 'Please enter product';
                     }
+                    return null;
                   },
                 ),
                 TextFormField(
@@ -251,11 +280,18 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
           actions: <Widget>[
             TextButton(
               child: const Text('Add'),
-              onPressed: () {
+              onPressed: () async {
                 if (selectedProduct.sku != null) {
-                  transactionController.setTransaction = selectedProduct
-                      .copyWith(stock: int.parse(quantityController.text));
-                  Navigator.of(context).pop();
+                  if (await transactionController.setTransaction(
+                      args.transactionId!,
+                      selectedProduct.copyWith(
+                          stock: int.parse(quantityController.text)))) {
+                    Navigator.of(context).pop();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('Error. Product already in transcation'),
+                    ));
+                  }
                 }
               },
             ),

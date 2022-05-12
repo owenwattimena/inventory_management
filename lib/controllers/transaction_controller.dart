@@ -7,22 +7,34 @@ import 'package:path_provider/path_provider.dart';
 import 'package:inventory_management/models/product.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:inventory_management/repository/transaction_repository.dart';
+
+import '../repository/product_repository.dart';
 // import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 
 class TransactionController extends GetxController {
   Rx<List<Product>> products = Rx<List<Product>>([]);
   RxString imagePath = ''.obs;
 
-  set setTransaction(Product product) {
-    products.update((val) {
-      return val!.add(product);
-    });
+  Future<bool> setTransaction(String transactionId, Product product) async {
+    final result = await TransactionRepository.setTransactionProduct(transactionId, product);
+    if(result){
+      getTransaction(transactionId);
+    }
+    return result;
   }
 
   void getTransaction(String transactionId) {
     TransactionRepository.getTransactionDetail(transactionId).then((value) {
       products.value = value;
     });
+  }
+
+  Future<bool> deleteTransactionProduct(String transactionId, String sku) async {
+    return await TransactionRepository.deleteTransactionProduct(transactionId, sku);
+  }
+
+  Future<List<Product>> searchProduct(String query)async{
+    return await ProductRepository.getProduct(query: query);
   }
 
   Future<File?> saveImage(File file) async {

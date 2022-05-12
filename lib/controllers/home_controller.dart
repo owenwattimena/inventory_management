@@ -14,6 +14,20 @@ class HomeController extends GetxController {
     selectedIndex.value = index;
   }
 
+  Future<bool> createOutTransaction(Transaction transaction) async {
+    final result = await TransactionRepository.createTransaction(transaction);
+    return result;
+  }
+
+  Future<List<String>> getDivision(String query) async {
+    final result = await TransactionRepository.getDivision(query);
+    return result;
+  }
+  Future<List<String>> getTakeBy(String query) async {
+    final result = await TransactionRepository.getTakeBy(query);
+    return result;
+  }
+
   void getEntryTransaction() {
     TransactionRepository.getGroupTransactionByDate(type: TransactionType.entry).then((value) {
       entryTransactionList.value = value;

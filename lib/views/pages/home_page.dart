@@ -43,36 +43,44 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           controller: _tabController,
           physics: const BouncingScrollPhysics(),
           children: [
-            Obx(() => _homeController.outTransactionList.value.isNotEmpty ? ListView.builder(
-                  itemCount: _homeController.outTransactionList.value.length,
-                  itemBuilder: (context, index) {
-                    return TransactionTile(
-                        transactionList:
-                            _homeController.outTransactionList.value[index]!);
-                  },
-                ) : const Center(child: Text('No Data'))),
-            Obx(() => _homeController.entryTransactionList.value.isNotEmpty ? ListView.builder(
-                  itemCount: _homeController.entryTransactionList.value.length,
-                  itemBuilder: (context, index) {
-                    return TransactionTile(
-                        transactionList:
-                            _homeController.entryTransactionList.value[index]!);
-                  },
-                ) : const Center(child: Text('No Data'))),
-            Obx(() => _homeController.auditTransactionList.value.isNotEmpty ? ListView.builder(
-                  itemCount: _homeController.auditTransactionList.value.length,
-                  itemBuilder: (context, index) {
-                    return TransactionTile(
-                        transactionList:
-                            _homeController.auditTransactionList.value[index]!);
-                  },
-                ): const Center(child: Text('No Data'))),
+            Obx(() => _homeController.outTransactionList.value.isNotEmpty
+                ? ListView.builder(
+                    itemCount: _homeController.outTransactionList.value.length,
+                    itemBuilder: (context, index) {
+                      return TransactionTile(
+                          transactionList:
+                              _homeController.outTransactionList.value[index]!);
+                    },
+                  )
+                : const Center(child: Text('No Data'))),
+            Obx(() => _homeController.entryTransactionList.value.isNotEmpty
+                ? ListView.builder(
+                    itemCount:
+                        _homeController.entryTransactionList.value.length,
+                    itemBuilder: (context, index) {
+                      return TransactionTile(
+                          transactionList: _homeController
+                              .entryTransactionList.value[index]!);
+                    },
+                  )
+                : const Center(child: Text('No Data'))),
+            Obx(() => _homeController.auditTransactionList.value.isNotEmpty
+                ? ListView.builder(
+                    itemCount:
+                        _homeController.auditTransactionList.value.length,
+                    itemBuilder: (context, index) {
+                      return TransactionTile(
+                          transactionList: _homeController
+                              .auditTransactionList.value[index]!);
+                    },
+                  )
+                : const Center(child: Text('No Data'))),
           ],
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             final datetime = DateTime.now();
-            final unitTextController = TextEditingController();
+            final divisionTextController = TextEditingController();
             final takeInTextController = TextEditingController();
             final distributorTextController = TextEditingController();
             List<String> division = [];
@@ -113,16 +121,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               },
                             ),
                             TypeAheadFormField(
+                              minCharsForSuggestions: 3,
                               textFieldConfiguration: TextFieldConfiguration(
-                                  controller: unitTextController,
+                                  controller: divisionTextController,
                                   decoration: const InputDecoration(
                                       labelText: 'Division')),
                               suggestionsCallback: (pattern) {
-                                // return CitiesService.getSuggestions(pattern);
-                                return division
-                                    .where(
-                                        (element) => element.contains(pattern))
-                                    .toList();
+                                return _homeController.getDivision(pattern);
                               },
                               itemBuilder: (context, suggestion) {
                                 return ListTile(
@@ -134,25 +139,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 return suggestionsBox;
                               },
                               onSuggestionSelected: (suggestion) {
-                                // this._typeAheadController.text = suggestion;
+                                divisionTextController.text = suggestion.toString();
                               },
                               validator: (value) {
                                 if (value!.isEmpty) {
                                   return 'Please enter division';
                                 }
+                                return null;
                               },
                             ),
                             TypeAheadFormField(
+                              minCharsForSuggestions: 3,
                               textFieldConfiguration: TextFieldConfiguration(
                                   controller: takeInTextController,
                                   decoration: const InputDecoration(
                                       labelText: 'Take In By')),
                               suggestionsCallback: (pattern) {
-                                // return CitiesService.getSuggestions(pattern);
-                                return takeInBy
-                                    .where(
-                                        (element) => element.contains(pattern))
-                                    .toList();
+                                return _homeController.getTakeBy(pattern);
                               },
                               itemBuilder: (context, suggestion) {
                                 return ListTile(
@@ -164,12 +167,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 return suggestionsBox;
                               },
                               onSuggestionSelected: (suggestion) {
-                                // this._typeAheadController.text = suggestion;
+                                takeInTextController.text = suggestion.toString();
                               },
                               validator: (value) {
                                 if (value!.isEmpty) {
                                   return 'Please enter take in by';
                                 }
+                                return null;
                               },
                             ),
                           ],
@@ -178,20 +182,32 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       actions: <Widget>[
                         TextButton(
                           child: const Text('CREATE'),
-                          onPressed: () {
+                          onPressed: () async {
                             if (formOutGlobalKey.currentState!.validate()) {
-                              Navigator.of(context).pop();
-                              Navigator.of(context).pushNamed(
-                                '/transaction-detail',
-                                arguments: Transaction(
-                                  type: TransactionType.out,
-                                  transactionId: DateFormat('yyyyMMddhhmmss')
-                                      .format(datetime),
-                                  createdAt: datetime.millisecondsSinceEpoch,
-                                  division: unitTextController.text,
-                                  takeBy: takeInTextController.text,
-                                ),
+                              final transaction = Transaction(
+                                type: TransactionType.out,
+                                transactionId: DateFormat('yyyyMMddhhmmss')
+                                    .format(datetime),
+                                createdAt: datetime.millisecondsSinceEpoch,
+                                division: divisionTextController.text,
+                                takeBy: takeInTextController.text,
+                                status: TransactionStatus.pending,
                               );
+                              if (await _homeController
+                                  .createOutTransaction(transaction)) {
+                                _homeController.getOutTransaction();
+                                Navigator.of(context).pop();
+                                Navigator.of(context).pushNamed(
+                                  '/transaction-detail',
+                                  arguments: transaction,
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text(
+                                      'Error. Can\'t not create transaction'),
+                                ));
+                              }
                             }
                           },
                         ),
@@ -201,7 +217,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 );
                 break;
               case 1:
-              _showMyDialog(
+                _showMyDialog(
                   child: Form(
                     key: formOutGlobalKey,
                     child: AlertDialog(
@@ -262,9 +278,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 if (value!.isEmpty) {
                                   return 'Please enter division';
                                 }
+                                return null;
                               },
                             ),
-                            
                           ],
                         ),
                       ),

@@ -1,6 +1,6 @@
 enum TransactionType { out, entry, audit }
 
-enum TransactionStatus { panding, finished, canceled }
+enum TransactionStatus { pending, finished, canceled }
 
 class Transaction {
   final int? id;
