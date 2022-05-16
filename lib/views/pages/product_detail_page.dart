@@ -15,6 +15,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   initState() {
     super.initState();
     product = widget.product;
+    productTransactionController.getListItem(product.sku!);
   }
 
   @override
@@ -41,7 +42,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           ? ListView.builder(
               itemCount: productTransactionController
                   .listProductTransaction.value.length,
-              itemBuilder: (context, index) => ProductHistory(),
+              itemBuilder: (context, index) => ProductHistory(transaction: productTransactionController.listProductTransaction.value[index],),
             )
           : const Center(
               child: Text('No data'),

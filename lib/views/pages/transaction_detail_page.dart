@@ -88,7 +88,8 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                               if (await transactionController
                                   .deleteTransactionProduct(
                                       args.transactionId!, product.sku!)) {
-                                        transactionController.getTransaction(args.transactionId!);
+                                transactionController
+                                    .getTransaction(args.transactionId!);
                                 ScaffoldMessenger.of(context)
                                     .showSnackBar(const SnackBar(
                                   content: Text(
@@ -109,7 +110,11 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                           ),
                         ],
                       ),
-                      child: ProductTile(product: product),
+                      child: InkWell(
+                        onLongPress: () => (args.status != TransactionStatus.finished) ?  _showProductDialog(
+                            addProduct: false, product: product) : null,
+                        child: ProductTile(product: product),
+                      ),
                     ),
                   )
                   .toList(),
@@ -127,7 +132,16 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                   padding: const EdgeInsets.all(0.0),
                   child: FloatingActionButton(
                     heroTag: "btn1",
-                    onPressed: () {},
+                    onPressed: () async {
+                      if (await _showDeleteConfirm(args.transactionId!) == true) {
+                        Navigator.pop(context);
+                      } else {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(
+                          content: Text('Error. Transaction not deleted.'),
+                        ));
+                      }
+                    },
                     child: Transform.rotate(
                         angle: math.pi / 4, child: const Icon(Icons.add)),
                   ),
@@ -137,7 +151,16 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                 bottom: 0,
                 left: (MediaQuery.of(context).size.width - 185) / 2,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    if(await transactionController.setTransactionFinished(args.transactionId!, args.type!)){
+                      Navigator.pop(context);
+                    }else{
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(const SnackBar(
+                        content: Text('Error. Transaction not finished.'),
+                      ));
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0),
@@ -161,6 +184,38 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
               ),
             ])
           : const SizedBox(),
+    );
+  }
+
+  Future<bool?> _showDeleteConfirm(String transactionID) async {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Sure to delete this transaction?'),
+          content: const Text('This action cannot be undone.'),
+          actions: [
+            ElevatedButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+            ),
+            ElevatedButton(
+              child: const Text('DELETE'),
+              onPressed: () async {
+                if (await transactionController
+                    .deleteTransaction(transactionID)) {
+                  Navigator.pop(context, true);
+                } else {
+                  Navigator.pop(context, false);
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -214,11 +269,17 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
     );
   }
 
-  Future<void> _showProductDialog() async {
-    final TextEditingController _typeAheadController = TextEditingController();
-    final TextEditingController quantityController =
-        TextEditingController(text: '0');
+  Future<void> _showProductDialog(
+      {bool addProduct = true, Product? product}) async {
+    final TextEditingController _typeAheadController =
+        TextEditingController(text: (product != null) ? product.name : '');
+    final TextEditingController quantityController = TextEditingController(
+        text: (product != null) ? product.stock.toString() : '0');
     late Product selectedProduct;
+
+    if (product != null) {
+      selectedProduct = product;
+    }
 
     return showDialog<void>(
       context: context,
@@ -233,6 +294,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                   hideOnLoading: true,
                   minCharsForSuggestions: 3,
                   textFieldConfiguration: TextFieldConfiguration(
+                      enabled: addProduct,
                       controller: _typeAheadController,
                       decoration:
                           const InputDecoration(labelText: 'Add Product')),

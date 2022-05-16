@@ -140,4 +140,12 @@ class TransactionRepository {
     }
     return products;
   }
+
+  static Future<bool> deleteTransaction(String transactionId) async {
+    return await TransactionService().deleteTransaction(transactionId);
+  }
+
+  static Future<bool> setTransactionFinished(String transactionId, TransactionType type) async {
+    return await TransactionService().setTransactionFinished(transactionId, type);
+  }
 }

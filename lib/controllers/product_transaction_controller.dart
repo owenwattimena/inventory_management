@@ -7,7 +7,9 @@ class ProductTransactionController extends GetxController {
   Rx<List<Transaction>> listProductTransaction = Rx<List<Transaction>>([]);
   void getListItem(String sku) {
     ProductRepository.getProductTransaction(sku).then((value) {
-      listProductTransaction.value = value;
+      listProductTransaction.update((val) {
+        listProductTransaction.value = value;
+      });
     });
   }
 }

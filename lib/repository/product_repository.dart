@@ -17,12 +17,16 @@ class ProductRepository {
       final product = Product.fromMapObject(result[i]);
       final lastTransaction =
           await productService.getLastProductTransaction(product.sku!);
+      int stock = 0;
       if (lastTransaction != null) {
-        data.add(product.copyWith(
-            stock: int.parse(lastTransaction['quantity'].toString())));
-      } else {
-        data.add(product.copyWith(stock: 0));
+        if (lastTransaction['stock'] != null) {
+          stock = int.parse(lastTransaction['stock'].toString());
+        }
       }
+      data.add(product.copyWith(stock: stock));
+      // else {
+      //   data.add(product.copyWith(stock: stock));
+      // }
     }
     return data;
   }

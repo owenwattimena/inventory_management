@@ -6,6 +6,7 @@ class TransactionTile extends StatelessWidget {
       : super(key: key);
   @override
   Widget build(BuildContext context) {
+    final homeController = Get.find<HomeController>(); 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: const BoxDecoration(
@@ -28,6 +29,7 @@ class TransactionTile extends StatelessWidget {
                 onTap: () async {
                   await Navigator.pushNamed(context, '/transaction-detail',
                       arguments: transaction);
+                  homeController.getAllTransactionList();
                   Get.delete<TransactionController>();
                 },
                 transactionType: transaction.type,

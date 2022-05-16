@@ -8,6 +8,7 @@ import 'package:inventory_management/models/product.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:inventory_management/repository/transaction_repository.dart';
 
+import '../models/transaction.dart';
 import '../repository/product_repository.dart';
 // import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 
@@ -78,5 +79,13 @@ class TransactionController extends GetxController {
       }
     }
     return false;
+  }
+
+  Future<bool> deleteTransaction(String transactionId) async {
+    return await TransactionRepository.deleteTransaction(transactionId);
+  }
+
+  Future<bool> setTransactionFinished(String transactionId, TransactionType type) async {
+    return await TransactionRepository.setTransactionFinished(transactionId, type);
   }
 }

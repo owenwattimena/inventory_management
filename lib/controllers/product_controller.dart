@@ -10,9 +10,11 @@ class ProductController extends GetxController{
   RxString dropdownValue = "All".obs;
   
 
-  void getProducts() {
-    ProductRepository.getProduct().then((value) {
-      listProduct.value = value;
+  void getProducts({String? query}) {
+    ProductRepository.getProduct(query: query).then((value) {
+      listProduct.update((val) {
+        listProduct.value = value;
+      });
     });
   }
   Future<void> importFile() async{

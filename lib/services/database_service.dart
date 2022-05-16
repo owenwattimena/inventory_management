@@ -56,6 +56,10 @@ class DatabaseService {
         created_by TEXT,
         status TEXT)''');
 
+      /// Transaction Detail Table
+      /// last_stock : last stock of product before this transaction
+      /// quantity : quantity is the quantity of product that is taken in or out or audit
+      /// stock : stock of product after this transaction
       await db.execute('''
       CREATE TABLE transaction_detail (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

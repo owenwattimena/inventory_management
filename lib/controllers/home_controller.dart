@@ -28,19 +28,31 @@ class HomeController extends GetxController {
     return result;
   }
 
+  void getAllTransactionList() {
+    getEntryTransaction();
+    getOutTransaction();
+    getAuditTransaction();
+  }
+
   void getEntryTransaction() {
     TransactionRepository.getGroupTransactionByDate(type: TransactionType.entry).then((value) {
-      entryTransactionList.value = value;
+      entryTransactionList.update((val) {
+        entryTransactionList.value = value;
+      });
     });
   }
   void getOutTransaction() {
     TransactionRepository.getGroupTransactionByDate(type: TransactionType.out).then((value) {
-      outTransactionList.value = value;
+      outTransactionList.update((val) {
+        outTransactionList.value = value;
+      });
     });
   }
   void getAuditTransaction() {
     TransactionRepository.getGroupTransactionByDate(type: TransactionType.audit).then((value) {
-      auditTransactionList.value = value;
+      auditTransactionList.update((val) {
+        auditTransactionList.value = value;
+      });
     });
   }
 }

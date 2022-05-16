@@ -31,11 +31,12 @@ class _ProductPageState extends State<ProductPage> {
       // ignore: prefer_const_literals_to_create_immutables
       body: Column(
         children: [
-          const TextField(
-            decoration: InputDecoration(
+          TextField(
+            decoration: const InputDecoration(
               contentPadding: EdgeInsets.all(10.0),
               hintText: 'Search',
             ),
+            onChanged: (value) => productController.getProducts(query: value),
           ),
           Expanded(
             child: Obx(
@@ -43,7 +44,8 @@ class _ProductPageState extends State<ProductPage> {
                 itemCount: productController.listProduct.value.length,
                 itemBuilder: (context, index) => GestureDetector(
                   onTap: () async {
-                    await Navigator.pushNamed(context, '/product-detail', arguments: productController.listProduct.value[index]);
+                    await Navigator.pushNamed(context, '/product-detail',
+                        arguments: productController.listProduct.value[index]);
                     Get.delete<ProductTransactionController>();
                   },
                   child: ProductTile(

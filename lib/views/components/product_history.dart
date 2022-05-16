@@ -1,8 +1,8 @@
 part of 'components.dart';
 
 class ProductHistory extends StatelessWidget {
-  // final Product product;
-  const ProductHistory({Key? key}) : super(key: key);
+  final Transaction transaction;
+  const ProductHistory({Key? key, required this.transaction}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,23 +15,37 @@ class ProductHistory extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Transaction ID',
+              Text('${transaction.transactionId}',
                   style: primaryTextStyle.copyWith(color: Colors.grey[700])),
-              Text('Tanggal'),
+              Text(DateFormat('E dd-MM-yyyy').format(
+                        DateTime.fromMicrosecondsSinceEpoch(
+                            transaction.createdAt! * 1000))),
             ],
           ),
           const SizedBox(height: 3),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('UNIT|AUDIT|MASUK',
+              Text((transaction.type == TransactionType.out
+                      ? '${transaction.division}'
+                      : transaction.type == TransactionType.audit
+                          ? 'AUDIT'
+                          : 'MASUK') ,
                   style: primaryTextStyleBold.copyWith(fontSize: 16)),
-              Text('38 Pcs',
-                  style: primaryTextStyle.copyWith(color: Colors.grey[700])),
+              Text('${transaction.totalItem} Pcs',
+                  style: primaryTextStyle.copyWith(color: (transaction.type == TransactionType.out
+                      ? Colors.red
+                      : transaction.type == TransactionType.audit
+                          ? Colors.blueAccent
+                          : Colors.greenAccent))),
             ],
           ),
           const SizedBox(height: 3),
-          Text('TAKE IN BY|AUDIT BY|DISTRIBUTOR',
+          Text((transaction.type == TransactionType.out
+                      ? '${transaction.takeBy}'
+                      : transaction.type == TransactionType.audit
+                          ? '${transaction.createdBy}'
+                          : '${transaction.distributor}'),
               style: primaryTextStyle.copyWith(color: Colors.grey[700])),
           const SizedBox(height: 14),
           Divider(height: 1, color: Colors.grey[300]),

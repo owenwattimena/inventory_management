@@ -28,7 +28,12 @@ class ProductService {
     Database db = await database.database;
     var sql = '''
     SELECT 
-    product_transaction.created_at, product_transaction.transaction_id, transaction_detail.sku, transaction_detail.quantity 
+    product_transaction.created_at, 
+    product_transaction.transaction_id, 
+    transaction_detail.sku, 
+    transaction_detail.last_stock, 
+    transaction_detail.quantity,
+    transaction_detail.stock 
     FROM transaction_detail 
     JOIN product_transaction
     ON transaction_detail.transaction_id = product_transaction.transaction_id 
@@ -54,15 +59,16 @@ class ProductService {
       t.distributor, 
       t.warehouse, 
       t.take_in_by, 
-      t.devision 
+      t.division, 
       td.quantity
       FROM transaction_detail as td
-      WHERE td.sku = ? AND t.status = ?
       JOIN product_transaction as t
       ON td.transaction_id = t.transaction_id
+      WHERE td.sku = ? AND t.status = ?
+      ORDER BY t.created_at DESC
     ''';
     mapObject = await db.rawQuery(sql, [sku, "finished"]);
-
+    print(mapObject);
     return mapObject;
   }
 

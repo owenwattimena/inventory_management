@@ -16,9 +16,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    _homeController.getEntryTransaction();
-    _homeController.getOutTransaction();
-    _homeController.getAuditTransaction();
+    _homeController.getAllTransactionList();
   }
 
   @override
@@ -197,10 +195,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   .createOutTransaction(transaction)) {
                                 _homeController.getOutTransaction();
                                 Navigator.of(context).pop();
-                                Navigator.of(context).pushNamed(
+                                await Navigator.of(context).pushNamed(
                                   '/transaction-detail',
                                   arguments: transaction,
                                 );
+                                Get.delete<TransactionController>();
+                                _homeController.getAllTransactionList();
                               } else {
                                 ScaffoldMessenger.of(context)
                                     .showSnackBar(const SnackBar(
