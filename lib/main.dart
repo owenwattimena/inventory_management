@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const HomePage(),
         '/product': (context) => const ProductPage(),
+        '/division': (context) => const DivisionPage(),
         // '/product-detail': (context) => ProductDetailPage(),
         // '/transaction-detail': (context) => const TransactionDetailPage(),
       },
@@ -44,6 +45,11 @@ class MyApp extends StatelessWidget {
         else if(settings.name == '/product-detail') {
           return MaterialPageRoute(
             builder: (context) => ProductDetailPage(settings.arguments as Product),
+          );
+        }
+        else if(settings.name == '/division-transaction') {
+          return MaterialPageRoute(
+            builder: (context) => DivisionTransactionPage(settings.arguments as String),
           );
         }
         return null;

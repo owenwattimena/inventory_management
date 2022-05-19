@@ -41,6 +41,7 @@ class _ProductPageState extends State<ProductPage> {
           Expanded(
             child: Obx(
               () => ListView.builder(
+                padding: const EdgeInsets.only(bottom: 80),
                 itemCount: productController.listProduct.value.length,
                 itemBuilder: (context, index) => GestureDetector(
                   onTap: () async {
@@ -70,12 +71,202 @@ class _ProductPageState extends State<ProductPage> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showImportDialog();
-        },
-        child: const Icon(Icons.add),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     _showImportDialog();
+      //   },
+      //   child: const Icon(Icons.add),
+      // ),
+      floatingActionButton: SpeedDial(
+        icon: Icons.add,
+        activeIcon: Icons.close,
+        children: [
+          SpeedDialChild(
+              child: const Icon(Icons.add),
+              label: 'New Product',
+              backgroundColor: Colors.blue,
+              onTap: _showCreateProductDialog),
+          SpeedDialChild(
+              child: const Icon(Icons.download),
+              label: 'Import',
+              onTap: _showImportDialog),
+        ],
       ),
+    );
+  }
+
+  Future<void> _showCreateProductDialog() async {
+    final formGlobalKey = GlobalKey<FormState>();
+    final skuTextController = TextEditingController();
+    final nameTextController = TextEditingController();
+    final barcodeTextController = TextEditingController();
+    final categoryTextController = TextEditingController();
+    final uomTextController = TextEditingController();
+    final priceTextController = TextEditingController();
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Create New Product'),
+          content: SingleChildScrollView(
+            child: Form(
+              key: formGlobalKey,
+              child: ListBody(
+                children: <Widget>[
+                  TextFormField(
+                    controller: skuTextController,
+                    decoration: const InputDecoration(
+                      labelText: 'SKU',
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter SKU';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: nameTextController,
+                    decoration: const InputDecoration(
+                      labelText: 'Name',
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter name of product';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: barcodeTextController,
+                    decoration: const InputDecoration(
+                      labelText: 'Barcode',
+                    ),
+                  ),
+                  TypeAheadFormField(
+                    hideOnLoading: true,
+                    minCharsForSuggestions: 3,
+                    textFieldConfiguration: TextFieldConfiguration(
+                        controller: categoryTextController,
+                        decoration:
+                            const InputDecoration(labelText: 'Category')),
+                    suggestionsCallback: (pattern) {
+                      return productController.getCategory(pattern);
+                    },
+                    itemBuilder: (BuildContext context, String suggestion) {
+                      return ListTile(
+                        title: Text(suggestion),
+                      );
+                    },
+                    transitionBuilder: (context, suggestionsBox, controller) {
+                      return suggestionsBox;
+                    },
+                    onSuggestionSelected: (String suggestion) {
+                      categoryTextController.text = suggestion;
+                    },
+                    noItemsFoundBuilder: (context) {
+                      return const Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: Text(
+                          'No Category Found',
+                          style: TextStyle(fontSize: 16.0),
+                        ),
+                      );
+                    },
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter category';
+                      }
+                      return null;
+                    },
+                  ),
+                  TypeAheadFormField(
+                    hideOnLoading: true,
+                    minCharsForSuggestions: 3,
+                    textFieldConfiguration: TextFieldConfiguration(
+                        controller: uomTextController,
+                        decoration: const InputDecoration(labelText: 'UOM')),
+                    suggestionsCallback: (pattern) {
+                      return productController.getUom(pattern);
+                    },
+                    itemBuilder: (BuildContext context, String suggestion) {
+                      return ListTile(
+                        title: Text(suggestion),
+                      );
+                    },
+                    transitionBuilder: (context, suggestionsBox, controller) {
+                      return suggestionsBox;
+                    },
+                    onSuggestionSelected: (String suggestion) {
+                      uomTextController.text = suggestion;
+                    },
+                    noItemsFoundBuilder: (context) {
+                      return const Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: Text(
+                          'No UOM Found',
+                          style: TextStyle(fontSize: 16.0),
+                        ),
+                      );
+                    },
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter UOM';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: priceTextController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Price',
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter price';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (formGlobalKey.currentState!.validate()) {
+                        final product = Product(
+                          sku: skuTextController.text,
+                          name: nameTextController.text,
+                          barcode: barcodeTextController.text.isEmpty
+                              ? null
+                              : barcodeTextController.text,
+                          category: categoryTextController.text,
+                          uom: uomTextController.text,
+                          price: int.parse(priceTextController.text),
+                        );
+                        if (await productController.addProduct(product)) {
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(const SnackBar(
+                            content: Text('Add Product Success'),
+                          ));
+                          productController.getProducts();
+                        } else {
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(const SnackBar(
+                            content: Text('Add Product Failed. Product with this SKU or Barcode already exist'),
+                          ));
+                        }
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: const Text('SAVE'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

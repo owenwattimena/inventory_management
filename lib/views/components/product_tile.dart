@@ -28,8 +28,8 @@ class ProductTile extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             // ignore: prefer_const_literals_to_create_immutables
             children: [
-              Text('${product.barcode}', style: primaryTextStyle.copyWith(color:Colors.grey[700])),
-              Text('${product.stock} Pieces', style: primaryTextStyle.copyWith(color:Colors.grey[700])),
+              Text(product.barcode ?? '-', style: primaryTextStyle.copyWith(color:Colors.grey[700])),
+              Text('${product.stock} ${product.uom}', style: primaryTextStyle.copyWith(color:Colors.grey[700])),
             ],
           ),
           const SizedBox(height: 14),

@@ -10,6 +10,47 @@ class ProductService {
     database = DatabaseService();
   }
 
+  Future<List<Map<String, Object?>>> getCategory(String query) async {
+    final db = await database.database;
+    var sql = '''
+    SELECT DISTINCT category FROM product WHERE category LIKE '%$query%'
+    ''';
+    final mapObject = await db.rawQuery(sql);
+    return mapObject;
+  }
+
+  Future<List<Map<String, Object?>>> getUom(String query) async {
+    final db = await database.database;
+    var sql = '''
+    SELECT DISTINCT uom FROM product WHERE uom LIKE '%$query%'
+    ''';
+    final mapObject = await db.rawQuery(sql);
+    return mapObject;
+  }
+
+  Future<bool> addProduct(Product product) async {
+    final db = await database.database;
+    var sql = '''SELECT sku, barcode FROM product WHERE sku = ?''';
+    // '''SELECT sku, barcode FROM product WHERE sku = ? OR barcode = ?''';
+    var data = await db.rawQuery(sql, [product.sku]);
+    if (data.isEmpty) {
+      sql = '''
+    INSERT INTO product (id, sku, barcode, name, category, uom, price) VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''';
+      var result = await db.rawInsert(sql, [
+        null,
+        product.sku,
+        product.barcode,
+        product.name,
+        product.category,
+        product.uom,
+        product.price
+      ]);
+      return result > 0;
+    }
+    return false;
+  }
+
   Future<List<Map<String, Object?>>> getProduct({String? query}) async {
     Database db = await database.database;
     List<Map<String, Object?>> mapObject;
@@ -43,33 +84,8 @@ class ProductService {
     LIMIT 1
   ''';
     List<Map<String, Object?>> data = await db.rawQuery(sql, [sku, "finished"]);
-    if(data.isEmpty) return null;
+    if (data.isEmpty) return null;
     return data[0];
-  }
-
-  Future<List<Map<String, Object?>>> getProductTransaction(String sku) async {
-    Database db = await database.database;
-    List<Map<String, Object?>> mapObject;
-
-    var sql = '''
-      SELECT 
-      t.created_at, 
-      t.transaction_id, 
-      t.type, 
-      t.distributor, 
-      t.warehouse, 
-      t.take_in_by, 
-      t.division, 
-      td.quantity
-      FROM transaction_detail as td
-      JOIN product_transaction as t
-      ON td.transaction_id = t.transaction_id
-      WHERE td.sku = ? AND t.status = ?
-      ORDER BY t.created_at DESC
-    ''';
-    mapObject = await db.rawQuery(sql, [sku, "finished"]);
-    print(mapObject);
-    return mapObject;
   }
 
   Future<bool> storeProduct(Product product) async {

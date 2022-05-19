@@ -7,8 +7,33 @@ import 'package:inventory_management/models/transaction.dart';
 
 import '../models/product.dart';
 import '../services/product_service.dart';
+import '../services/transaction_service.dart';
 
 class ProductRepository {
+
+  static Future<List<String>> getCategory(String query) async {
+    final result = await ProductService().getCategory(query);
+    List<String> category = [];
+    for(var i = 0; i < result.length; i++){
+      category.add(result[i]['category'].toString());
+    }
+    return category;
+  }
+  
+  static Future<List<String>> getUom(String query) async {
+    final result = await ProductService().getUom(query);
+    List<String> uom = [];
+    for(var i = 0; i < result.length; i++){
+      uom.add(result[i]['uom'].toString());
+    }
+    return uom;
+  }
+
+  static Future<bool> addProduct(Product product) async {
+    final result = await ProductService().addProduct(product);
+    return result;
+  }
+
   static Future<List<Product>> getProduct({String? query}) async {
     final productService = ProductService();
     final result = await productService.getProduct(query: query);
@@ -32,8 +57,7 @@ class ProductRepository {
   }
 
   static Future<List<Transaction>> getProductTransaction(String sku) async {
-    final productService = ProductService();
-    final result = await productService.getProductTransaction(sku);
+    final result = await TransactionService().getProductTransaction(sku);
     List<Transaction> data = [];
     for (var i = 0; i < result.length; i++) {
       data.add(Transaction.fromMapObject(result[i]));

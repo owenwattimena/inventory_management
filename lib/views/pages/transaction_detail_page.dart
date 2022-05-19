@@ -45,7 +45,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                   ? '${args.division} - ${args.takeBy}'
                   : args.type == TransactionType.entry
                       ? '${args.distributor}'
-                      : '${args.warehouse} - ${args.createdBy}',
+                      : /*'${args.warehouse} - */'${args.createdBy}',
               style: primaryTextStyle.copyWith(color: Colors.white),
             ),
           ],
@@ -76,6 +76,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
               children: transactionController.products.value
                   .map(
                     (product) => Slidable(
+                      enabled: args.status == TransactionStatus.pending,
                       key: Key(product.sku!),
                       direction: Axis.horizontal,
                       endActionPane: ActionPane(

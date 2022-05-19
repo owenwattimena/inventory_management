@@ -6,53 +6,67 @@ import '../models/transaction_list.dart';
 import '../services/transaction_service.dart';
 
 class TransactionRepository {
-
-
-  static Future<bool> setTransactionProduct(String transactionId, Product product)async{
-    return await TransactionService().setTransactionProduct(transactionId, product);
+  static Future<bool> setTransactionProduct(
+      String transactionId, Product product) async {
+    return await TransactionService()
+        .setTransactionProduct(transactionId, product);
   }
 
-  static Future<bool> deleteTransactionProduct(String transactionId, String sku)async{
-    return await TransactionService().deleteTransactionProduct(transactionId, sku);
+  static Future<bool> deleteTransactionProduct(
+      String transactionId, String sku) async {
+    return await TransactionService()
+        .deleteTransactionProduct(transactionId, sku);
   }
 
-
-  static Future<List<String>> getDivision(String query)async{
+  static Future<List<String>> getDivision(String query) async {
     final result = await TransactionService().getDivision(query);
     List<String> division = [];
-    for(var i = 0; i < result.length; i++){
+    for (var i = 0; i < result.length; i++) {
       division.add(result[i]['division'].toString());
     }
     return division;
-  } 
-  
-  static Future<List<String>> getTakeBy(String query)async{
+  }
+
+  static Future<List<String>> getTakeBy(String query) async {
     final result = await TransactionService().getTakeBy(query);
     List<String> division = [];
-    for(var i = 0; i < result.length; i++){
+    for (var i = 0; i < result.length; i++) {
       division.add(result[i]['take_in_by'].toString());
     }
     return division;
-  } 
+  }
 
   static Future<bool> createTransaction(Transaction transaction) async {
-    final transactionService = TransactionService();
-    final result = await transactionService.createTransaction(transaction);
-    return result;
+    return await TransactionService().createTransaction(transaction);
   }
 
   static Future<List<TransactionList>> getGroupTransactionByDate(
-      {required TransactionType type}) async {
+      {required TransactionType type,
+      String? division,
+      TransactionStatus? status, int? dateStart, int? dateEnd}) async {
     final transactionService = TransactionService();
 
-    String _type = type == TransactionType.entry ? 'entry' : type == TransactionType.out ? 'out' : 'audit';
+    String _type = type == TransactionType.entry
+        ? 'entry'
+        : type == TransactionType.out
+            ? 'out'
+            : 'audit';
+    String? _status;
+    if (status != null) {
+      _status = status == TransactionStatus.pending
+          ? 'pending'
+          : status == TransactionStatus.finished
+              ? 'finished'
+              : 'Cancelled';
+    }
 
-    final _transaction =
-        await transactionService.getGroupTransactionByDate(type: _type);
+    final _transaction = await transactionService.getGroupTransactionByDate(
+        type: _type, division: division, status: _status, dateStart: dateStart, dateEnd: dateEnd);
     if (_transaction.isEmpty) return [];
     List<TransactionList> transactionList = [];
     for (var item in _transaction) {
-      int total = await transactionService.getTotalItem(item['transaction_id'].toString());
+      int total = await transactionService
+          .getTotalItem(item['transaction_id'].toString());
       int transactionAt = int.parse(item['created_at'].toString());
       var date = DateTime.fromMicrosecondsSinceEpoch(transactionAt * 1000);
       String sStartDate = DateFormat('yyyy-MM-dd 00:00:00').format(date);
@@ -124,7 +138,8 @@ class TransactionRepository {
 
   static Future<List<Product>> getTransactionDetail(
       String transactionId) async {
-    final result = await TransactionService().getTransactionDetail(transactionId);
+    final result =
+        await TransactionService().getTransactionDetail(transactionId);
     List<Product> products = [];
 
     for (var item in result) {
@@ -135,7 +150,9 @@ class TransactionRepository {
         name: item['name'].toString(),
         uom: item['uom'].toString(),
         category: item['category'].toString(),
-        stock: (item['quantity'] != null) ? int.parse(item['quantity'].toString()) : 0,
+        stock: (item['quantity'] != null)
+            ? int.parse(item['quantity'].toString())
+            : 0,
       ));
     }
     return products;
@@ -145,7 +162,10 @@ class TransactionRepository {
     return await TransactionService().deleteTransaction(transactionId);
   }
 
-  static Future<bool> setTransactionFinished(String transactionId, TransactionType type) async {
-    return await TransactionService().setTransactionFinished(transactionId, type);
+  static Future<bool> setTransactionFinished(
+      String transactionId, TransactionType type) async {
+    return await TransactionService()
+        .setTransactionFinished(transactionId, type);
   }
+
 }

@@ -16,7 +16,28 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    _homeController.getAllTransactionList();
+    _homeController.getAllTransactionList(
+        dateStart: _homeController.getDateStart(),
+        dateEnd: _homeController.getDateEnd());
+  }
+
+  void monthDialog() {
+    showDialog(
+      context: context,
+      barrierColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Obx(() => FilterDateDialog(
+              onMonthSelected: (month) {
+                _homeController.goToMonth(month);
+                Navigator.pop(context);
+              },
+              onPrevYear: () => _homeController.prevNextYear(prev: true),
+              onNextYear: () => _homeController.prevNextYear(next: true),
+              activeMonth: _homeController.currentDate.value.month,
+              activeYear: _homeController.currentDate.value.year,
+            ));
+      },
+    );
   }
 
   @override
@@ -25,7 +46,38 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Inventory Management'),
+          title: const Text('Inventory Management',
+              style: TextStyle(fontSize: 14)),
+          actions: [
+            Row(
+              children: [
+                TextButton(
+                  onPressed: () => _homeController.prevNextMonth(prev: true),
+                  child: const Icon(
+                    Icons.keyboard_arrow_left_sharp,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+                TextButton(
+                  onPressed: monthDialog,
+                  child: Obx(() => Text(
+                        DateFormat('MMM yyyy')
+                            .format(_homeController.currentDate.value),
+                        style: primaryTextStyle.copyWith(color: Colors.white),
+                      )),
+                ),
+                TextButton(
+                  onPressed: () => _homeController.prevNextMonth(next: true),
+                  child: const Icon(
+                    Icons.keyboard_arrow_right_sharp,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+              ],
+            ),
+          ],
           bottom: TabBar(
             controller: _tabController,
             // ignore: prefer_const_literals_to_create_immutables
@@ -81,6 +133,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             final divisionTextController = TextEditingController();
             final takeInTextController = TextEditingController();
             final distributorTextController = TextEditingController();
+            final createdByTextController = TextEditingController();
             List<String> division = [];
             List<String> takeInBy = [];
             switch (_tabController.index) {
@@ -137,7 +190,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 return suggestionsBox;
                               },
                               onSuggestionSelected: (suggestion) {
-                                divisionTextController.text = suggestion.toString();
+                                divisionTextController.text =
+                                    suggestion.toString();
                               },
                               validator: (value) {
                                 if (value!.isEmpty) {
@@ -165,7 +219,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 return suggestionsBox;
                               },
                               onSuggestionSelected: (suggestion) {
-                                takeInTextController.text = suggestion.toString();
+                                takeInTextController.text =
+                                    suggestion.toString();
                               },
                               validator: (value) {
                                 if (value!.isEmpty) {
@@ -192,7 +247,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 status: TransactionStatus.pending,
                               );
                               if (await _homeController
-                                  .createOutTransaction(transaction)) {
+                                  .createTransaction(transaction)) {
                                 _homeController.getOutTransaction();
                                 Navigator.of(context).pop();
                                 await Navigator.of(context).pushNamed(
@@ -287,19 +342,33 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       actions: <Widget>[
                         TextButton(
                           child: const Text('CREATE'),
-                          onPressed: () {
+                          onPressed: () async {
                             if (formOutGlobalKey.currentState!.validate()) {
-                              Navigator.of(context).pop();
-                              Navigator.of(context).pushNamed(
-                                '/transaction-detail',
-                                arguments: Transaction(
-                                  type: TransactionType.out,
-                                  transactionId: DateFormat('yyyyMMddhhmmss')
-                                      .format(datetime),
-                                  createdAt: datetime.millisecondsSinceEpoch,
-                                  distributor: distributorTextController.text,
-                                ),
+                              final transaction = Transaction(
+                                type: TransactionType.entry,
+                                transactionId: DateFormat('yyyyMMddhhmmss')
+                                    .format(datetime),
+                                createdAt: datetime.millisecondsSinceEpoch,
+                                distributor: distributorTextController.text,
+                                status: TransactionStatus.pending,
                               );
+                              if (await _homeController
+                                  .createTransaction(transaction)) {
+                                _homeController.getOutTransaction();
+                                Navigator.of(context).pop();
+                                await Navigator.of(context).pushNamed(
+                                  '/transaction-detail',
+                                  arguments: transaction,
+                                );
+                                Get.delete<TransactionController>();
+                                _homeController.getAllTransactionList();
+                              } else {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text(
+                                      'Error. Can\'t not create transaction'),
+                                ));
+                              }
                             }
                           },
                         ),
@@ -309,6 +378,110 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 );
                 break;
               case 2:
+                _showMyDialog(
+                  child: Form(
+                    key: formOutGlobalKey,
+                    child: AlertDialog(
+                      title: const Text("Audit Transaction"),
+                      content: SingleChildScrollView(
+                        child: ListBody(
+                          children: <Widget>[
+                            DateTimeField(
+                              decoration: const InputDecoration(
+                                labelText: 'Date of Transaction',
+                              ),
+                              format: DateFormat("yyyy-MM-dd"),
+                              initialValue: datetime,
+                              onShowPicker: (context, currentValue) async {
+                                final date = await showDatePicker(
+                                  context: context,
+                                  initialDate: currentValue ?? DateTime.now(),
+                                  firstDate: DateTime.now()
+                                      .subtract(const Duration(days: 50)),
+                                  lastDate: DateTime.now(),
+                                );
+                                return date;
+                              },
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Please enter date of transaction';
+                                }
+                                return null;
+                              },
+                            ),
+                            TypeAheadFormField(
+                              textFieldConfiguration: TextFieldConfiguration(
+                                  controller: createdByTextController,
+                                  decoration: const InputDecoration(
+                                      labelText: 'Auditor')),
+                              suggestionsCallback: (pattern) {
+                                // return CitiesService.getSuggestions(pattern);
+                                return division
+                                    .where(
+                                        (element) => element.contains(pattern))
+                                    .toList();
+                              },
+                              itemBuilder: (context, suggestion) {
+                                return ListTile(
+                                  title: Text(suggestion.toString()),
+                                );
+                              },
+                              transitionBuilder:
+                                  (context, suggestionsBox, controller) {
+                                return suggestionsBox;
+                              },
+                              onSuggestionSelected: (suggestion) {
+                                // this._typeAheadController.text = suggestion;
+                              },
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Please enter Auditor';
+                                }
+                                return null;
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      actions: <Widget>[
+                        TextButton(
+                          child: const Text('CREATE'),
+                          onPressed: () async {
+                            if (formOutGlobalKey.currentState!.validate()) {
+                              final transaction = Transaction(
+                                type: TransactionType.audit,
+                                transactionId: DateFormat('yyyyMMddhhmmss')
+                                    .format(datetime),
+                                createdAt: datetime.millisecondsSinceEpoch,
+                                createdBy: createdByTextController.text,
+                                status: TransactionStatus.pending,
+                              );
+                              if (await _homeController
+                                  .createTransaction(transaction)) {
+                                _homeController.getOutTransaction();
+                                Navigator.of(context).pop();
+                                await Navigator.of(context).pushNamed(
+                                  '/transaction-detail',
+                                  arguments: transaction,
+                                );
+                                Get.delete<TransactionController>();
+                                _homeController.getAllTransactionList();
+                              } else {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text(
+                                      'Error. Can\'t not create transaction'),
+                                ));
+                              }
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                );
                 break;
             }
           },

@@ -49,6 +49,15 @@ class DrawerHome extends StatelessWidget {
           },
         ),
         ListTile(
+          leading: const Icon(Icons.business_outlined),
+          title: const Text('Division'),
+          onTap: () async {
+            Navigator.pop(context);
+            await Navigator.pushNamed(context, '/division');
+            Get.delete<ProductController>();
+          },
+        ),
+        ListTile(
           leading: const Icon(Icons.more_horiz),
           title: const Text('More'),
           onTap: () {

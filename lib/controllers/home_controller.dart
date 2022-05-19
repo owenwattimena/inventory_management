@@ -6,15 +6,50 @@ import '../repository/transaction_repository.dart';
 
 class HomeController extends GetxController {
   RxInt selectedIndex = 0.obs;
-  Rx<List<TransactionList?>> entryTransactionList = Rx<List<TransactionList>>([]);
+  Rx<List<TransactionList?>> entryTransactionList =
+      Rx<List<TransactionList>>([]);
   Rx<List<TransactionList?>> outTransactionList = Rx<List<TransactionList>>([]);
-  Rx<List<TransactionList?>> auditTransactionList = Rx<List<TransactionList>>([]);
+  Rx<List<TransactionList?>> auditTransactionList =
+      Rx<List<TransactionList>>([]);
+  Rx<DateTime> currentDate = DateTime.now().obs;
 
   set setSelectedIndex(int index) {
     selectedIndex.value = index;
   }
+  int getDateStart() {
+    return DateTime(currentDate.value.year, currentDate.value.month, 1)
+        .millisecondsSinceEpoch;
+  }
+  int getDateEnd() {
+    return DateTime(currentDate.value.year, currentDate.value.month + 1, 0, 23, 59, 59)
+        .millisecondsSinceEpoch;
+  }
 
-  Future<bool> createOutTransaction(Transaction transaction) async {
+  void prevNextYear({bool? next, bool? prev}) {
+    DateTime now = currentDate.value;
+    if (next != null && next) {
+      currentDate.value = DateTime(now.year+1, now.month, now.day);
+    } else if (prev != null && prev) {
+      currentDate.value = DateTime(now.year-1, now.month, now.day);
+    }
+    getAllTransactionList(dateStart: getDateStart(), dateEnd: getDateEnd());
+  }
+  void goToMonth(int month) {
+    DateTime now = currentDate.value;
+    currentDate.value = DateTime(now.year, month, now.day);
+    getAllTransactionList(dateStart: getDateStart(), dateEnd: getDateEnd());
+  }
+  void prevNextMonth({bool? next, bool? prev}) {
+    DateTime now = currentDate.value;
+    if (next != null && next) {
+      currentDate.value = DateTime(now.year, now.month + 1, now.day);
+    } else if (prev != null && prev) {
+      currentDate.value = DateTime(now.year, now.month - 1, now.day);
+    }
+    getAllTransactionList(dateStart: getDateStart(), dateEnd: getDateEnd());
+  }
+
+  Future<bool> createTransaction(Transaction transaction) async {
     final result = await TransactionRepository.createTransaction(transaction);
     return result;
   }
@@ -23,33 +58,43 @@ class HomeController extends GetxController {
     final result = await TransactionRepository.getDivision(query);
     return result;
   }
+
   Future<List<String>> getTakeBy(String query) async {
     final result = await TransactionRepository.getTakeBy(query);
     return result;
   }
 
-  void getAllTransactionList() {
-    getEntryTransaction();
-    getOutTransaction();
-    getAuditTransaction();
+  void getAllTransactionList({int? dateStart, int? dateEnd}) {
+      print(dateStart);
+    getEntryTransaction(dateStart: dateStart, dateEnd: dateEnd);
+    getOutTransaction(dateStart: dateStart, dateEnd: dateEnd);
+    getAuditTransaction(dateStart: dateStart, dateEnd: dateEnd);
   }
 
-  void getEntryTransaction() {
-    TransactionRepository.getGroupTransactionByDate(type: TransactionType.entry).then((value) {
+  void getEntryTransaction({int? dateStart, int? dateEnd}) {
+    TransactionRepository.getGroupTransactionByDate(
+            type: TransactionType.entry, dateStart: dateStart, dateEnd: dateEnd)
+        .then((value) {
       entryTransactionList.update((val) {
         entryTransactionList.value = value;
       });
     });
   }
-  void getOutTransaction() {
-    TransactionRepository.getGroupTransactionByDate(type: TransactionType.out).then((value) {
+
+  void getOutTransaction({int? dateStart, int? dateEnd}) {
+    TransactionRepository.getGroupTransactionByDate(
+            type: TransactionType.out, dateStart: dateStart, dateEnd: dateEnd)
+        .then((value) {
       outTransactionList.update((val) {
         outTransactionList.value = value;
       });
     });
   }
-  void getAuditTransaction() {
-    TransactionRepository.getGroupTransactionByDate(type: TransactionType.audit).then((value) {
+
+  void getAuditTransaction({int? dateStart, int? dateEnd}) {
+    TransactionRepository.getGroupTransactionByDate(
+            type: TransactionType.audit, dateStart: dateStart, dateEnd: dateEnd)
+        .then((value) {
       auditTransactionList.update((val) {
         auditTransactionList.value = value;
       });

@@ -1,14 +1,12 @@
-
 import 'package:file_picker/file_picker.dart';
 import 'package:get/get.dart';
 import '../models/product.dart';
 import '../repository/product_repository.dart';
 
-class ProductController extends GetxController{
+class ProductController extends GetxController {
   Rx<List<Product>> listProduct = Rx<List<Product>>([]);
   Rx<PlatformFile> file = Rx<PlatformFile>(PlatformFile(name: '', size: 0));
   RxString dropdownValue = "All".obs;
-  
 
   void getProducts({String? query}) {
     ProductRepository.getProduct(query: query).then((value) {
@@ -17,12 +15,26 @@ class ProductController extends GetxController{
       });
     });
   }
-  Future<void> importFile() async{
+
+  Future<bool> addProduct(Product product) async {
+    final result = await ProductRepository.addProduct(product);
+    return result;
+  }
+
+  Future<List<String>> getCategory(String query) async {
+    return await ProductRepository.getCategory(query);
+  } 
+  
+  Future<List<String>> getUom(String query) async {
+    return await ProductRepository.getUom(query);
+  } 
+
+  Future<void> importFile() async {
     await ProductRepository.importFile(file.value);
     getProducts();
   }
 
-   Future<void> openFilePicker() async {
+  Future<void> openFilePicker() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
     if (result != null) {
       file.value = result.files.first;

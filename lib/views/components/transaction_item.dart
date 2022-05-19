@@ -30,9 +30,9 @@ class TransactionItem extends StatelessWidget {
                 ),
                 (transactionType == TransactionType.out)
                     ? Text('$division')
-                    : (transactionType == TransactionType.audit)
+                    : /*(transactionType == TransactionType.audit)
                         ? Text('$warehouse')
-                        : const SizedBox()
+                        : */const SizedBox()
               ],
             ),
             Column(crossAxisAlignment: CrossAxisAlignment.end, children: [

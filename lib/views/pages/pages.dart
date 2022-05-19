@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:inventory_management/config/text_style.dart';
@@ -13,8 +14,10 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'dart:math' as math;
 import 'package:image_picker/image_picker.dart';
+import 'package:inventory_management/models/transaction_list.dart';
 
 // COMPONENTS
+import '../../controllers/division_controller.dart';
 import '../../controllers/product_controller.dart';
 import '../../controllers/product_transaction_controller.dart';
 import '../components/components.dart';
@@ -23,3 +26,5 @@ part 'home_page.dart';
 part 'transaction_detail_page.dart';
 part 'product_page.dart';
 part 'product_detail_page.dart';
+part 'division_page.dart';
+part 'division_transaction_page.dart';
