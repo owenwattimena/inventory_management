@@ -17,3 +17,5 @@ part 'drawer_home.dart';
 part 'product_tile.dart';
 part 'product_history.dart';
 part 'filter_date_dialog.dart';
+part 'dash_separator.dart';
+part 'filter_date_button.dart';

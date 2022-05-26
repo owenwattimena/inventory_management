@@ -1,3 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:csv/csv.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:inventory_management/models/product.dart';
 
@@ -18,7 +23,7 @@ class TransactionRepository {
         .deleteTransactionProduct(transactionId, sku);
   }
 
-  static Future<List<String>> getDivision(String query) async {
+  static Future<List<String>> getDivision({String query = ''}) async {
     final result = await TransactionService().getDivision(query);
     List<String> division = [];
     for (var i = 0; i < result.length; i++) {
@@ -29,11 +34,19 @@ class TransactionRepository {
 
   static Future<List<String>> getTakeBy(String query) async {
     final result = await TransactionService().getTakeBy(query);
-    List<String> division = [];
+    List<String> takeInBy = [];
     for (var i = 0; i < result.length; i++) {
-      division.add(result[i]['take_in_by'].toString());
+      takeInBy.add(result[i]['take_in_by'].toString());
     }
-    return division;
+    return takeInBy;
+  }
+  static Future<List<String>> getDistributor(String query) async {
+    final result = await TransactionService().getDistributor(query);
+    List<String> distributor = [];
+    for (var i = 0; i < result.length; i++) {
+      distributor.add(result[i]['distributor'].toString());
+    }
+    return distributor;
   }
 
   static Future<bool> createTransaction(Transaction transaction) async {
@@ -166,6 +179,26 @@ class TransactionRepository {
       String transactionId, TransactionType type) async {
     return await TransactionService()
         .setTransactionFinished(transactionId, type);
+  }
+
+  static Future<void> importFile(PlatformFile file, String transactionId) async {
+    final transactionService = TransactionService();
+    final input = File(file.path!).openRead();
+    final fields = await input
+        .transform(utf8.decoder)
+        .transform(const CsvToListConverter())
+        .toList();
+    for (int i = 0; i < fields.length; i++) {
+      if (i > 0) {
+        // int j = 1 + i;
+        Product product = Product(
+          sku: fields[i][0],
+          name: fields[i][1],
+          stock: int.parse(fields[i][2].toString()),
+        );
+        await transactionService.setTransactionProduct(transactionId, product);
+      }
+    }
   }
 
 }

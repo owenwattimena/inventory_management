@@ -33,7 +33,7 @@ class ProductHistory extends StatelessWidget {
                           ? 'AUDIT'
                           : 'MASUK') ,
                   style: primaryTextStyleBold.copyWith(fontSize: 16)),
-              Text('${transaction.totalItem} Pcs',
+              Text('${transaction.totalItem} ${transaction.productUom}',
                   style: primaryTextStyle.copyWith(color: (transaction.type == TransactionType.out
                       ? Colors.red
                       : transaction.type == TransactionType.audit

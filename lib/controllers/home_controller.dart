@@ -34,9 +34,9 @@ class HomeController extends GetxController {
     }
     getAllTransactionList(dateStart: getDateStart(), dateEnd: getDateEnd());
   }
-  void goToMonth(int month) {
+  void goToMonth(int month, {int? year}) {
     DateTime now = currentDate.value;
-    currentDate.value = DateTime(now.year, month, now.day);
+    currentDate.value = DateTime(year??now.year, month, now.day);
     getAllTransactionList(dateStart: getDateStart(), dateEnd: getDateEnd());
   }
   void prevNextMonth({bool? next, bool? prev}) {
@@ -55,7 +55,7 @@ class HomeController extends GetxController {
   }
 
   Future<List<String>> getDivision(String query) async {
-    final result = await TransactionRepository.getDivision(query);
+    final result = await TransactionRepository.getDivision(query:query);
     return result;
   }
 
@@ -63,9 +63,12 @@ class HomeController extends GetxController {
     final result = await TransactionRepository.getTakeBy(query);
     return result;
   }
+  Future<List<String>> getDistributor(String query) async {
+    final result = await TransactionRepository.getDistributor(query);
+    return result;
+  }
 
   void getAllTransactionList({int? dateStart, int? dateEnd}) {
-      print(dateStart);
     getEntryTransaction(dateStart: dateStart, dateEnd: dateEnd);
     getOutTransaction(dateStart: dateStart, dateEnd: dateEnd);
     getAuditTransaction(dateStart: dateStart, dateEnd: dateEnd);

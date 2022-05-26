@@ -6,6 +6,7 @@ class FilterDateDialog extends StatelessWidget {
   final Function() onPrevYear;
   final Function() onNextYear;
   final Function(int) onMonthSelected;
+  final Function() onThisMonthSelected;
   const FilterDateDialog({
     Key? key,
     required this.activeMonth,
@@ -13,7 +14,7 @@ class FilterDateDialog extends StatelessWidget {
     required this.onNextYear,
     required this.onPrevYear,
     required this.onMonthSelected,
-
+    required this.onThisMonthSelected,
   }) : super(key: key);
 
   @override
@@ -65,7 +66,7 @@ class FilterDateDialog extends StatelessWidget {
                                   decoration: TextDecoration.none)),
                           Row(children: [
                             TextButton(
-                                onPressed: () {},
+                                onPressed: onThisMonthSelected,
                                 child: const Text('This Month')),
                             const SizedBox(width: 10),
                             GestureDetector(
@@ -96,7 +97,7 @@ class FilterDateDialog extends StatelessWidget {
                     child: GridView.count(
                       childAspectRatio: 2.0,
                       shrinkWrap: true,
-                      padding: const EdgeInsets.only(top: 20),
+                      // padding: const EdgeInsets.only(top: 8),
                       crossAxisCount: 4,
                       children: monthList
                           .asMap()

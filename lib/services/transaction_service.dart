@@ -63,6 +63,15 @@ class TransactionService {
     return mapObject;
   }
 
+  Future<List<Map<String, Object?>>> getDistributor(String query) async {
+    final db = await database.database;
+    var sql = '''
+    SELECT DISTINCT distributor FROM product_transaction WHERE distributor LIKE '%$query%'
+''';
+    List<Map<String, Object?>> mapObject = await db.rawQuery(sql);
+    return mapObject;
+  }
+
   Future<bool> createTransaction(transacion.Transaction transaction) async {
     final Database db = await database.database;
     var sql = '''
@@ -105,7 +114,11 @@ class TransactionService {
   }
 
   Future<List<Map<String, Object?>>> getGroupTransactionByDate(
-      {String? type, String? division, String? status, int? dateStart, int? dateEnd}) async {
+      {String? type,
+      String? division,
+      String? status,
+      int? dateStart,
+      int? dateEnd}) async {
     Database db = await database.database;
     List<Map<String, Object?>> mapObject;
     //   var sql = '''
@@ -157,7 +170,11 @@ class TransactionService {
     Database db = await database.database;
     List<Map<String, Object?>> mapObject;
     var sql = '''
-    SELECT * FROM transaction_detail AS td JOIN product AS p ON td.sku = p.sku  WHERE td.transaction_id = ?
+    SELECT * FROM 
+    transaction_detail AS td 
+    JOIN product AS p 
+    ON td.sku = p.sku  
+    WHERE td.transaction_id = ? 
   ''';
     mapObject = await db.rawQuery(sql, [transactionId]);
     return mapObject;
@@ -220,13 +237,97 @@ class TransactionService {
     return await db.rawUpdate(sql, [transactionId]) > 0;
   }
 
-   Future<List<Map<String, Object?>>> getDivisionProductTransaction(
-      String division) async {
+  Future<List<Map<String, Object?>>> getDivisionProductTransaction(
+      String division,
+      {int? dateStart,
+      int? dateEnd,
+      String? productCategory,
+      String? productSku}) async {
     Database db = await database.database;
-    String sql = '''
+    String sql = '';
+    List<dynamic> whereArgs = [];
+    if (dateStart != null && dateEnd != null) {
+      if (productCategory != null) {
+        sql = '''
         SELECT 
         p.sku,
+        p.barcode,
         p.name,
+        p.uom,
+        p.category,
+        t.created_at, 
+        t.created_by, 
+        t.transaction_id, 
+        t.type, 
+        t.take_in_by, 
+        t.division, 
+        td.quantity
+        FROM transaction_detail as td
+        JOIN product_transaction as t
+        ON td.transaction_id = t.transaction_id
+        JOIN product as p
+        ON p.sku = td.sku
+        WHERE t.status = ? AND t.division = ? AND t.created_at >= ? AND t.created_at <= ? AND p.category = ?
+        ORDER BY t.created_at DESC
+      ''';
+        whereArgs = ["finished", division, dateStart, dateEnd, productCategory];
+      } else if (productSku != null) {
+        sql = '''
+        SELECT 
+        p.sku,
+        p.barcode,
+        p.name,
+        p.uom,
+        p.category,
+        t.created_at, 
+        t.created_by, 
+        t.transaction_id, 
+        t.type, 
+        t.take_in_by, 
+        t.division, 
+        td.quantity
+        FROM transaction_detail as td
+        JOIN product_transaction as t
+        ON td.transaction_id = t.transaction_id
+        JOIN product as p
+        ON p.sku = td.sku
+        WHERE t.status = ? AND t.division = ? AND t.created_at >= ? AND t.created_at <= ? AND p.sku = ?
+        ORDER BY t.created_at DESC
+      ''';
+        whereArgs = ["finished", division, dateStart, dateEnd, productSku];
+      } else {
+        sql = '''
+        SELECT 
+        p.sku,
+        p.barcode,
+        p.name,
+        p.uom,
+        p.category,
+        t.created_at, 
+        t.created_by, 
+        t.transaction_id, 
+        t.type, 
+        t.take_in_by, 
+        t.division, 
+        td.quantity
+        FROM transaction_detail as td
+        JOIN product_transaction as t
+        ON td.transaction_id = t.transaction_id
+        JOIN product as p
+        ON p.sku = td.sku
+        WHERE t.status = ? AND t.division = ? AND t.created_at >= ? AND t.created_at <= ?
+        ORDER BY t.created_at DESC
+      ''';
+        whereArgs = ["finished", division, dateStart, dateEnd];
+      }
+    } else {
+      sql = '''
+        SELECT 
+        p.sku,
+        p.barcode,
+        p.name,
+        p.uom,
+        p.category,
         t.created_at, 
         t.created_by, 
         t.transaction_id, 
@@ -242,17 +343,23 @@ class TransactionService {
         WHERE t.status = ? AND t.division = ?
         ORDER BY t.created_at DESC
       ''';
+      whereArgs = ["finished", division];
+    }
 
-    return await db.rawQuery(sql, ["finished", division]);
+    return await db.rawQuery(sql, whereArgs);
   }
 
-  Future<List<Map<String, Object?>>> getProductTransaction(String sku) async {
+  Future<List<Map<String, Object?>>> getProductTransaction(
+      String sku, int startDate, int endDate,
+      {String? filter}) async {
     Database db = await database.database;
     List<Map<String, Object?>> mapObject;
     String sql;
-    List<String> whereArgs;
-    sql = '''
+    List<dynamic> whereArgs;
+    if (filter == null || filter == 'all') {
+      sql = '''
         SELECT 
+        p.uom,
         t.created_at, 
         t.created_by, 
         t.transaction_id, 
@@ -265,10 +372,35 @@ class TransactionService {
         FROM transaction_detail as td
         JOIN product_transaction as t
         ON td.transaction_id = t.transaction_id
-        WHERE td.sku = ? AND t.status = ?
+        JOIN product as p
+        ON p.sku = td.sku
+        WHERE td.sku = ? AND t.status = ? AND t.created_at >= ? AND t.created_at <= ? 
         ORDER BY t.created_at DESC
       ''';
-    whereArgs = [sku, "finished"];
+      whereArgs = [sku, "finished", startDate, endDate];
+    } else {
+      sql = '''
+        SELECT 
+        p.uom,
+        t.created_at, 
+        t.created_by, 
+        t.transaction_id, 
+        t.type, 
+        t.distributor, 
+        t.warehouse, 
+        t.take_in_by, 
+        t.division, 
+        td.quantity
+        FROM transaction_detail as td
+        JOIN product_transaction as t
+        ON td.transaction_id = t.transaction_id
+        JOIN product as p
+        ON p.sku = td.sku
+        WHERE td.sku = ? AND t.status = ? AND t.created_at >= ? AND t.created_at <= ? AND t.type = ?
+        ORDER BY t.created_at DESC
+      ''';
+      whereArgs = [sku, "finished", startDate, endDate, filter];
+    }
 
     mapObject = await db.rawQuery(sql, whereArgs);
     return mapObject;

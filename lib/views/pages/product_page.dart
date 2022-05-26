@@ -253,7 +253,8 @@ class _ProductPageState extends State<ProductPage> {
                         } else {
                           ScaffoldMessenger.of(context)
                               .showSnackBar(const SnackBar(
-                            content: Text('Add Product Failed. Product with this SKU or Barcode already exist'),
+                            content: Text(
+                                'Add Product Failed. Product with this SKU or Barcode already exist'),
                           ));
                         }
                         Navigator.of(context).pop();
@@ -311,7 +312,6 @@ class _ProductPageState extends State<ProductPage> {
 
   Future<void> _showExportDialog() async {
     final exportFileController = TextEditingController();
-    List<String> division = [];
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -325,7 +325,7 @@ class _ProductPageState extends State<ProductPage> {
                   () => DropdownButton(
                     isExpanded: true,
                     value: productController.dropdownValue.value,
-                    items: <String>['All', 'SKU', 'Category']
+                    items: <String>['All', 'Category']
                         .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
@@ -341,17 +341,10 @@ class _ProductPageState extends State<ProductPage> {
                     ? TypeAheadFormField(
                         textFieldConfiguration: TextFieldConfiguration(
                             controller: exportFileController,
-                            decoration: InputDecoration(
-                                labelText:
-                                    productController.dropdownValue.value ==
-                                            'SKU'
-                                        ? 'SKU'
-                                        : 'Category')),
+                            decoration: const InputDecoration(labelText: 'Category')),
                         suggestionsCallback: (pattern) {
                           // return CitiesService.getSuggestions(pattern);
-                          return division
-                              .where((element) => element.contains(pattern))
-                              .toList();
+                          return productController.getCategory(pattern);
                         },
                         itemBuilder: (context, suggestion) {
                           return ListTile(
@@ -363,18 +356,19 @@ class _ProductPageState extends State<ProductPage> {
                           return suggestionsBox;
                         },
                         onSuggestionSelected: (suggestion) {
-                          // this._typeAheadController.text = suggestion;
+                          exportFileController.text = suggestion.toString();
                         },
                         validator: (value) {
                           if (value!.isEmpty) {
-                            return 'Please enter division';
+                            return 'Please enter category';
                           }
+                          return null;
                         },
                       )
                     : const SizedBox()),
                 ElevatedButton(
-                  onPressed: () {},
-                  child: const Text('IMPORT FILE'),
+                  onPressed: ()async => await productController.exportProduct(category: exportFileController.text),
+                  child: const Text('EXPORT'),
                 ),
               ],
             ),

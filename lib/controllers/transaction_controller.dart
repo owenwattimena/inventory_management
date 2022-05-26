@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:get/get.dart';
 import 'package:image/image.dart';
 import 'package:path_provider/path_provider.dart';
@@ -15,6 +16,8 @@ import '../repository/product_repository.dart';
 class TransactionController extends GetxController {
   Rx<List<Product>> products = Rx<List<Product>>([]);
   RxString imagePath = ''.obs;
+  Rx<PlatformFile> file = Rx<PlatformFile>(PlatformFile(name: '', size: 0));
+
 
   Future<bool> setTransaction(String transactionId, Product product) async {
     final result = await TransactionRepository.setTransactionProduct(transactionId, product);
@@ -62,7 +65,7 @@ class TransactionController extends GetxController {
       // }
       // }
     } catch (e) {
-      print('error:$e');
+      // print('error:$e');
       return null;
     }
   }
@@ -87,5 +90,19 @@ class TransactionController extends GetxController {
 
   Future<bool> setTransactionFinished(String transactionId, TransactionType type) async {
     return await TransactionRepository.setTransactionFinished(transactionId, type);
+  }
+
+   Future<void> importFile(String transactionId) async {
+    await TransactionRepository.importFile(file.value, transactionId);
+    getTransaction(transactionId);
+  }
+
+  Future<void> openFilePicker() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      file.value = result.files.first;
+    } else {
+      // User canceled the picker
+    }
   }
 }

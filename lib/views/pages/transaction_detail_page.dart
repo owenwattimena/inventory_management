@@ -10,6 +10,8 @@ class TransactionDetailPage extends StatefulWidget {
 
 class _TransactionDetailPageState extends State<TransactionDetailPage> {
   final transactionController = Get.put(TransactionController());
+  // final _homeController = Get.find<HomeController>();
+
   late Transaction args;
   final ImagePicker _picker = ImagePicker();
   XFile? image;
@@ -45,7 +47,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                   ? '${args.division} - ${args.takeBy}'
                   : args.type == TransactionType.entry
                       ? '${args.distributor}'
-                      : /*'${args.warehouse} - */'${args.createdBy}',
+                      : /*'${args.warehouse} - */ '${args.createdBy}',
               style: primaryTextStyle.copyWith(color: Colors.white),
             ),
           ],
@@ -57,20 +59,23 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
             ? const EdgeInsets.only(bottom: 80)
             : const EdgeInsets.all(0),
         children: [
-          // ignore: prefer_const_constructors
-          InkWell(
-            onTap: _showImagePicker,
-            child: Obx(() => Container(
-                  color: Colors.grey[200],
-                  child: transactionController.imagePath.value.isEmpty
-                      ? Icon(Icons.supervised_user_circle_outlined,
-                          size: 131, color: Colors.grey[400])
-                      : Image.file(
-                          File(transactionController.imagePath.value),
-                          height: 165,
-                        ),
-                )),
-          ),
+          (args.type == TransactionType.out)
+              ?
+              // ignore: prefer_const_constructors
+              InkWell(
+                  onTap: _showImagePicker,
+                  child: Obx(() => Container(
+                        color: Colors.grey[200],
+                        child: transactionController.imagePath.value.isEmpty
+                            ? Icon(Icons.supervised_user_circle_outlined,
+                                size: 131, color: Colors.grey[400])
+                            : Image.file(
+                                File(transactionController.imagePath.value),
+                                height: 165,
+                              ),
+                      )),
+                )
+              : const SizedBox(),
           Obx(
             () => Column(
               children: transactionController.products.value
@@ -112,8 +117,11 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                         ],
                       ),
                       child: InkWell(
-                        onLongPress: () => (args.status != TransactionStatus.finished) ?  _showProductDialog(
-                            addProduct: false, product: product) : null,
+                        onLongPress: () =>
+                            (args.status != TransactionStatus.finished)
+                                ? _showProductDialog(
+                                    addProduct: false, product: product)
+                                : null,
                         child: ProductTile(product: product),
                       ),
                     ),
@@ -134,7 +142,8 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                   child: FloatingActionButton(
                     heroTag: "btn1",
                     onPressed: () async {
-                      if (await _showDeleteConfirm(args.transactionId!) == true) {
+                      if (await _showDeleteConfirm(args.transactionId!) ==
+                          true) {
                         Navigator.pop(context);
                       } else {
                         ScaffoldMessenger.of(context)
@@ -152,16 +161,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                 bottom: 0,
                 left: (MediaQuery.of(context).size.width - 185) / 2,
                 child: ElevatedButton(
-                  onPressed: () async {
-                    if(await transactionController.setTransactionFinished(args.transactionId!, args.type!)){
-                      Navigator.pop(context);
-                    }else{
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(const SnackBar(
-                        content: Text('Error. Transaction not finished.'),
-                      ));
-                    }
-                  },
+                  onPressed: _showFinalConfirmDialog,
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0),
@@ -177,14 +177,72 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
               Positioned(
                 bottom: 0,
                 right: 0,
-                child: FloatingActionButton(
-                  heroTag: "btn3",
-                  onPressed: _showProductDialog,
-                  child: const Icon(Icons.add),
-                ),
+                child: (args.type == TransactionType.out)
+                    ? FloatingActionButton(
+                        heroTag: "btn3",
+                        onPressed: _showProductDialog,
+                        child: const Icon(Icons.add),
+                      )
+                    : SpeedDial(
+                        icon: Icons.add,
+                        activeIcon: Icons.close,
+                        children: [
+                          SpeedDialChild(
+                              child: const Icon(Icons.add),
+                              label: 'New Transaction',
+                              backgroundColor: Colors.blue,
+                              onTap: _showProductDialog),
+                          SpeedDialChild(
+                              child: const Icon(Icons.download),
+                              label: 'Import',
+                              onTap: () => _showImportDialog(context)),
+                        ],
+                      ),
               ),
             ])
           : const SizedBox(),
+    );
+  }
+
+  Future<void> _showFinalConfirmDialog()async{
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Are you sure?'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              // ignore: prefer_const_literals_to_create_immutables
+              children: <Widget>[
+                const Text('This will finalize the transaction.'),
+                const Text('This cannot be undone.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: const Text('FINALIZE'),
+              onPressed: () async {
+                if (await transactionController.setTransactionFinished(
+                    args.transactionId!, args.type!)) {
+                  Navigator.of(context).pop();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Error. Transaction not finished.'),
+                  ));
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -243,7 +301,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                     if (_file != null) {
                       transactionController.imagePath.value = _file.path;
                     }
-                    print(_file!.path);
+                    // print(_file!.path);
                     Navigator.of(context).pop();
                   },
                 ),
@@ -258,7 +316,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                     if (_file != null) {
                       transactionController.imagePath.value = _file.path;
                     }
-                    print(_file!.path);
+                    // print(_file!.path);
                     Navigator.of(context).pop();
                   },
                 ),
@@ -362,5 +420,41 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
         );
       },
     );
+  }
+
+  Future<void> _showImportDialog(BuildContext context) {
+    final importFileController = TextEditingController();
+
+    return showDialog<void>(context: context, builder: (BuildContext context){
+      return AlertDialog(
+          title: const Text('Import'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                GestureDetector(
+                  onTap: () async {
+                    await transactionController.openFilePicker();
+                    importFileController.text =
+                        transactionController.file.value.name;
+                  },
+                  child: TextField(
+                    enabled: false,
+                    controller: importFileController,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    await transactionController.importFile(args.transactionId!);
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('Import Success'),
+                    ));
+                  },
+                  child: const Text('IMPORT FILE'),
+                ),
+              ],
+            ),
+          ),
+        );
+    });
   }
 }

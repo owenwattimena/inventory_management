@@ -35,6 +35,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               onNextYear: () => _homeController.prevNextYear(next: true),
               activeMonth: _homeController.currentDate.value.month,
               activeYear: _homeController.currentDate.value.year,
+              onThisMonthSelected: (){
+                _homeController.goToMonth(DateTime.now().month, year: DateTime.now().year);
+                Navigator.pop(context);
+              },
             ));
       },
     );
@@ -46,37 +50,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Inventory Management',
-              style: TextStyle(fontSize: 14)),
+          // title: const Text('Inventory Management',
+          //     style: TextStyle(fontSize: 14)),
           actions: [
-            Row(
-              children: [
-                TextButton(
-                  onPressed: () => _homeController.prevNextMonth(prev: true),
-                  child: const Icon(
-                    Icons.keyboard_arrow_left_sharp,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                ),
-                TextButton(
-                  onPressed: monthDialog,
-                  child: Obx(() => Text(
-                        DateFormat('MMM yyyy')
-                            .format(_homeController.currentDate.value),
-                        style: primaryTextStyle.copyWith(color: Colors.white),
-                      )),
-                ),
-                TextButton(
-                  onPressed: () => _homeController.prevNextMonth(next: true),
-                  child: const Icon(
-                    Icons.keyboard_arrow_right_sharp,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                ),
-              ],
-            ),
+            Obx(()=>FilterDateButton(
+              onPrevMonthPressed: () => _homeController.prevNextMonth(prev: true),
+              onMonthPressed: monthDialog,
+              onNextMonthPressed: () => _homeController.prevNextMonth(next: true),
+              date: _homeController.currentDate.value,
+            )),
           ],
           bottom: TabBar(
             controller: _tabController,
@@ -135,7 +117,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             final distributorTextController = TextEditingController();
             final createdByTextController = TextEditingController();
             List<String> division = [];
-            List<String> takeInBy = [];
             switch (_tabController.index) {
               case 0:
                 _showMyDialog(
@@ -306,16 +287,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               },
                             ),
                             TypeAheadFormField(
+                              minCharsForSuggestions: 3,
                               textFieldConfiguration: TextFieldConfiguration(
                                   controller: distributorTextController,
                                   decoration: const InputDecoration(
                                       labelText: 'Distributor')),
                               suggestionsCallback: (pattern) {
                                 // return CitiesService.getSuggestions(pattern);
-                                return division
-                                    .where(
-                                        (element) => element.contains(pattern))
-                                    .toList();
+                                return _homeController.getDistributor(pattern);
                               },
                               itemBuilder: (context, suggestion) {
                                 return ListTile(
@@ -327,6 +306,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 return suggestionsBox;
                               },
                               onSuggestionSelected: (suggestion) {
+                                distributorTextController.text = suggestion
+                                    .toString();
                                 // this._typeAheadController.text = suggestion;
                               },
                               validator: (value) {
@@ -487,6 +468,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           },
           child: const Icon(Icons.add),
         ),
+        // ---------------------------------------------------
         // bottomNavigationBar: Obx(()=>BottomNavigationBar(
         //   showUnselectedLabels: false,
         //   currentIndex: _homeController.selectedIndex.value,

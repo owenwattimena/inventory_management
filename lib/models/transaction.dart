@@ -14,7 +14,11 @@ class Transaction {
   final int? createdAt;
   final int? totalItem;
   final TransactionStatus? status;
+  final String? productSku;
+  final String? productBarcode;
   final String? productName;
+  final String? productUom;
+  final String? productCategory;
 
   Transaction({
     this.createdAt,
@@ -28,7 +32,11 @@ class Transaction {
     this.createdBy,
     this.totalItem,
     this.status,
+    this.productSku,
+    this.productBarcode,
     this.productName,
+    this.productUom,
+    this.productCategory,
   });
 
   factory Transaction.fromMapObject(Map<String, dynamic> json) => Transaction(
@@ -45,6 +53,10 @@ class Transaction {
         division: json['division'],
         totalItem: json['quantity'],
         createdBy: json['created_by'],
-        productName: json['name']
+        productSku: json['sku'],
+        productBarcode: json['barcode'],
+        productName: json['name'],
+        productUom: json['uom'],
+        productCategory: json['category'],
       );
 }

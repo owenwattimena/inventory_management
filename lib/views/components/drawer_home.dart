@@ -6,21 +6,56 @@ class DrawerHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          bottomRight: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
       // ignore: prefer_const_literals_to_create_immutables
       child: ListView(padding: const EdgeInsets.all(0.0), children: [
         // ignore: prefer_const_constructors
-        DrawerHeader(
-          decoration: const BoxDecoration(
-            color: Colors.blue,
-          ),
+        // DrawerHeader(
+        //   decoration: const BoxDecoration(
+        //     // color: Colors.blue,
+        //     border: Border(
+        //       bottom: BorderSide.none,
+        //     ),
+        //   ),
+        //   child: Column(
+        //     mainAxisAlignment: MainAxisAlignment.start,
+        //     crossAxisAlignment: CrossAxisAlignment.start,
+        //     // ignore: prefer_const_literals_to_create_immutables
+        //     children: [
+        //       const SizedBox(height: 10),
+        //       Text('Inventory Management', style: primaryTextStyleBold.copyWith(fontSize: 20),),
+        //       Text('Version 1.0.0', style: primaryTextStyle.copyWith(fontSize: 12),),
+        //     ],
+        //   ),
+        // ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 40.0, horizontal: 20),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             // ignore: prefer_const_literals_to_create_immutables
             children: [
-              const Text('Inventory Management'),
-              const Text('Version 1.0.0'),
+              const SizedBox(height: 10),
+              Text(
+                'Inventory Management',
+                style: primaryTextStyleBold.copyWith(fontSize: 20),
+              ),
+              Text(
+                'Version 1.0.0',
+                style: primaryTextStyle.copyWith(fontSize: 12),
+              ),
             ],
           ),
+        ),
+        const SizedBox(height: 80),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: DashSeparator(height: 1.5, color: Colors.grey[400]!),
         ),
         const Padding(
           padding: EdgeInsets.only(left: 20.0, top: 10, bottom: 0),

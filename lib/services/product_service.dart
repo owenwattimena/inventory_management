@@ -10,13 +10,16 @@ class ProductService {
     database = DatabaseService();
   }
 
-  Future<List<Map<String, Object?>>> getCategory(String query) async {
+  Future<List<Map<String, Object?>>> getCategory({String? query}) async {
     final db = await database.database;
-    var sql = '''
-    SELECT DISTINCT category FROM product WHERE category LIKE '%$query%'
+    if (query == null) {
+      return await db.rawQuery('SELECT DISTINCT category FROM product');
+    } else {
+      var sql = '''
+      SELECT DISTINCT category FROM product WHERE category LIKE '%$query%'
     ''';
-    final mapObject = await db.rawQuery(sql);
-    return mapObject;
+      return await db.rawQuery(sql);
+    }
   }
 
   Future<List<Map<String, Object?>>> getUom(String query) async {
@@ -51,12 +54,24 @@ class ProductService {
     return false;
   }
 
-  Future<List<Map<String, Object?>>> getProduct({String? query}) async {
+  Future<List<Map<String, Object?>>> getProduct(
+      {String? query, String? category}) async {
     Database db = await database.database;
     List<Map<String, Object?>> mapObject;
+    List<dynamic> whereArgs;
     if (query == null) {
-      const sql = 'SELECT * FROM product';
-      mapObject = await db.rawQuery(sql);
+      if (category == null) {
+        var sql = '''
+        SELECT * FROM product
+        ''';
+        mapObject = await db.rawQuery(sql);
+      } else {
+        var sql = '''
+        SELECT * FROM product WHERE category = ?
+        ''';
+        whereArgs = [category];
+        mapObject = await db.rawQuery(sql, whereArgs);
+      }
     } else {
       var sql =
           'SELECT * FROM product WHERE name LIKE "%$query%" OR sku LIKE "%$query%" OR barcode LIKE "%$query%"';
