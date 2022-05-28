@@ -11,7 +11,7 @@ class ProductDetailPage extends StatefulWidget {
 class _ProductDetailPageState extends State<ProductDetailPage> {
   final productTransactionController = Get.put(ProductTransactionController());
   final _homeController = Get.find<HomeController>();
- 
+  final myMenuItems = <String>['Export',];
 
   late Product product;
   @override
@@ -88,10 +88,26 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             ])
           ]),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.more_vert),
-              onPressed: () => monthDialog(),
-            ),
+            PopupMenuButton<String>(
+            itemBuilder: (BuildContext context) {
+              return myMenuItems.map((String choice) {
+                return PopupMenuItem<String>(
+                  child: Text(choice),
+                  value: choice,
+                );
+              }).toList();
+            },
+            onSelected: (val) {
+              switch (val) {
+                case 'Export':
+                  productTransactionController.exportProductTransaction(product.sku!,
+        _homeController.getDateStart(), _homeController.getDateEnd(), product.barcode!, product.name!, product.category!, product.uom!);
+                  break;
+                // case 'Pulihkan':
+                  // break;
+              }
+            },
+          )
           ],
         ),
         body: Column(

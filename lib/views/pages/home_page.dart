@@ -7,18 +7,69 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+class _HomePageState extends State<HomePage>
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   late TabController _tabController;
   final HomeController _homeController = Get.put(HomeController());
   final formOutGlobalKey = GlobalKey<FormState>();
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        showPasscode();
+        break;
+      default:
+      // case AppLifecycleState.inactive:
+      //   print("app in inactive");
+      //   break;
+      // case AppLifecycleState.paused:
+      //   print("app in paused");
+      //   break;
+      // case AppLifecycleState.detached:
+      //   print("app in detached");
+      //   break;
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    // _homeController.getPasscode();
     _tabController = TabController(length: 3, vsync: this);
     _homeController.getAllTransactionList(
-        dateStart: _homeController.getDateStart(),
-        dateEnd: _homeController.getDateEnd());
+      dateStart: _homeController.getDateStart(),
+      dateEnd: _homeController.getDateEnd(),
+    );
+    
+    showPasscode();
+  }
+
+  void showPasscode() async{
+
+    if (await _homeController.getPasscode() != null) {
+      Future.delayed(const Duration(seconds: 0), () {
+        if (!_homeController.isPasscodeOn.value) {
+          _homeController.isPasscodeOn.value = true;
+          screenLock(
+            context: context,
+            correctString: _homeController.passcode.value!,
+            canCancel: false,
+            didUnlocked: () {
+              _homeController.isPasscodeOn.value = false;
+              Navigator.pop(context);
+            },
+          );
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   void monthDialog() {
@@ -35,8 +86,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               onNextYear: () => _homeController.prevNextYear(next: true),
               activeMonth: _homeController.currentDate.value.month,
               activeYear: _homeController.currentDate.value.year,
-              onThisMonthSelected: (){
-                _homeController.goToMonth(DateTime.now().month, year: DateTime.now().year);
+              onThisMonthSelected: () {
+                _homeController.goToMonth(DateTime.now().month,
+                    year: DateTime.now().year);
                 Navigator.pop(context);
               },
             ));
@@ -53,12 +105,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           // title: const Text('Inventory Management',
           //     style: TextStyle(fontSize: 14)),
           actions: [
-            Obx(()=>FilterDateButton(
-              onPrevMonthPressed: () => _homeController.prevNextMonth(prev: true),
-              onMonthPressed: monthDialog,
-              onNextMonthPressed: () => _homeController.prevNextMonth(next: true),
-              date: _homeController.currentDate.value,
-            )),
+            Obx(() => FilterDateButton(
+                  onPrevMonthPressed: () =>
+                      _homeController.prevNextMonth(prev: true),
+                  onMonthPressed: monthDialog,
+                  onNextMonthPressed: () =>
+                      _homeController.prevNextMonth(next: true),
+                  date: _homeController.currentDate.value,
+                )),
           ],
           bottom: TabBar(
             controller: _tabController,
@@ -306,8 +360,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 return suggestionsBox;
                               },
                               onSuggestionSelected: (suggestion) {
-                                distributorTextController.text = suggestion
-                                    .toString();
+                                distributorTextController.text =
+                                    suggestion.toString();
                                 // this._typeAheadController.text = suggestion;
                               },
                               validator: (value) {

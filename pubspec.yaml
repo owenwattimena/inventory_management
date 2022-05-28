@@ -31,9 +31,11 @@ dependencies:
   cupertino_icons: ^1.0.2
   datetime_picker_formfield: any
   encrypt: ^5.0.1
+  external_path: ^1.0.1
   file_picker: any
   flutter:
     sdk: flutter
+  flutter_screen_lock: ^5.0.12
   flutter_slidable: ^1.2.0
   flutter_speed_dial: ^6.0.0
   flutter_typeahead: ^3.2.5
@@ -44,6 +46,8 @@ dependencies:
   path_provider: ^2.0.9
   permission_handler: null
   share_plus: ^4.0.4
+  shared_preferences: ^2.0.15
+  slugify: ^2.0.0
   sqflite: ^2.0.2+1
 
 dev_dependencies:

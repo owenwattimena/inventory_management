@@ -368,7 +368,8 @@ class TransactionService {
         t.warehouse, 
         t.take_in_by, 
         t.division, 
-        td.quantity
+        td.quantity,
+        td.stock
         FROM transaction_detail as td
         JOIN product_transaction as t
         ON td.transaction_id = t.transaction_id
@@ -390,7 +391,8 @@ class TransactionService {
         t.warehouse, 
         t.take_in_by, 
         t.division, 
-        td.quantity
+        td.quantity,
+        td.stock
         FROM transaction_detail as td
         JOIN product_transaction as t
         ON td.transaction_id = t.transaction_id

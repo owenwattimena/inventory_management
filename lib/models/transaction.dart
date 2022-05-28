@@ -13,6 +13,7 @@ class Transaction {
   final String? createdBy;
   final int? createdAt;
   final int? totalItem;
+  final int? stock;
   final TransactionStatus? status;
   final String? productSku;
   final String? productBarcode;
@@ -31,6 +32,7 @@ class Transaction {
     this.takeBy,
     this.createdBy,
     this.totalItem,
+    this.stock,
     this.status,
     this.productSku,
     this.productBarcode,
@@ -52,6 +54,7 @@ class Transaction {
         takeBy: json['take_in_by'],
         division: json['division'],
         totalItem: json['quantity'],
+        stock: json['stock'],
         createdBy: json['created_by'],
         productSku: json['sku'],
         productBarcode: json['barcode'],

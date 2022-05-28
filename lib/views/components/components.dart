@@ -9,7 +9,6 @@ import 'package:inventory_management/models/transaction_list.dart';
 import '../../controllers/home_controller.dart';
 import '../../models/transaction.dart';
 import '../../config/text_style.dart';
-import '../../config/colors.dart';
 part 'transaction_date.dart';
 part 'transaction_item.dart';
 part 'transaction_tile.dart';

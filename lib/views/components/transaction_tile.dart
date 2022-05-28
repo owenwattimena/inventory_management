@@ -9,11 +9,13 @@ class TransactionTile extends StatelessWidget {
     final homeController = Get.find<HomeController>(); 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: const BoxDecoration(
-        color: Color(0xffFFFFFF),
-        border: Border(
+            // ignore: prefer_const_constructors
+      decoration: BoxDecoration(
+        color: const Color(0xffFFFFFF),
+        border: const Border(
+            // ignore: prefer_const_constructors
             bottom: BorderSide(
-          color: greyColor,
+          color: Color.fromARGB(255, 222, 222, 222),
         )),
       ),
       child: Column(

@@ -104,9 +104,14 @@ class _DivisionTransactionPageState extends State<DivisionTransactionPage> {
                       onPressed: () {
                         _showExportDialog();
                       },
-                      child: Text(
-                        'Report',
-                        style: primaryTextStyle.copyWith(color: Colors.black),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.file_copy_sharp, color: Colors.grey),
+                          Text(
+                            'Export',
+                            style: primaryTextStyle.copyWith(color: Colors.black, fontWeight: FontWeight.w400),
+                          ),
+                        ],
                       ),
                     ),
                     // Obx(
