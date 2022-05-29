@@ -20,6 +20,7 @@ class Transaction {
   final String? productName;
   final String? productUom;
   final String? productCategory;
+  final String? photo;
 
   Transaction({
     this.createdAt,
@@ -39,6 +40,7 @@ class Transaction {
     this.productName,
     this.productUom,
     this.productCategory,
+    this.photo,
   });
 
   factory Transaction.fromMapObject(Map<String, dynamic> json) => Transaction(
@@ -61,5 +63,6 @@ class Transaction {
         productName: json['name'],
         productUom: json['uom'],
         productCategory: json['category'],
+        photo: json['photo'],
       );
 }

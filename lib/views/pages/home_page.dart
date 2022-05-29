@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage>
 
     if (await _homeController.getPasscode() != null) {
       Future.delayed(const Duration(seconds: 0), () {
-        if (!_homeController.isPasscodeOn.value) {
+        if (!_homeController.isPasscodeOn.value){
           _homeController.isPasscodeOn.value = true;
           screenLock(
             context: context,

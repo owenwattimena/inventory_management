@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:csv/csv.dart';
+import 'package:external_path/external_path.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:inventory_management/models/product.dart';
@@ -15,6 +16,21 @@ class TransactionRepository {
       String transactionId, Product product) async {
     return await TransactionService()
         .setTransactionProduct(transactionId, product);
+  }
+
+  static Future<bool> setTransactionPhoto(
+      String transactionId, String? photo) async {
+    return await TransactionService().setTransactionPhoto(transactionId, photo);
+  }
+
+  static Future<bool> deleteTransactionPhoto(String photo) async {
+    File file = File(photo);
+    try {
+      await file.delete();
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   static Future<bool> deleteTransactionProduct(
@@ -40,6 +56,7 @@ class TransactionRepository {
     }
     return takeInBy;
   }
+
   static Future<List<String>> getDistributor(String query) async {
     final result = await TransactionService().getDistributor(query);
     List<String> distributor = [];
@@ -56,7 +73,9 @@ class TransactionRepository {
   static Future<List<TransactionList>> getGroupTransactionByDate(
       {required TransactionType type,
       String? division,
-      TransactionStatus? status, int? dateStart, int? dateEnd}) async {
+      TransactionStatus? status,
+      int? dateStart,
+      int? dateEnd}) async {
     final transactionService = TransactionService();
 
     String _type = type == TransactionType.entry
@@ -74,7 +93,11 @@ class TransactionRepository {
     }
 
     final _transaction = await transactionService.getGroupTransactionByDate(
-        type: _type, division: division, status: _status, dateStart: dateStart, dateEnd: dateEnd);
+        type: _type,
+        division: division,
+        status: _status,
+        dateStart: dateStart,
+        dateEnd: dateEnd);
     if (_transaction.isEmpty) return [];
     List<TransactionList> transactionList = [];
     for (var item in _transaction) {
@@ -107,6 +130,7 @@ class TransactionRepository {
           division: item['division'].toString(),
           distributor: item['distributor'].toString(),
           takeBy: item['take_in_by'].toString(),
+          photo: item['photo'].toString(),
           createdBy: item['created_by'].toString(),
           warehouse: item['warehouse'].toString(),
           createdAt: int.parse(item['created_at'].toString()),
@@ -135,6 +159,7 @@ class TransactionRepository {
               createdBy: item['created_by'].toString(),
               warehouse: item['warehouse'].toString(),
               createdAt: int.parse(item['created_at'].toString()),
+              photo: item['photo'].toString(),
               totalItem: total,
               status: item['status'] == 'pending'
                   ? TransactionStatus.pending
@@ -181,7 +206,8 @@ class TransactionRepository {
         .setTransactionFinished(transactionId, type);
   }
 
-  static Future<void> importFile(PlatformFile file, String transactionId) async {
+  static Future<void> importFile(
+      PlatformFile file, String transactionId) async {
     final transactionService = TransactionService();
     final input = File(file.path!).openRead();
     final fields = await input
@@ -201,4 +227,28 @@ class TransactionRepository {
     }
   }
 
+  // SAVE IMAGE
+  static Future<File> uploadImage(File file) async {
+    var storage = await ExternalPath.getExternalStorageDirectories();
+    String dir;
+    Directory _dir;
+    if (storage.length > 1) {
+      dir = storage[1];
+      _dir = await Directory(dir + "/Pictures/inventory_management").create();
+    } else {
+      dir = await ExternalPath.getExternalStoragePublicDirectory(
+          ExternalPath.DIRECTORY_PICTURES);
+      _dir = await Directory(dir + "/inventory_management").create();
+    }
+
+    //   // copy the file to a new path
+    // final image = decodeImage(file.readAsBytesSync());
+    String path = _dir.path +
+        "/" +
+        DateFormat('yyyyMMddhhmmss').format(DateTime.now()) +
+        ".jpg";
+    // final _file =  File(path)..writeAsBytesSync(encodePng(image!));
+    final _file = file.copy(path);
+    return _file;
+  }
 }

@@ -10,7 +10,6 @@ class TransactionDetailPage extends StatefulWidget {
 
 class _TransactionDetailPageState extends State<TransactionDetailPage> {
   final transactionController = Get.put(TransactionController());
-  // final _homeController = Get.find<HomeController>();
 
   late Transaction args;
   final ImagePicker _picker = ImagePicker();
@@ -20,6 +19,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
     super.initState();
     args = widget.transaction;
     transactionController.getTransaction(args.transactionId!);
+    transactionController.imagePath.value = args.photo;
   }
 
   @override
@@ -60,22 +60,58 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
             : const EdgeInsets.all(0),
         children: [
           (args.type == TransactionType.out)
-              ?
-              // ignore: prefer_const_constructors
-              InkWell(
-                  onTap: _showImagePicker,
-                  child: Obx(() => Container(
-                        color: Colors.grey[200],
-                        child: transactionController.imagePath.value.isEmpty
-                            ? Icon(Icons.supervised_user_circle_outlined,
-                                size: 131, color: Colors.grey[400])
-                            : Image.file(
-                                File(transactionController.imagePath.value),
-                                height: 165,
+              ? Obx(
+                  () => transactionController.imagePath.value == null ||
+                          transactionController.imagePath.value == 'null'
+                      ? Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              // ignore: prefer_const_literals_to_create_immutables
+                              children: [
+                                const Text('Photo'),
+                                IconButton(
+                                    onPressed: _showImagePicker,
+                                    icon: const Icon(Icons.camera_enhance))
+                              ]),
+                        )
+                      : Stack(
+                          children: [
+                            Container(
+                              // color: Colors.grey[200],
+                              color: Colors.white,
+                              child: Center(
+                                child: Image.file(
+                                  File(transactionController.imagePath.value ??
+                                      ''),
+                                  height: 165,
+                                ),
                               ),
-                      )),
+                            ),
+                            Align(
+                                alignment: Alignment.topRight,
+                                child: IconButton(
+                                    onPressed: () async {
+                                      if (await transactionController
+                                          .setTransactionPhoto(
+                                              args.transactionId!, null)) {
+                                        await transactionController
+                                            .deleteTransactionPhoto(
+                                                transactionController
+                                                    .imagePath.value!);
+                                        transactionController.imagePath.value =
+                                            null;
+                                      }
+                                    },
+                                    icon: const Icon(Icons.close)))
+                          ],
+                        ),
                 )
               : const SizedBox(),
+          Container(
+            color: Colors.grey[200],
+            height: 12,
+          ),
           Obx(
             () => Column(
               children: transactionController.products.value
@@ -204,7 +240,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
     );
   }
 
-  Future<void> _showFinalConfirmDialog()async{
+  Future<void> _showFinalConfirmDialog() async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -266,6 +302,11 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
               onPressed: () async {
                 if (await transactionController
                     .deleteTransaction(transactionID)) {
+                  if (transactionController.imagePath.value != null ||
+                      transactionController.imagePath.value != 'null') {
+                    await transactionController.deleteTransactionPhoto(
+                        transactionController.imagePath.value!);
+                  }
                   Navigator.pop(context, true);
                 } else {
                   Navigator.pop(context, false);
@@ -279,48 +320,116 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
   }
 
   Future<void> _showImagePicker() async {
-    return showDialog<void>(
+    showDialog(
       context: context,
-      barrierDismissible: false, // user must tap button!
+      barrierColor: Colors.transparent,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Choose your picture'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                ElevatedButton(
-                  child: const Text('Gallery'),
-                  onPressed: () async {
-                    // check status permission
-                    if (!await transactionController.checkPermission()) return;
-                    image =
-                        await _picker.pickImage(source: ImageSource.gallery);
+        return Padding(
+          padding: const EdgeInsets.only(top: 105, right: 16),
+          child: Align(
+            alignment: Alignment.topRight,
+            child: DecoratedBox(
+              position: DecorationPosition.background,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: const Offset(0, 3), // changes position of shadow
+                  ),
+                ],
+              ),
+              child: Container(
+                color: Colors.white,
+                width: MediaQuery.of(context).size.width * 0.5,
+                child: IntrinsicHeight(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      GestureDetector(
+                          child: Container(
+                              padding: const EdgeInsets.all(12),
+                              width: double.infinity,
+                              child: Text(
+                                'Gallery',
+                                style: primaryTextStyle.copyWith(
+                                    decoration: TextDecoration.none),
+                                textAlign: TextAlign.left,
+                              )),
+                          onTap: () async {
+                            if (!await transactionController.checkPermission()){
+                              return;
+                            }
+                            image = await _picker.pickImage(
+                                source: ImageSource.gallery, imageQuality: 15);
+                            if (image != null) {
+                              // transactionController.imagePath.value =
+                              // image!.path;
 
-                    File? _file = await transactionController
-                        .saveImage(File(image!.path));
-                    if (_file != null) {
-                      transactionController.imagePath.value = _file.path;
-                    }
-                    // print(_file!.path);
-                    Navigator.of(context).pop();
-                  },
+                              transactionController
+                                  .uploadImage(File(image!.path))
+                                  .then((val) async {
+                                if (val != null) {
+                                  if (await transactionController
+                                      .setTransactionPhoto(
+                                          args.transactionId!, val.path)) {
+                                    transactionController.imagePath.value =
+                                        val.path;
+                                  } else {
+                                    transactionController.imagePath.value =
+                                        null;
+                                  }
+                                }
+                              });
+                            }
+                            Navigator.of(context).pop();
+                          }),
+                      GestureDetector(
+                          child: Container(
+                              padding: const EdgeInsets.all(12),
+                              width: double.infinity,
+                              child: Text(
+                                'Camera',
+                                style: primaryTextStyle.copyWith(
+                                    decoration: TextDecoration.none),
+                                textAlign: TextAlign.left,
+                              )),
+                          onTap: () async {
+                            // check status permission
+                            if (!await transactionController.checkPermission())
+                            {
+                              return;
+                            }
+                            image = await _picker.pickImage(
+                                source: ImageSource.camera, imageQuality: 15);
+                            if (image != null) {
+                              // transactionController.imagePath.value =
+                              //     image!.path;
+                              transactionController
+                                  .uploadImage(File(image!.path))
+                                  .then((val) async {
+                                if (val != null) {
+                                  if (await transactionController
+                                      .setTransactionPhoto(
+                                          args.transactionId!, val.path)) {
+                                    transactionController.imagePath.value =
+                                        val.path;
+                                  } else {
+                                    transactionController.imagePath.value =
+                                        null;
+                                  }
+                                }
+                              });
+                            }
+                            Navigator.of(context).pop();
+                          }),
+                    ],
+                  ),
                 ),
-                ElevatedButton(
-                  child: const Text('Camera'),
-                  onPressed: () async {
-                    // check status permission
-                    if (!await transactionController.checkPermission()) return;
-                    image = await _picker.pickImage(source: ImageSource.camera);
-                    File? _file = await transactionController
-                        .saveImage(File(image!.path));
-                    if (_file != null) {
-                      transactionController.imagePath.value = _file.path;
-                    }
-                    // print(_file!.path);
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
+              ),
             ),
           ),
         );
@@ -425,36 +534,39 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
   Future<void> _showImportDialog(BuildContext context) {
     final importFileController = TextEditingController();
 
-    return showDialog<void>(context: context, builder: (BuildContext context){
-      return AlertDialog(
-          title: const Text('Import'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                GestureDetector(
-                  onTap: () async {
-                    await transactionController.openFilePicker();
-                    importFileController.text =
-                        transactionController.file.value.name;
-                  },
-                  child: TextField(
-                    enabled: false,
-                    controller: importFileController,
+    return showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Import'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  GestureDetector(
+                    onTap: () async {
+                      await transactionController.openFilePicker();
+                      importFileController.text =
+                          transactionController.file.value.name;
+                    },
+                    child: TextField(
+                      enabled: false,
+                      controller: importFileController,
+                    ),
                   ),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    await transactionController.importFile(args.transactionId!);
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('Import Success'),
-                    ));
-                  },
-                  child: const Text('IMPORT FILE'),
-                ),
-              ],
+                  ElevatedButton(
+                    onPressed: () async {
+                      await transactionController
+                          .importFile(args.transactionId!);
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Import Success'),
+                      ));
+                    },
+                    child: const Text('IMPORT FILE'),
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
-    });
+          );
+        });
   }
 }

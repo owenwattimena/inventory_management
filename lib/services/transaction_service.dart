@@ -37,6 +37,25 @@ class TransactionService {
     return result > 0;
   }
 
+  Future<bool> setTransactionPhoto(
+      String transactionId, String? photo) async {
+    Database db = await database.database;
+    var sqlCheck =
+        'SELECT * FROM product_transaction WHERE transaction_id = ?';
+    var data = await db.rawQuery(sqlCheck, [transactionId]);
+    int result = 0;
+    if (data.isNotEmpty) {
+      var sql = '''
+      UPDATE product_transaction SET photo = ? WHERE transaction_id = ?''';
+      result = await db.rawInsert(
+          sql, [photo, transactionId]);
+    } else {
+      result = 0;
+    }
+    return result > 0;
+  }
+
+
   Future<bool> deleteTransactionProduct(
       String transactionId, String sku) async {
     Database db = await database.database;

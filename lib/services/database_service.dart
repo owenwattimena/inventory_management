@@ -52,6 +52,7 @@ class DatabaseService {
         distributor TEXT,
         warehouse TEXT,
         take_in_by TEXT,
+        photo TEXT,
         division TEXT,
         created_by TEXT,
         status TEXT)''');
