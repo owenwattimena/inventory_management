@@ -22,10 +22,21 @@ class _ProductPageState extends State<ProductPage> {
       appBar: AppBar(
         title: const Text('Product'),
         actions: [
-          IconButton(
-            onPressed: _showExportDialog,
-            icon: const Icon(Icons.upload),
-          )
+          // IconButton(
+          //   onPressed: _showExportDialog,
+          //   icon: const Icon(Icons.upload),
+          // ),
+          PopupMenuButton<String>(
+            onSelected: (_) => _showExportDialog(),
+            itemBuilder: (BuildContext context) {
+              return {'Export'}.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
+            },
+          ),
         ],
       ),
       // ignore: prefer_const_literals_to_create_immutables
@@ -43,40 +54,56 @@ class _ProductPageState extends State<ProductPage> {
               () => ListView.builder(
                 padding: const EdgeInsets.only(bottom: 80),
                 itemCount: productController.listProduct.value.length,
-                itemBuilder: (context, index) => GestureDetector(
-                  onTap: () async {
-                    await Navigator.pushNamed(context, '/product-detail',
-                        arguments: productController.listProduct.value[index]);
-                    Get.delete<ProductTransactionController>();
-                  },
-                  child: ProductTile(
-                    product: productController.listProduct.value[index],
+                itemBuilder: (context, index) => Slidable(
+                  key: Key(productController.listProduct.value[index].sku!),
+                      direction: Axis.horizontal,
+                      endActionPane: ActionPane(
+                        motion: const ScrollMotion(),
+                        children: [
+                          SlidableAction(
+                            // An action can be bigger than the others.
+                            flex: 2,
+                            onPressed: (_) async {
+                              if (await productController
+                                  .deleteProduct(productController.listProduct.value[index].sku!)) {
+                                
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text(
+                                      'Success. Product deleted successfully.'),
+                                ));
+                                productController.getProducts();
+                              } else {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text(
+                                      'Error. The product has a relationship in the transaction.'),
+                                ));
+                              }
+                            },
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            icon: Icons.delete,
+                            label: 'DELETE',
+                          ),
+                        ],
+                      ),
+                  child: GestureDetector(
+                    onTap: () async {
+                      await Navigator.pushNamed(context, '/product-detail',
+                          arguments: productController.listProduct.value[index]);
+                      Get.delete<ProductTransactionController>();
+                    },
+                    child: ProductTile(
+                      product: productController.listProduct.value[index],
+                    ),
                   ),
                 ),
               ),
             ),
-            // child: ListView(
-            //   children: [
-            //     GestureDetector(
-            //       onTap: () async{
-            //         await Navigator.pushNamed(context, '/product-detail');
-            //         Get.delete<ProductTransactionController>();
-            //       },
-            //       child: ProductTile(
-            //         product: products[0],
-            //       ),
-            //     ),
-            //   ],
-            // ),
           ),
         ],
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     _showImportDialog();
-      //   },
-      //   child: const Icon(Icons.add),
-      // ),
       floatingActionButton: SpeedDial(
         icon: Icons.add,
         activeIcon: Icons.close,
@@ -291,14 +318,24 @@ class _ProductPageState extends State<ProductPage> {
                   child: TextField(
                     enabled: false,
                     controller: importFileController,
+                    decoration: const InputDecoration(
+                      hintText: 'Select File',
+                    ),
                   ),
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    await productController.importFile();
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('Import Success'),
-                    ));
+                    if (importFileController.text.isNotEmpty) {
+                      await productController.importFile();
+                      Navigator.of(context).pop();
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Import Success'),
+                      ));
+                    }else{
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Please select the file first.'),
+                      ));
+                    }
                   },
                   child: const Text('IMPORT FILE'),
                 ),
@@ -341,7 +378,8 @@ class _ProductPageState extends State<ProductPage> {
                     ? TypeAheadFormField(
                         textFieldConfiguration: TextFieldConfiguration(
                             controller: exportFileController,
-                            decoration: const InputDecoration(labelText: 'Category')),
+                            decoration:
+                                const InputDecoration(labelText: 'Category')),
                         suggestionsCallback: (pattern) {
                           // return CitiesService.getSuggestions(pattern);
                           return productController.getCategory(pattern);
@@ -367,7 +405,8 @@ class _ProductPageState extends State<ProductPage> {
                       )
                     : const SizedBox()),
                 ElevatedButton(
-                  onPressed: ()async => await productController.exportProduct(category: exportFileController.text),
+                  onPressed: () async => await productController.exportProduct(
+                      category: exportFileController.text),
                   child: const Text('EXPORT'),
                 ),
               ],

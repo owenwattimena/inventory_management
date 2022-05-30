@@ -32,7 +32,7 @@ class ProductRepository {
   }
 
   static Future<bool> addProduct(Product product) async {
-    final result = await ProductService().addProduct(product);
+    final result = await ProductService().storeProduct(product);
     return result;
   }
 
@@ -58,6 +58,12 @@ class ProductRepository {
       // }
     }
     return data;
+  }
+
+  static Future<bool> deleteProduct(String sku)async{
+    final productService = ProductService();
+    final result = await productService.deleteProduct(sku);
+    return result;
   }
 
   static Future<List<Transaction>> getProductTransaction(
@@ -152,6 +158,7 @@ class ProductRepository {
         'PRODUCT NAME',
         'UOM',
         'STOCK',
+        'PRICE',
         'CATEGORY',
       ]
     ];
@@ -162,6 +169,7 @@ class ProductRepository {
       row.add(item.name);
       row.add(item.uom);
       row.add(item.stock);
+      row.add(item.price);
       row.add(item.category);
 
       rows.add(row);

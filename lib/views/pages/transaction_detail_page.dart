@@ -269,7 +269,9 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                 if (await transactionController.setTransactionFinished(
                     args.transactionId!, args.type!)) {
                   Navigator.of(context).pop();
+                  Navigator.of(context).pop();
                 } else {
+                  Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                     content: Text('Error. Transaction not finished.'),
                   ));

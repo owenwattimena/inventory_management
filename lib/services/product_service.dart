@@ -31,28 +31,28 @@ class ProductService {
     return mapObject;
   }
 
-  Future<bool> addProduct(Product product) async {
-    final db = await database.database;
-    var sql = '''SELECT sku, barcode FROM product WHERE sku = ?''';
-    // '''SELECT sku, barcode FROM product WHERE sku = ? OR barcode = ?''';
-    var data = await db.rawQuery(sql, [product.sku]);
-    if (data.isEmpty) {
-      sql = '''
-    INSERT INTO product (id, sku, barcode, name, category, uom, price) VALUES (?, ?, ?, ?, ?, ?, ?)
-    ''';
-      var result = await db.rawInsert(sql, [
-        null,
-        product.sku,
-        product.barcode,
-        product.name,
-        product.category,
-        product.uom,
-        product.price
-      ]);
-      return result > 0;
-    }
-    return false;
-  }
+  // Future<bool> addProduct(Product product) async {
+  //   final db = await database.database;
+  //   var sql = '''SELECT sku, barcode FROM product WHERE sku = ?''';
+  //   // '''SELECT sku, barcode FROM product WHERE sku = ? OR barcode = ?''';
+  //   var data = await db.rawQuery(sql, [product.sku]);
+  //   if (data.isEmpty) {
+  //     sql = '''
+  //   INSERT INTO product (id, sku, barcode, name, category, uom, price) VALUES (?, ?, ?, ?, ?, ?, ?)
+  //   ''';
+  //     var result = await db.rawInsert(sql, [
+  //       null,
+  //       product.sku,
+  //       product.barcode,
+  //       product.name,
+  //       product.category,
+  //       product.uom,
+  //       product.price
+  //     ]);
+  //     return result > 0;
+  //   }
+  //   return false;
+  // }
 
   Future<List<Map<String, Object?>>> getProduct(
       {String? query, String? category}) async {
@@ -78,6 +78,22 @@ class ProductService {
       mapObject = await db.rawQuery(sql);
     }
     return mapObject;
+  }
+
+  Future<bool> deleteProduct(String sku) async {
+    final db = await database.database;
+    var sql = '''
+    SELECT sku FROM transaction_detail WHERE sku = ?
+    ''';
+    var result = await db.rawQuery(sql, [sku]);
+    if (result.isEmpty) {
+      sql = '''
+    DELETE FROM product WHERE sku = ?
+    ''';
+      return (await db.rawDelete(sql, [sku])) > 0;
+    } else {
+      return false;
+    }
   }
 
   Future<Map<String, Object?>?> getLastProductTransaction(String sku) async {
@@ -110,14 +126,15 @@ class ProductService {
     int result = 0;
     if (mapObject.isEmpty) {
       const sql =
-          'INSERT INTO product(id, sku, barcode, name, uom, category) VALUES(?,?,?,?,?,?)';
+          'INSERT INTO product(id, sku, barcode, name, uom, category, price) VALUES(?,?,?,?,?,?,?)';
       result = await db.rawInsert(sql, [
         null,
         product.sku,
         product.barcode,
         product.name,
         product.uom,
-        product.category
+        product.category,
+        product.price
       ]);
     } else {
       final sql = '''
@@ -125,7 +142,8 @@ class ProductService {
       barcode = "${product.barcode}", 
       name = "${product.name}", 
       uom = "${product.uom}", 
-      category = "${product.category}" 
+      category = "${product.category}",
+      price = ${product.price} 
       WHERE sku = "${product.sku}"
       ''';
       result = await db.rawUpdate(sql);

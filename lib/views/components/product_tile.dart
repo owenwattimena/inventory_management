@@ -22,13 +22,13 @@ class ProductTile extends StatelessWidget {
           ),
           const SizedBox(height: 3),
           Text('${product.name}',
-              style: primaryTextStyleBold.copyWith(fontSize: 16)),
+              style: primaryTextStyleBold.copyWith(fontSize: 16)),  
           const SizedBox(height: 3),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             // ignore: prefer_const_literals_to_create_immutables
             children: [
-              Text(product.barcode ?? '-', style: primaryTextStyle.copyWith(color:Colors.grey[700])),
+              Text((product.barcode ?? '-') + ' ~ ' + ( product.price != null  ? NumberFormat.currency(locale: 'id_ID', decimalDigits: 0, symbol:'Rp ').format(product.price) : '-'), style: primaryTextStyle.copyWith(color:Colors.grey[700])),
               Text('${product.stock} ${product.uom}', style: primaryTextStyle.copyWith(color:Colors.grey[700])),
             ],
           ),

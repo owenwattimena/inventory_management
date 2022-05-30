@@ -22,6 +22,11 @@ class ProductController extends GetxController {
     return result;
   }
 
+  Future<bool> deleteProduct(String sku) async {
+    final result = await ProductRepository.deleteProduct(sku);
+    return result;
+  }
+
   Future<List<String>> getCategory(String query) async {
     return await ProductRepository.getCategory(query:query);
   }

@@ -188,6 +188,7 @@ class TransactionRepository {
         name: item['name'].toString(),
         uom: item['uom'].toString(),
         category: item['category'].toString(),
+        price: int.parse(item['price'].toString()),
         stock: (item['quantity'] != null)
             ? int.parse(item['quantity'].toString())
             : 0,
