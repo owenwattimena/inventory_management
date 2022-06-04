@@ -90,6 +90,15 @@ class TransactionService {
     List<Map<String, Object?>> mapObject = await db.rawQuery(sql);
     return mapObject;
   }
+ 
+  Future<List<Map<String, Object?>>> getAuditor(String query) async {
+    final db = await database.database;
+    var sql = '''
+    SELECT DISTINCT created_by FROM product_transaction WHERE created_by LIKE '%$query%'
+''';
+    List<Map<String, Object?>> mapObject = await db.rawQuery(sql);
+    return mapObject;
+  }
 
   Future<bool> createTransaction(transacion.Transaction transaction) async {
     final Database db = await database.database;
@@ -174,6 +183,26 @@ class TransactionService {
       orderBy: 'created_at DESC',
     );
     return mapObject;
+  }
+
+  Future<List<Map<String, Object?>>> groupTransactionProduct(
+      {String type = 'out',
+      int? dateStart,
+      int? dateEnd}) async {
+    Database db = await database.database;
+    // List<Map<String, Object?>> mapObject;
+    String sql = '''
+      SELECT p.sku, p.name, SUM(td.quantity) AS total, p.uom, p.barcode, p.category, p.price FROM 
+      product_transaction AS t 
+      JOIN transaction_detail AS td 
+      ON t.transaction_id = td.transaction_id 
+      JOIN product AS p
+      ON td.sku = p.sku
+      WHERE type = ? AND created_at >= ? AND created_at <= ? 
+      GROUP BY td.sku
+    ''';
+    final result = await db.rawQuery(sql, [type, dateStart, dateEnd]);
+    return result;
   }
 
   Future<int> getTotalItem(String transactionId) async {

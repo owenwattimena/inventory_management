@@ -1,12 +1,10 @@
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:csv/csv.dart';
+import 'package:excel/excel.dart';
 import 'package:external_path/external_path.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:inventory_management/models/product.dart';
-
 import '../models/transaction.dart';
 import '../models/transaction_list.dart';
 import '../services/transaction_service.dart';
@@ -66,8 +64,44 @@ class TransactionRepository {
     return distributor;
   }
 
+  static Future<List<String>> getAuditor(String query) async {
+    final result = await TransactionService().getAuditor(query);
+    List<String> auditor = [];
+    for (var i = 0; i < result.length; i++) {
+      auditor.add(result[i]['created_by'].toString());
+    }
+    return auditor;
+  }
+
   static Future<bool> createTransaction(Transaction transaction) async {
     return await TransactionService().createTransaction(transaction);
+  }
+
+  static Future<List<Product>> groupTransactionProduct(
+      {int? dateStart, int? dateEnd}) async {
+    final result = await TransactionService()
+        .groupTransactionProduct(dateStart: dateStart, dateEnd: dateEnd);
+    List<Product> data = [];
+    for (var item in result) {
+      data.add(
+        Product(
+          sku: item['sku'].toString(),
+          barcode: item['barcode'].toString(),
+          name: item['name'].toString(),
+          uom: item['uom'].toString(),
+          stock:int.parse(item['total'].toString()),
+          price: int.parse(item['price'].toString()),
+          category: item['category'].toString(),
+        )
+        // PieChart(
+        //   item['name'].toString(),
+        //   int.parse(item['total'].toString()),
+        //   item['name'].toString(),
+        //   item['uom'].toString(),
+        // ),
+      );
+    }
+    return data;
   }
 
   static Future<List<TransactionList>> getGroupTransactionByDate(
@@ -91,6 +125,9 @@ class TransactionRepository {
               ? 'finished'
               : 'Cancelled';
     }
+    // await transactionService.groupTransactionProduct(
+    //     dateStart: dateStart,
+    //     dateEnd: dateEnd);
 
     final _transaction = await transactionService.getGroupTransactionByDate(
         type: _type,
@@ -209,27 +246,55 @@ class TransactionRepository {
 
   static Future<void> importFile(
       PlatformFile file, String transactionId) async {
-    final transactionService = TransactionService();
-    final input = File(file.path!).openRead();
-    final fields = await input
-        .transform(utf8.decoder)
-        .transform(const CsvToListConverter())
-        .toList();
-    for (int i = 0; i < fields.length; i++) {
-      if (i > 0) {
-        // int j = 1 + i;
-        Product product = Product(
-          sku: fields[i][0],
-          name: fields[i][1],
-          stock: int.parse(fields[i][2].toString()),
-        );
-        await transactionService.setTransactionProduct(transactionId, product);
+    var bytes = File(file.path!).readAsBytesSync();
+    var excel = Excel.decodeBytes(bytes);
+
+    for (var table in excel.tables.keys) {
+      var rows = excel.tables[table]?.rows;
+      if (rows != null) {
+        for (var i = 0; i < rows.length; i++) {
+          if (i > 0) {
+            int stock = 0;
+            if (rows[i][2]!.value is double) {
+              stock = rows[i][2]!.value.toInt();
+            } else if (rows[i][2]!.value is String) {
+              stock = int.parse(rows[i][2]!.value);
+            }
+            Product product = Product(
+              sku: rows[i][0]?.value,
+              name: rows[i][1]?.value,
+              stock: stock,
+            );
+            await TransactionService()
+                .setTransactionProduct(transactionId, product);
+          }
+        }
       }
     }
   }
+  // static Future<void> importFile(
+  //     PlatformFile file, String transactionId) async {
+  //   final transactionService = TransactionService();
+  //   final input = File(file.path!).openRead();
+  //   final fields = await input
+  //       .transform(utf8.decoder)
+  //       .transform(const CsvToListConverter())
+  //       .toList();
+  //   for (int i = 0; i < fields.length; i++) {
+  //     if (i > 0) {
+  //       // int j = 1 + i;
+  //       Product product = Product(
+  //         sku: fields[i][0],
+  //         name: fields[i][1],
+  //         stock: int.parse(fields[i][2].toString()),
+  //       );
+  //       await transactionService.setTransactionProduct(transactionId, product);
+  //     }
+  //   }
+  // }
 
   // SAVE IMAGE
-  static Future<File> uploadImage(File file) async {
+  static Future<File> uploadImage(File file, String transactionId) async {
     var storage = await ExternalPath.getExternalStorageDirectories();
     String dir;
     Directory _dir;
@@ -244,10 +309,7 @@ class TransactionRepository {
 
     //   // copy the file to a new path
     // final image = decodeImage(file.readAsBytesSync());
-    String path = _dir.path +
-        "/" +
-        DateFormat('yyyyMMddhhmmss').format(DateTime.now()) +
-        ".jpg";
+    String path = _dir.path + "/" + transactionId + ".jpg";
     // final _file =  File(path)..writeAsBytesSync(encodePng(image!));
     final _file = file.copy(path);
     return _file;

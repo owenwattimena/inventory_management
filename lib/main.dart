@@ -35,6 +35,7 @@ class MyApp extends StatelessWidget {
         '/division': (context) => const DivisionPage(),
         '/more': (context) => const MorePage(),
         '/backup' : (context) => const BackupPage(),
+        '/chart' : (context) => const ChartPage(),
         // '/product-detail': (context) => ProductDetailPage(),
         // '/transaction-detail': (context) => const TransactionDetailPage(),
       },
@@ -46,7 +47,7 @@ class MyApp extends StatelessWidget {
         } 
         else if(settings.name == '/product-detail') {
           return MaterialPageRoute(
-            builder: (context) => ProductDetailPage(settings.arguments as Product),
+            builder: (context) => ProductDetailPage((settings.arguments as List)[0] as Product, selectedTransaction: (settings.arguments as List)[1] as String),
           );
         }
         else if(settings.name == '/division-transaction') {

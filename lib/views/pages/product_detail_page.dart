@@ -2,7 +2,8 @@ part of "pages.dart";
 
 class ProductDetailPage extends StatefulWidget {
   final Product product;
-  const ProductDetailPage(this.product, {Key? key}) : super(key: key);
+  final String? selectedTransaction;
+  const ProductDetailPage(this.product, {Key? key, this.selectedTransaction }) : super(key: key);
 
   @override
   State<ProductDetailPage> createState() => _ProductDetailPageState();
@@ -18,9 +19,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   initState() {
     super.initState();
     product = widget.product;
+    if(widget.selectedTransaction != null) {
+      productTransactionController.selectedTransaction.value = widget.selectedTransaction!;
+    }
     productTransactionController.getListItem(product.sku!,
         _homeController.getDateStart(), _homeController.getDateEnd());
-
   }
 
   void monthDialog() {

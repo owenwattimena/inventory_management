@@ -15,9 +15,13 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'dart:math' as math;
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_screen_lock/flutter_screen_lock.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
+
 
 // COMPONENTS
+import '../../config/colors.dart';
 import '../../controllers/backup_controller.dart';
+import '../../controllers/chart_controller.dart';
 import '../../controllers/division_controller.dart';
 import '../../controllers/passcode_controller.dart';
 import '../../controllers/product_controller.dart';
@@ -32,3 +36,4 @@ part 'division_page.dart';
 part 'division_transaction_page.dart';
 part 'more_page.dart';
 part 'backup_page.dart';
+part 'chart_page.dart';

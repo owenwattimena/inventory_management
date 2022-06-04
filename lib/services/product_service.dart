@@ -55,26 +55,31 @@ class ProductService {
   // }
 
   Future<List<Map<String, Object?>>> getProduct(
-      {String? query, String? category}) async {
+      {String? query, String? category, int page = 1}) async {
+
+    int itemPerPage = 20;
+
+    int offset = (page - 1) * itemPerPage;
+
     Database db = await database.database;
     List<Map<String, Object?>> mapObject;
     List<dynamic> whereArgs;
     if (query == null) {
       if (category == null) {
         var sql = '''
-        SELECT * FROM product
+        SELECT * FROM product LIMIT $itemPerPage OFFSET $offset
         ''';
         mapObject = await db.rawQuery(sql);
       } else {
         var sql = '''
-        SELECT * FROM product WHERE category = ?
+        SELECT * FROM product WHERE category = ? LIMIT $itemPerPage OFFSET $offset
         ''';
         whereArgs = [category];
         mapObject = await db.rawQuery(sql, whereArgs);
       }
     } else {
       var sql =
-          'SELECT * FROM product WHERE name LIKE "%$query%" OR sku LIKE "%$query%" OR barcode LIKE "%$query%"';
+          'SELECT * FROM product WHERE name LIKE "%$query%" OR sku LIKE "%$query%" OR barcode LIKE "%$query%" LIMIT $itemPerPage OFFSET $offset';
       mapObject = await db.rawQuery(sql);
     }
     return mapObject;

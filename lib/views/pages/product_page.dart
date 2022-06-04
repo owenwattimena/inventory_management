@@ -9,11 +9,34 @@ class ProductPage extends StatefulWidget {
 
 class _ProductPageState extends State<ProductPage> {
   final productController = Get.put(ProductController());
+  late ScrollController _controller;
 
   @override
   initState() {
     super.initState();
     productController.getProducts();
+    _controller = ScrollController()..addListener(_loadMore);
+  }
+
+  void _loadMore() async {
+    // if(!productController.hasNextPage.value){
+    //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+    //     content: Text('No more data'),
+    //   ));
+    // }
+    if (productController.hasNextPage.value == true &&
+        productController.isFirstLoadRunning.value == false &&
+        productController.isLoading.value == false &&
+        _controller.position.extentAfter < 300) {
+      productController.isLoading.value =
+          true; // Display a progress indicator at the bottom
+      productController.page.value += 1; // Increase _page by 1
+      try {
+        productController.getProducts(page: productController.page.value);
+      } catch (err) {
+        print('Something went wrong!');
+      }
+    }
   }
 
   @override
@@ -52,46 +75,50 @@ class _ProductPageState extends State<ProductPage> {
           Expanded(
             child: Obx(
               () => ListView.builder(
-                padding: const EdgeInsets.only(bottom: 80),
+                controller: _controller,
+                padding: const EdgeInsets.only(bottom: 8),
                 itemCount: productController.listProduct.value.length,
                 itemBuilder: (context, index) => Slidable(
                   key: Key(productController.listProduct.value[index].sku!),
-                      direction: Axis.horizontal,
-                      endActionPane: ActionPane(
-                        motion: const ScrollMotion(),
-                        children: [
-                          SlidableAction(
-                            // An action can be bigger than the others.
-                            flex: 2,
-                            onPressed: (_) async {
-                              if (await productController
-                                  .deleteProduct(productController.listProduct.value[index].sku!)) {
-                                
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(
-                                  content: Text(
-                                      'Success. Product deleted successfully.'),
-                                ));
-                                productController.getProducts();
-                              } else {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(
-                                  content: Text(
-                                      'Error. The product has a relationship in the transaction.'),
-                                ));
-                              }
-                            },
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                            icon: Icons.delete,
-                            label: 'DELETE',
-                          ),
-                        ],
+                  direction: Axis.horizontal,
+                  endActionPane: ActionPane(
+                    motion: const ScrollMotion(),
+                    children: [
+                      SlidableAction(
+                        // An action can be bigger than the others.
+                        flex: 2,
+                        onPressed: (_) async {
+                          if (await productController.deleteProduct(
+                              productController
+                                  .listProduct.value[index].sku!)) {
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(const SnackBar(
+                              content: Text(
+                                  'Success. Product deleted successfully.'),
+                            ));
+                            productController.getProducts();
+                          } else {
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(const SnackBar(
+                              content: Text(
+                                  'Error. The product has a relationship in the transaction.'),
+                            ));
+                          }
+                        },
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        icon: Icons.delete,
+                        label: 'DELETE',
                       ),
+                    ],
+                  ),
                   child: GestureDetector(
                     onTap: () async {
                       await Navigator.pushNamed(context, '/product-detail',
-                          arguments: productController.listProduct.value[index]);
+                          arguments: [
+                            productController.listProduct.value[index],
+                            'all'
+                          ]);
                       Get.delete<ProductTransactionController>();
                     },
                     child: ProductTile(
@@ -102,6 +129,25 @@ class _ProductPageState extends State<ProductPage> {
               ),
             ),
           ),
+
+          // when the _loadMore function is running
+          Obx(()=> (productController.isLoading.value) ? 
+            const Padding(
+              padding: EdgeInsets.only(top: 10, bottom: 40),
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ) : const SizedBox()),
+
+          // When nothing else to load
+          // Obx(()=> (!productController.hasNextPage.value)?
+          //   Container(
+          //     padding: const EdgeInsets.only(top: 30, bottom: 40),
+          //     color: Colors.grey[200],
+          //     child: const Center(
+          //       child: Text('You have fetched all of the content'),
+          //     ),
+          //   ) : const SizedBox()),
         ],
       ),
       floatingActionButton: SpeedDial(
@@ -331,7 +377,7 @@ class _ProductPageState extends State<ProductPage> {
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                         content: Text('Import Success'),
                       ));
-                    }else{
+                    } else {
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                         content: Text('Please select the file first.'),
                       ));

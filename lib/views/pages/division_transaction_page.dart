@@ -149,7 +149,7 @@ class _DivisionTransactionPageState extends State<DivisionTransactionPage> {
             ),
             Expanded(
               child: Obx(
-                () => ListView.builder(
+                () => divisionController.outTransactionList.value.isNotEmpty ? ListView.builder(
                   itemCount: (divisionController.selectedLayout.value ==
                           divisionController.layout[0])
                       ? divisionController.outTransactionList.value.length
@@ -168,7 +168,7 @@ class _DivisionTransactionPageState extends State<DivisionTransactionPage> {
                                 .outTransactionProductList.value[index]!,
                           );
                   },
-                ),
+                ) : const Center(child: Text('No Data')),
               ),
             )
           ],

@@ -39,9 +39,9 @@ class TransactionController extends GetxController {
     return await ProductRepository.getProduct(query: query);
   }
 
-  Future<File?> uploadImage(File file) async {
+  Future<File?> uploadImage(File file, String transactionId) async {
     try {
-      return await TransactionRepository.uploadImage(file);
+      return await TransactionRepository.uploadImage(file, transactionId);
     } catch (e) {
       // print('error:$e');
       return null;

@@ -1,4 +1,6 @@
-class Product{
+import 'package:excel/excel.dart';
+
+class Product {
   final int? id;
   final String? sku;
   final String? barcode;
@@ -8,39 +10,59 @@ class Product{
   final int? stock;
   final int? price;
 
-  Product({this.id, this.sku, this.barcode, this.name, this.uom, this.category, this.stock, this.price});
+  Product(
+      {this.id,
+      this.sku,
+      this.barcode,
+      this.name,
+      this.uom,
+      this.category,
+      this.stock,
+      this.price});
 
-  factory Product.fromMapObject(Map<String, dynamic> json)=>Product(
-    id: json['id'],
-    sku: json['sku'],
-    name: json['name'],
-    barcode: json['barcode'],
-    uom: json['uom'],
-    category: json['category'],
-    price: json['price'],
-  );
+  factory Product.fromMapObject(Map<String, dynamic> json) => Product(
+        id: json['id'],
+        sku: json['sku'],
+        name: json['name'],
+        barcode: json['barcode'],
+        uom: json['uom'],
+        category: json['category'],
+        price: json['price'],
+      );
 
-  Product copyWith({int? id, String? sku, String? barcode, String? name, String? uom, String? category, int? stock, int? price})=>Product(
-    id: id ?? this.id,
-    sku: sku ?? this.sku,
-    barcode: barcode ?? this.barcode,
-    name: name ?? this.name,
-    uom: uom ?? this.uom,
-    category: category ?? this.category,
-    stock: stock ?? this.stock,
-    price: price ?? this.price,
-  );
+  Product copyWith(
+          {int? id,
+          String? sku,
+          String? barcode,
+          String? name,
+          String? uom,
+          String? category,
+          int? stock,
+          int? price}) =>
+      Product(
+        id: id ?? this.id,
+        sku: sku ?? this.sku,
+        barcode: barcode ?? this.barcode,
+        name: name ?? this.name,
+        uom: uom ?? this.uom,
+        category: category ?? this.category,
+        stock: stock ?? this.stock,
+        price: price ?? this.price,
+      );
 
-  factory Product.fromArray(List array, int id) => Product(
-    id: id,
-    sku: array[0],
-    barcode: array[1],
-    name: array[2],
-    uom: array[3],
-    category: array[4],
-    price: array[5],
-  );
-
+  factory Product.fromArray(List<Data?> array, int id) => Product(
+        id: id,
+        sku: array[0]?.value,
+        barcode: array[1]?.value,
+        name: array[2]?.value,
+        uom: array[3]?.value,
+        category: array[4]?.value,
+        price: array[5]?.value is String
+            ? int.parse(array[5]?.value)
+            : (array[5]?.value is double
+                ? array[5]?.value.round()
+                : array[5]?.value),
+      );
 }
 
 List<Product> products = [

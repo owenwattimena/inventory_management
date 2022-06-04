@@ -15,6 +15,7 @@ class HomeController extends GetxController {
   Rx<DateTime> currentDate = DateTime.now().obs;
   Rx<bool> isPasscodeOn = false.obs;
   Rx<String?> passcode = Rx<String?>(null);
+  RxBool isTabOutActive = true.obs;
 
   @override
   void onInit() {
@@ -88,8 +89,14 @@ class HomeController extends GetxController {
     final result = await TransactionRepository.getDistributor(query);
     return result;
   }
+  Future<List<String>> getAuditor(String query) async {
+    final result = await TransactionRepository.getAuditor(query);
+    return result;
+  }
 
   void getAllTransactionList({int? dateStart, int? dateEnd}) {
+    dateStart ??= getDateStart();
+    dateEnd ??= getDateEnd();
     getEntryTransaction(dateStart: dateStart, dateEnd: dateEnd);
     getOutTransaction(dateStart: dateStart, dateEnd: dateEnd);
     getAuditTransaction(dateStart: dateStart, dateEnd: dateEnd);

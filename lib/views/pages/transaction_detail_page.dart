@@ -63,7 +63,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
               ? Obx(
                   () => transactionController.imagePath.value == null ||
                           transactionController.imagePath.value == 'null'
-                      ? Container(
+                      ? (args.status == TransactionStatus.pending) ? Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -74,23 +74,25 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                                     onPressed: _showImagePicker,
                                     icon: const Icon(Icons.camera_enhance))
                               ]),
-                        )
+                        ) : const SizedBox()
                       : Stack(
                           children: [
                             Container(
                               // color: Colors.grey[200],
                               color: Colors.white,
                               child: Center(
-                                child: Image.file(
-                                  File(transactionController.imagePath.value ??
-                                      ''),
+                                child: File(transactionController.imagePath.value?? '').existsSync() ? Image.file(
+                                  File(transactionController.imagePath.value!),
                                   height: 165,
+                                ) : const Padding(
+                                  padding: EdgeInsets.symmetric(vertical:15.0),
+                                  child: Text('No Image'),
                                 ),
                               ),
                             ),
                             Align(
                                 alignment: Alignment.topRight,
-                                child: IconButton(
+                                child: (args.status == TransactionStatus.pending) ? IconButton(
                                     onPressed: () async {
                                       if (await transactionController
                                           .setTransactionPhoto(
@@ -103,7 +105,8 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                                             null;
                                       }
                                     },
-                                    icon: const Icon(Icons.close)))
+                                    icon: const Icon(Icons.close)) : const SizedBox(),
+                                    )
                           ],
                         ),
                 )
@@ -372,7 +375,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                               // image!.path;
 
                               transactionController
-                                  .uploadImage(File(image!.path))
+                                  .uploadImage(File(image!.path), args.transactionId!)
                                   .then((val) async {
                                 if (val != null) {
                                   if (await transactionController
@@ -411,7 +414,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                               // transactionController.imagePath.value =
                               //     image!.path;
                               transactionController
-                                  .uploadImage(File(image!.path))
+                                  .uploadImage(File(image!.path), args.transactionId!)
                                   .then((val) async {
                                 if (val != null) {
                                   if (await transactionController
@@ -553,6 +556,9 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                     child: TextField(
                       enabled: false,
                       controller: importFileController,
+                      decoration: const InputDecoration(
+                        hintText: 'Select file',
+                      ),
                     ),
                   ),
                   ElevatedButton(
@@ -562,6 +568,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                         content: Text('Import Success'),
                       ));
+                      Navigator.of(context).pop();
                     },
                     child: const Text('IMPORT FILE'),
                   ),

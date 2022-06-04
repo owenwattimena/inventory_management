@@ -38,19 +38,23 @@ class _HomePageState extends State<HomePage>
     WidgetsBinding.instance.addObserver(this);
     // _homeController.getPasscode();
     _tabController = TabController(length: 3, vsync: this);
-    _homeController.getAllTransactionList(
-      dateStart: _homeController.getDateStart(),
-      dateEnd: _homeController.getDateEnd(),
-    );
-    
-    showPasscode();
+    _tabController.addListener(() {
+      if (_tabController.index == 0) {
+        _homeController.isTabOutActive.value = true;
+      } else {
+        _homeController.isTabOutActive.value = false;
+      }
+    });
+    _homeController.getAllTransactionList();
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   showPasscode();
+    // });
   }
 
-  void showPasscode() async{
-
+  void showPasscode() async {
     if (await _homeController.getPasscode() != null) {
       Future.delayed(const Duration(seconds: 0), () {
-        if (!_homeController.isPasscodeOn.value){
+        if (!_homeController.isPasscodeOn.value) {
           _homeController.isPasscodeOn.value = true;
           screenLock(
             context: context,
@@ -98,6 +102,7 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
+    Future.delayed(Duration.zero, () => showPasscode());
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -113,6 +118,15 @@ class _HomePageState extends State<HomePage>
                       _homeController.prevNextMonth(next: true),
                   date: _homeController.currentDate.value,
                 )),
+            Obx(() => _homeController.isTabOutActive.value
+                ? IconButton(
+                    onPressed: () async {
+                      await Navigator.pushNamed(context, '/chart');
+                      Get.delete<ChartController>();
+                    },
+                    icon: const Icon(Icons.pie_chart),
+                  )
+                : const SizedBox())
           ],
           bottom: TabBar(
             controller: _tabController,
@@ -170,7 +184,6 @@ class _HomePageState extends State<HomePage>
             final takeInTextController = TextEditingController();
             final distributorTextController = TextEditingController();
             final createdByTextController = TextEditingController();
-            List<String> division = [];
             switch (_tabController.index) {
               case 0:
                 _showMyDialog(
@@ -185,6 +198,7 @@ class _HomePageState extends State<HomePage>
                               decoration: const InputDecoration(
                                 labelText: 'Date of Transaction',
                               ),
+                              enabled: false,
                               format: DateFormat("yyyy-MM-dd"),
                               initialValue: datetime,
                               onShowPicker: (context, currentValue) async {
@@ -319,6 +333,7 @@ class _HomePageState extends State<HomePage>
                               decoration: const InputDecoration(
                                 labelText: 'Date of Transaction',
                               ),
+                              enabled: false,
                               format: DateFormat("yyyy-MM-dd"),
                               initialValue: datetime,
                               onShowPicker: (context, currentValue) async {
@@ -425,6 +440,7 @@ class _HomePageState extends State<HomePage>
                               decoration: const InputDecoration(
                                 labelText: 'Date of Transaction',
                               ),
+                              enabled: false,
                               format: DateFormat("yyyy-MM-dd"),
                               initialValue: datetime,
                               onShowPicker: (context, currentValue) async {
@@ -451,12 +467,10 @@ class _HomePageState extends State<HomePage>
                                   controller: createdByTextController,
                                   decoration: const InputDecoration(
                                       labelText: 'Auditor')),
-                              suggestionsCallback: (pattern) {
+                              suggestionsCallback: (pattern) async {
                                 // return CitiesService.getSuggestions(pattern);
-                                return division
-                                    .where(
-                                        (element) => element.contains(pattern))
-                                    .toList();
+                                return await _homeController
+                                    .getAuditor(pattern);
                               },
                               itemBuilder: (context, suggestion) {
                                 return ListTile(
