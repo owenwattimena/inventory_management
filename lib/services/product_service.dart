@@ -31,28 +31,21 @@ class ProductService {
     return mapObject;
   }
 
-  // Future<bool> addProduct(Product product) async {
-  //   final db = await database.database;
-  //   var sql = '''SELECT sku, barcode FROM product WHERE sku = ?''';
-  //   // '''SELECT sku, barcode FROM product WHERE sku = ? OR barcode = ?''';
-  //   var data = await db.rawQuery(sql, [product.sku]);
-  //   if (data.isEmpty) {
-  //     sql = '''
-  //   INSERT INTO product (id, sku, barcode, name, category, uom, price) VALUES (?, ?, ?, ?, ?, ?, ?)
-  //   ''';
-  //     var result = await db.rawInsert(sql, [
-  //       null,
-  //       product.sku,
-  //       product.barcode,
-  //       product.name,
-  //       product.category,
-  //       product.uom,
-  //       product.price
-  //     ]);
-  //     return result > 0;
-  //   }
-  //   return false;
-  // }
+  Future<List<Map<String, Object?>>> getProducts({String? category})async{
+    Database db = await database.database;
+
+    if(category != null){
+      String sql = '''
+        SELECT * FROM product WHERE category = ?
+      ''';
+      return await db.rawQuery(sql, [category]);
+    }else{
+      String sql = '''
+        SELECT * FROM product
+      ''';
+      return await db.rawQuery(sql);
+    }
+  }
 
   Future<List<Map<String, Object?>>> getProduct(
       {String? query, String? category, int page = 1}) async {

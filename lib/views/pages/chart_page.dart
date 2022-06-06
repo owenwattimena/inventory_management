@@ -29,7 +29,7 @@ class _ChartPageState extends State<ChartPage> {
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.3,
             child: Obx(
-              () => SfCircularChart(
+              () => chartController.pieData.value.isNotEmpty ? SfCircularChart(
                   backgroundColor: Colors.white,
                   tooltipBehavior: TooltipBehavior(
                       enable: true,
@@ -97,11 +97,11 @@ class _ChartPageState extends State<ChartPage> {
                         ),
                       ),
                     ),
-                  ]),
+                  ]) : const Center(child: Text('No Data.')),
             ),
           ),
           Expanded(
-            child: Obx(() => ListView.builder(
+            child: Obx(() => chartController.pieData.value.isNotEmpty ? ListView.builder(
                   itemCount: chartController.pieData.value.length,
                   itemBuilder: (context, index) {
                     var data = chartController.pieData.value[index];
@@ -136,7 +136,7 @@ class _ChartPageState extends State<ChartPage> {
                       ),
                     );
                   },
-                )),
+                ) : const Center(child: Text('No Data.'))),
           ),
         ],
       ),

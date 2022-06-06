@@ -19,11 +19,6 @@ class _ProductPageState extends State<ProductPage> {
   }
 
   void _loadMore() async {
-    // if(!productController.hasNextPage.value){
-    //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-    //     content: Text('No more data'),
-    //   ));
-    // }
     if (productController.hasNextPage.value == true &&
         productController.isFirstLoadRunning.value == false &&
         productController.isLoading.value == false &&
@@ -31,11 +26,7 @@ class _ProductPageState extends State<ProductPage> {
       productController.isLoading.value =
           true; // Display a progress indicator at the bottom
       productController.page.value += 1; // Increase _page by 1
-      try {
-        productController.getProducts(page: productController.page.value);
-      } catch (err) {
-        print('Something went wrong!');
-      }
+      productController.getProducts(page: productController.page.value);
     }
   }
 
@@ -45,10 +36,6 @@ class _ProductPageState extends State<ProductPage> {
       appBar: AppBar(
         title: const Text('Product'),
         actions: [
-          // IconButton(
-          //   onPressed: _showExportDialog,
-          //   icon: const Icon(Icons.upload),
-          // ),
           PopupMenuButton<String>(
             onSelected: (_) => _showExportDialog(),
             itemBuilder: (BuildContext context) {
@@ -74,7 +61,7 @@ class _ProductPageState extends State<ProductPage> {
           ),
           Expanded(
             child: Obx(
-              () => ListView.builder(
+              () => productController.listProduct.value.isNotEmpty ? ListView.builder(
                 controller: _controller,
                 padding: const EdgeInsets.only(bottom: 8),
                 itemCount: productController.listProduct.value.length,
@@ -126,7 +113,7 @@ class _ProductPageState extends State<ProductPage> {
                     ),
                   ),
                 ),
-              ),
+              ) : const Center(child: Text('No data')),
             ),
           ),
 
@@ -138,16 +125,6 @@ class _ProductPageState extends State<ProductPage> {
                 child: CircularProgressIndicator(),
               ),
             ) : const SizedBox()),
-
-          // When nothing else to load
-          // Obx(()=> (!productController.hasNextPage.value)?
-          //   Container(
-          //     padding: const EdgeInsets.only(top: 30, bottom: 40),
-          //     color: Colors.grey[200],
-          //     child: const Center(
-          //       child: Text('You have fetched all of the content'),
-          //     ),
-          //   ) : const SizedBox()),
         ],
       ),
       floatingActionButton: SpeedDial(

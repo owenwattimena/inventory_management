@@ -33,6 +33,28 @@ class ProductRepository {
     return result;
   }
 
+  /// This method is using to get all of product or product by specific category to export
+  static Future<List<Product>> getProducts({String? category}) async {
+    final result = await ProductService().getProducts(category: category);
+
+    List<Product> data = [];
+
+    for (var i = 0; i < result.length; i++) {
+      final product = Product.fromMapObject(result[i]);
+      final lastTransaction =
+      await ProductService().getLastProductTransaction(product.sku!);
+      int stock = 0;
+      if (lastTransaction != null) {
+        if (lastTransaction['stock'] != null) {
+          stock = int.parse(lastTransaction['stock'].toString());
+        }
+      }
+      data.add(product.copyWith(stock: stock));
+    }
+    return data;
+
+  }
+
   static Future<List<Product>> getProduct(
       {String? query, String? category, int page = 1}) async {
     final productService = ProductService();
@@ -172,7 +194,7 @@ class ProductRepository {
   }
 
   static Future<String> exportProduct({String? category}) async {
-    List<Product> product = await getProduct(category: category);
+    List<Product> product = await getProducts(category: category);
     var excel = Excel.createExcel();
     Sheet sheetObject = excel['Sheet1'];
 
