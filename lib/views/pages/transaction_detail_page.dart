@@ -81,10 +81,12 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                               // color: Colors.grey[200],
                               color: Colors.white,
                               child: Center(
-                                child: File(transactionController.imagePath.value?? '').existsSync() ? Image.file(
+                                child: File(transactionController.imagePath.value ?? '').existsSync() ? GestureDetector(
+                                    onTap: ()=>showImage(transactionController.imagePath.value!),
+                                    child:Image.file(
                                   File(transactionController.imagePath.value!),
                                   height: 165,
-                                ) : const Padding(
+                                )) : const Padding(
                                   padding: EdgeInsets.symmetric(vertical:15.0),
                                   child: Text('No Image'),
                                 ),
@@ -171,6 +173,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
           // ProductTile(product: args.product),
         ],
       ),
+
       floatingActionButton: (args.status == TransactionStatus.pending)
           ? Stack(fit: StackFit.expand, children: [
               Positioned(
@@ -241,6 +244,11 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
             ])
           : const SizedBox(),
     );
+  }
+
+
+  showImage(String path){
+    Navigator.of(context).push(ImageOverlay(path));
   }
 
   Future<void> _showFinalConfirmDialog() async {
@@ -577,5 +585,71 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
             ),
           );
         });
+  }
+}
+
+class ImageOverlay extends ModalRoute<void> {
+  final String path;
+  ImageOverlay(this.path);
+
+  @override
+  Duration get transitionDuration => Duration(milliseconds: 500);
+
+  @override
+  bool get opaque => false;
+
+  @override
+  bool get barrierDismissible => false;
+
+  @override
+  Color get barrierColor => Colors.black.withOpacity(0.5);
+
+  @override
+  String get barrierLabel => "";
+
+  @override
+  bool get maintainState => true;
+
+  @override
+  Widget buildPage(
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      ) {
+    // This makes sure that text and other content follows the material style
+    return Material(
+      type: MaterialType.transparency,
+      // make sure that the overlay content is not cut off
+      child: SafeArea(
+        child: _buildOverlayContent(context),
+      ),
+    );
+  }
+
+  Widget _buildOverlayContent(BuildContext context) {
+    return Container(
+          width: MediaQuery.of(context).size.height,
+          height: MediaQuery.of(context).size.width,
+          child: Image.file(
+            File(path),
+            // height: MediaQuery.of(context).size.height * 0.95,
+            // width: MediaQuery.of(context).size.width,
+            fit: BoxFit.cover,
+
+      ),
+    );
+  }
+
+  @override
+  Widget buildTransitions(
+      BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+    // You can add your own animations for the overlay content
+    return FadeTransition(
+      opacity: animation,
+      child: ScaleTransition(
+        scale: animation,
+        child: child,
+      ),
+    );
   }
 }

@@ -97,7 +97,7 @@ class _ChartPageState extends State<ChartPage> {
                         ),
                       ),
                     ),
-                  ]) : const Center(child: Text('No Data.')),
+                  ]) : Container(color:Colors.grey[200], child: const Center(child: Text('No Data.'))),
             ),
           ),
           Expanded(
