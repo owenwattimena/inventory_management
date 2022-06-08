@@ -6,6 +6,7 @@ import 'package:inventory_management/controllers/transaction_controller.dart';
 import 'package:inventory_management/models/product.dart';
 import 'package:inventory_management/models/transaction_list.dart';
 
+import '../../controllers/division_controller.dart';
 import '../../controllers/home_controller.dart';
 import '../../models/transaction.dart';
 import '../../config/text_style.dart';

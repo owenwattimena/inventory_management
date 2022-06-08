@@ -27,6 +27,7 @@ class _DivisionPageState extends State<DivisionPage> {
               itemCount: divisionController.divisionList.value.length,
               itemBuilder: (context, index) {
                 return ListTile(
+                  tileColor: Colors.white,
                   onTap: () {
                     Navigator.pushNamed(context, '/division-transaction',
                         arguments: divisionController.divisionList.value[index]);
@@ -34,8 +35,8 @@ class _DivisionPageState extends State<DivisionPage> {
                   
                   },
                   title: Text(divisionController.divisionList.value[index]),
-                  shape: const RoundedRectangleBorder(
-                    side: BorderSide(color: Colors.grey, width: 0.5),
+                  shape: RoundedRectangleBorder(
+                    side: BorderSide(color: Colors.grey[200]!, width: 0.3),
                   ),
                 );
               },

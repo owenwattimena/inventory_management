@@ -14,25 +14,6 @@ class DrawerHome extends StatelessWidget {
       ),
       // ignore: prefer_const_literals_to_create_immutables
       child: ListView(padding: const EdgeInsets.all(0.0), children: [
-        // ignore: prefer_const_constructors
-        // DrawerHeader(
-        //   decoration: const BoxDecoration(
-        //     // color: Colors.blue,
-        //     border: Border(
-        //       bottom: BorderSide.none,
-        //     ),
-        //   ),
-        //   child: Column(
-        //     mainAxisAlignment: MainAxisAlignment.start,
-        //     crossAxisAlignment: CrossAxisAlignment.start,
-        //     // ignore: prefer_const_literals_to_create_immutables
-        //     children: [
-        //       const SizedBox(height: 10),
-        //       Text('Inventory Management', style: primaryTextStyleBold.copyWith(fontSize: 20),),
-        //       Text('Version 1.0.0', style: primaryTextStyle.copyWith(fontSize: 12),),
-        //     ],
-        //   ),
-        // ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 40.0, horizontal: 20),
           child: Column(
@@ -89,7 +70,7 @@ class DrawerHome extends StatelessWidget {
           onTap: () async {
             Navigator.pop(context);
             await Navigator.pushNamed(context, '/division');
-            Get.delete<ProductController>();
+            Get.delete<DivisionController>();
           },
         ),
         ListTile(

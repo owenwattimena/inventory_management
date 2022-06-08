@@ -10,7 +10,7 @@ class ChartController extends GetxController{
   Rx<int> percentageColor = Rx<int>(0);
 
 
-  void getChartData(int dateStart, int dateEnd) {
+  void getChartData(int dateStart, int dateEnd){
     TransactionRepository.groupTransactionProduct(dateStart: dateStart,
         dateEnd: dateEnd).then((value) {
       pieData.value = value;

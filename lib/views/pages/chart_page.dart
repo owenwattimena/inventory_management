@@ -87,7 +87,7 @@ class _ChartPageState extends State<ChartPage> {
                       xValueMapper: (Product data, _) => data.name,
                       yValueMapper: (Product data, _) => data.stock,
                       dataLabelMapper: (Product data, _) =>
-                          "${data.name}\n${(data.stock! / chartController.total * 100).toStringAsFixed(1)}%",
+                          "${data.name}[${(data.stock! / chartController.total * 100).toStringAsFixed(1)}%]",
                       dataLabelSettings: const DataLabelSettings(
                         isVisible: true,
                         labelPosition: ChartDataLabelPosition.outside,
@@ -108,6 +108,10 @@ class _ChartPageState extends State<ChartPage> {
                     if (chartController.percentageColor.value % chartColor.length == 0) {
                       chartController.percentageColor.value = 0;
                     }
+                    if (index == 0) {
+                      chartController.percentageColor.value = 0;
+                    }
+
                     var color = chartColor[chartController.percentageColor.value];
                     chartController.percentageColor.value += 1;
                     return ListTile(

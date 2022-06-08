@@ -200,6 +200,7 @@ class TransactionService {
       ON td.sku = p.sku
       WHERE type = ? AND created_at >= ? AND created_at <= ? 
       GROUP BY td.sku
+      ORDER BY total DESC
     ''';
     final result = await db.rawQuery(sql, [type, dateStart, dateEnd]);
     return result;
