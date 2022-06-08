@@ -482,6 +482,7 @@ class _HomePageState extends State<HomePage>
                                 return suggestionsBox;
                               },
                               onSuggestionSelected: (suggestion) {
+                                createdByTextController.text = suggestion.toString();
                                 // this._typeAheadController.text = suggestion;
                               },
                               validator: (value) {
