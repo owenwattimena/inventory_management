@@ -66,11 +66,6 @@ class _ChartPageState extends State<ChartPage> {
                   legend: Legend(isVisible: false),
                   series: <PieSeries<Product, String>>[
                     PieSeries<Product, String>(
-                      // onPointTap: (ChartPointDetails pointTap) {
-                      //   chartController.explodeIndex.value = pointTap.pointIndex;
-                      // },
-                      // explode: true,
-                      // explodeIndex: chartController.explodeIndex.value,
                       pointColorMapper: (product, index) {
                         if (chartController.colorIndex.value %
                                 chartColor.length ==
@@ -105,13 +100,13 @@ class _ChartPageState extends State<ChartPage> {
                   itemCount: chartController.pieData.value.length,
                   itemBuilder: (context, index) {
                     var data = chartController.pieData.value[index];
-                    if (chartController.percentageColor.value % chartColor.length == 0) {
-                      chartController.percentageColor.value = 0;
+                    if(index < chartColor.length){
+                      chartController.percentageColor.value = index;
+                    }else{
+                      if (index % chartColor.length == 0) {
+                        chartController.percentageColor.value = 0;
+                      }
                     }
-                    if (index == 0) {
-                      chartController.percentageColor.value = 0;
-                    }
-
                     var color = chartColor[chartController.percentageColor.value];
                     chartController.percentageColor.value += 1;
                     return ListTile(

@@ -6,7 +6,7 @@ const List<Color> chartColor = [
   Color.fromARGB(255, 255, 59, 59),
   Color(0xffff6601),
   Color(0xfffc9900),
-  Color(0xffffcd00),
+  Color(0xffffdd00),
   Color(0xffffff01),
   Color(0xff66cc01),
   Color(0xff019a00),

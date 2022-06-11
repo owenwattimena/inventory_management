@@ -377,7 +377,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                               return;
                             }
                             image = await _picker.pickImage(
-                                source: ImageSource.gallery, imageQuality: 15);
+                                source: ImageSource.gallery, imageQuality: 12);
                             if (image != null) {
                               // transactionController.imagePath.value =
                               // image!.path;
