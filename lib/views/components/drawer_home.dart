@@ -30,6 +30,10 @@ class DrawerHome extends StatelessWidget {
                 'Version 1.0.0',
                 style: primaryTextStyle.copyWith(fontSize: 12),
               ),
+              Text(
+                'Author @github : owenwattimena',
+                style: primaryTextStyle.copyWith(fontSize: 12),
+              ),
             ],
           ),
         ),

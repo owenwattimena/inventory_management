@@ -50,6 +50,10 @@ class _MorePageState extends State<MorePage> {
             onTap: () => Navigator.pushNamed(context, '/backup'),
             title: const Text('Backup'),
           ),
+          ListTile(
+            onTap: () => Navigator.pushNamed(context, '/pc-manager'),
+            title: const Text('PC Manager'),
+          ),
           Obx(() => ListTile(
                 onTap: setPasscode,
                 title: const Text('Passcode'),

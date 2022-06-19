@@ -35,8 +35,8 @@ class MyApp extends StatelessWidget {
         '/division': (context) => const DivisionPage(),
         '/more': (context) => const MorePage(),
         '/backup' : (context) => const BackupPage(),
-        '/chart' : (context) => const ChartPage(),
-        // '/product-detail': (context) => ProductDetailPage(),
+        // '/chart' : (context) => const ChartPage(),
+        '/pc-manager': (context) => const PcManagerPage(),
         // '/transaction-detail': (context) => const TransactionDetailPage(),
       },
       onGenerateRoute: (settings) {
@@ -47,12 +47,17 @@ class MyApp extends StatelessWidget {
         } 
         else if(settings.name == '/product-detail') {
           return MaterialPageRoute(
-            builder: (context) => ProductDetailPage((settings.arguments as List)[0] as Product, selectedTransaction: (settings.arguments as List)[1] as String),
+            builder: (context) => ProductDetailPage((settings.arguments as List)[0] as Product, selectedTransaction: (settings.arguments as List)[1] as String, showTypeButton: (settings.arguments as List).length > 2 ?(settings.arguments as List)[2] : true),
           );
         }
         else if(settings.name == '/division-transaction') {
           return MaterialPageRoute(
             builder: (context) => DivisionTransactionPage(settings.arguments as String),
+          );
+        }
+        else if(settings.name == '/chart') {
+          return MaterialPageRoute(
+            builder: (context) => ChartPage(showChart: (settings.arguments as Map)["showChart"] as bool, division: (settings.arguments as Map)["division"] as String?),
           );
         }
         return null;

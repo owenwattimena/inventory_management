@@ -121,7 +121,7 @@ class _HomePageState extends State<HomePage>
             Obx(() => _homeController.isTabOutActive.value
                 ? IconButton(
                     onPressed: () async {
-                      await Navigator.pushNamed(context, '/chart');
+                      await Navigator.pushNamed(context, '/chart', arguments: {"showChart" : false, "division":null});
                       Get.delete<ChartController>();
                     },
                     icon: const Icon(Icons.pie_chart),
@@ -132,8 +132,8 @@ class _HomePageState extends State<HomePage>
             controller: _tabController,
             // ignore: prefer_const_literals_to_create_immutables
             tabs: [
-              const Tab(text: 'KELUAR'),
-              const Tab(text: 'MASUK'),
+              const Tab(text: 'OUT'),
+              const Tab(text: 'ENTRY'),
               const Tab(text: 'AUDIT'),
             ],
           ),

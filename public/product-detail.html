@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Inventory Management | PC Manager</title>
+        <!-- Bootstrap -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+            crossorigin="anonymous"
+            />
+        <!-- JQuery -->
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.css"
+            />
+
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"
+            />
+
+        <!--    <link rel="stylesheet" href="css/reset.css" />-->
+        <style>
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,500;1,200&display=swap");
+        html,
+        body {
+            font-family: "Poppins", sans-serif;
+            font-weight: 100;
+        }
+        table.dataTable tbody th, table.dataTable tbody td {
+            padding: 3px 10px; /* e.g. change 8x to 4px here */
+        }
+    </style>
+    </head>
+    <body>
+        <!-- As a heading -->
+        <nav class="navbar bg-dark">
+            <div class="container-fluid">
+                <span class="navbar-brand mb-0 text-light h1 font-weight">Inventory
+                    Management
+                </span>
+            </div>
+        </nav>
+        <div class="row">
+            <aside class="col-sm-3 p-5">
+                <div class="list-group rounded-0">
+                    <a
+                        href="#"
+                        class="list-group-item list-group-item-action"
+                        aria-current="true" id="transactionLink">
+                        Transaction
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action
+                        active">Product</a>
+                    <a href="#" class="list-group-item list-group-item-action">Division</a>
+                </div>
+            </aside>
+            <section class="col-sm-9 py-3">
+                <div class="container">
+                    <h1 class="h3">Product Detail</h1>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h4 class="h4" id="product"></h4>
+                        </div>
+                        <div class="col-sm-6">
+                            <h5 class="h5 text-end text-secondary" id="stock"></h5>
+                        </div>
+                    </div>
+                    <div style="position: relative; height: 50vh;">
+                        <canvas id="myChart"></canvas>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-4">
+                            <div class="input-group mb-3 rounded-0">
+                                <span class="input-group-text rounded-0"
+                                    id="basic-addon1">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        fill="currentColor"
+                                        class="bi bi-calendar-event"
+                                        viewBox="0 0 16 16">
+                                        <path
+                                            d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0
+                                            0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0
+                                            0 1-.5-.5v-1z"
+                                            />
+                                            <path
+                                                d="M3.5 0a.5.5 0 0 1
+                                                .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2
+                                                2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2
+                                                2 0 0 1-2-2V3a2 2 0 0 1
+                                                2-2h1V.5a.5.5 0 0 1 .5-.5zM1
+                                                4v10a1 1 0 0 0 1 1h12a1 1 0 0 0
+                                                1-1V4H1z"
+                                                />
+                                            </svg>
+                                        </span>
+                                        <input
+                                            type="text"
+                                            class="form-control rounded-0"
+                                            name="daterange"
+                                            />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-body">
+
+                                    <div class="table-responsive py-3">
+                                        <table class="table table-sm"
+                                            id="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Type</th>
+                                                    <th>Transaction ID</th>
+                                                    <th>Out/Entry/Audit</th>
+                                                    <th>Take
+                                                        In/Distributor/Auditor</th>
+                                                    <th>Quantity</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <script
+                    src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+                    integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+                    crossorigin="anonymous"></script>
+                <script
+                    src="https://code.jquery.com/jquery-3.6.0.min.js"
+                    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="crossorigin="anonymous"></script>
+                <script
+                    type="text/javascript"
+                    charset="utf8"
+                    src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
+                <script
+                    type="text/javascript"
+                    src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+                <script
+                    type="text/javascript"
+                    src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+                <script
+                    src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js"
+                    integrity="sha512-sW/w8s4RWTdFFSduOTGtk4isV1+190E/GghVffMA9XczdJ2MDzSzLEubKAs5h0wzgSJOQTRYyaz73L3d6RtJSg=="crossorigin="anonymous"
+                    referrerpolicy="no-referrer"></script>
+                <script>
+
+
+
+function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+
+    return [year, month, day].join('-');
+}
+    
+    let startDate = moment().startOf("month");
+    let endDate = moment().endOf("month");
+
+    let url = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
+    let path = window.location.pathname;
+    
+    document.getElementById('transactionLink').setAttribute('href', url);
+
+    let arrPath = path.split('/');
+    let sku = arrPath[arrPath.length - 1];
+
+    $.ajax({
+            "url": url + '/api/product/' + sku,
+            "method": 'GET',
+            "dataType": 'json',
+            "success": function(data) {
+                data = data[0];
+                $('#product').text(data.sku + ' - ' + data.name);
+                $('#stock').text(data.stock + ' - ' + data.uom);
+            }
+        });
+
+    var monthName = new Array(
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
+      );
+      let labels = [];
+      let dates = [];
+      var d = new Date();
+      d.setDate(1);
+      for (i = 0; i < monthName.length; i++) {
+        labels.push(monthName[d.getMonth()] + " " + d.getFullYear());
+        var newDate =new Date();
+        newDate.setDate(1);
+        newDate.setMonth(d.getMonth());
+        newDate.setFullYear(d.getFullYear());
+        dates.push( newDate );
+        d.setMonth(d.getMonth() - 1);
+      }
+
+      labels = labels.reverse();
+      dates = dates.reverse();
+      
+      // CHART
+      const data = {
+        labels: labels,
+        datasets: [
+          {
+            label: "OUT",
+            backgroundColor: "rgb(255, 99, 132)",
+            borderColor: "rgb(255, 99, 132)",
+            data: []
+          }
+        ]
+      };
+
+      const config = {
+        type: "line",
+        data: data,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+        }
+      };
+      const myChart = new Chart(document.getElementById("myChart"), config);
+      let labelData = [];
+
+      dates.forEach(date => {
+
+        date = formatDate(date) + " 00:00:00";
+        $.ajax({
+            "url": url + '/api/product-chart/' + sku,
+            "method": 'POST',
+            "dataType": 'json',
+            "data" : JSON.stringify({"date" : date}),
+            "success": function(data) {
+                labelData.push({
+                    "date" : date,
+                    "data" : data[0].quantity??0
+                });
+            }
+        });
+    });
+
+    
+    setTimeout(()=>{
+        labelData.sort(function(a,b){
+        // Turn your strings into dates, and then subtract them
+        // to get a value that is either negative, positive, or zero.
+            return new Date(a.date) - new Date(b.date);
+        });
+        labelData.forEach(data => {
+            myChart.data.datasets[0].data.push(data.data);
+            myChart.update();
+        });
+    }, 3000);
+
+
+    let table = $("#table").DataTable({
+            ajax: {
+                url : url + "/api/product-transaction/" + sku + "?start=" + startDate.format('YYYY-MM-DD hh:mm') + "&end=" + endDate.format('YYYY-MM-DD hh:mm'),
+                dataSrc: ''
+            },
+            columns: [
+                    { data: 'created_at' },
+                    { data: 'type' },
+                    { data: 'transaction_id' },
+                    { data: 'division' },
+                    { data: 'take_in_by' },
+                    { data: 'quantity' },
+                    ],
+            columnDefs:[
+                {
+                    render: function (data, type, row) {
+                        switch (row.type) {
+                            case "audit":
+                                return "Audit";
+                                break;
+                            case "entry":
+                                return "Entry";
+                                break;
+                        
+                            default:
+                                return data;
+                                break;
+                        }
+                    },
+                    targets: 3,
+                },
+                {
+                    render: function (data, type, row) {
+                        return "<a href='"+ url +"/transaction/"+data+"'>" + data + "</a>";
+                    },
+                    targets: 2,
+                },
+                {
+                    render: function (data, type, row) {
+                        switch (row.type) {
+                            case "audit":
+                                return row.created_by;
+                                break;
+                            case "entry":
+                                return row.distributor;
+                                break;
+                        
+                            default:
+                                return data;
+                                break;
+                        }
+                    },
+                    targets: 4,
+                },
+                {
+                    render: function (data, type, row) {
+                        var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                        var d = new Date(data)
+                        return d.toLocaleDateString('id-ID', options);
+                    },
+                    targets: 0,
+                },
+                {
+                    render: function (data, type, row) {
+                        switch (row.type) {
+                            case "audit":
+                            return "<span class='badge bg-primary'>"  + data + "</span>";
+                                break;
+                            case "entry":
+                            return "<span class='badge bg-success'>"  + data + "</span>";
+                                break;
+                            default:
+                                return "<span class='badge bg-danger'>"  + data + "</span>";
+                                break;
+                        }
+                        
+                    },
+                    targets: 1,
+                },
+                {
+                    render: function (data, type, row) {
+                        switch (row.type) {
+                            case "audit":
+                            return "<span class='text-primary'>"  + data + "</span>";
+                                break;
+                            case "entry":
+                            return "<span class='text-success'>"  + data + "</span>";
+                                break;
+                            default:
+                                return "<span class='text-danger'>"  + data + "</span>";
+                                break;
+                        }
+                        
+                    },
+                    targets: 5,
+                },
+            ],
+            "order": [[ 2, 'desc' ]],
+            pageLength: -1,
+            lengthMenu: [
+            [10, 25, 50, -1],
+            [10, 25, 50, "All"]
+            ]
+        });
+    $(document).ready(function () {
+        $('input[name="daterange"]').daterangepicker({
+            startDate: startDate,
+            endDate: endDate
+        });
+        $('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+            getProductHistory(picker.startDate, picker.endDate);
+        });
+    });
+
+    function getProductHistory(start, end){
+        $.ajax({
+            "url": url + "/api/product-transaction/" + sku + "?start=" + start.format('YYYY-MM-DD hh:mm') + "&end=" + end.format('YYYY-MM-DD hh:mm'),
+            "method": 'GET',
+            "dataType": 'json',
+            "success": function(data) {
+                table.clear();
+                table.rows.add(data);
+                table.draw();
+            }
+        });
+    }
+
+</script>
+            </body>
+        </html>

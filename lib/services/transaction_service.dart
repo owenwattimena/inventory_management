@@ -37,24 +37,20 @@ class TransactionService {
     return result > 0;
   }
 
-  Future<bool> setTransactionPhoto(
-      String transactionId, String? photo) async {
+  Future<bool> setTransactionPhoto(String transactionId, String? photo) async {
     Database db = await database.database;
-    var sqlCheck =
-        'SELECT * FROM product_transaction WHERE transaction_id = ?';
+    var sqlCheck = 'SELECT * FROM product_transaction WHERE transaction_id = ?';
     var data = await db.rawQuery(sqlCheck, [transactionId]);
     int result = 0;
     if (data.isNotEmpty) {
       var sql = '''
       UPDATE product_transaction SET photo = ? WHERE transaction_id = ?''';
-      result = await db.rawInsert(
-          sql, [photo, transactionId]);
+      result = await db.rawInsert(sql, [photo, transactionId]);
     } else {
       result = 0;
     }
     return result > 0;
   }
-
 
   Future<bool> deleteTransactionProduct(
       String transactionId, String sku) async {
@@ -90,7 +86,7 @@ class TransactionService {
     List<Map<String, Object?>> mapObject = await db.rawQuery(sql);
     return mapObject;
   }
- 
+
   Future<List<Map<String, Object?>>> getAuditor(String query) async {
     final db = await database.database;
     var sql = '''
@@ -146,13 +142,11 @@ class TransactionService {
       String? division,
       String? status,
       int? dateStart,
-      int? dateEnd}) async {
+      int? dateEnd,}) async {
+
     Database db = await database.database;
     List<Map<String, Object?>> mapObject;
-    //   var sql = '''
-    //   SELECT * FROM product_transaction WHERE type = ? ORDER BY created_at DESC
-    // ''';
-    // mapObject = await db.rawQuery(sql, [type]);
+    
     String? where;
     List<dynamic>? whereArgs;
     if (division != null && status != null) {
@@ -188,21 +182,40 @@ class TransactionService {
   Future<List<Map<String, Object?>>> groupTransactionProduct(
       {String type = 'out',
       int? dateStart,
-      int? dateEnd}) async {
+      int? dateEnd,
+      String? division}) async {
     Database db = await database.database;
+    String sql = '';
+    List whereArgs = [];
     // List<Map<String, Object?>> mapObject;
-    String sql = '''
+    if (division != null) {
+      sql = '''
       SELECT p.sku, p.name, SUM(td.quantity) AS total, p.uom, p.barcode, p.category, p.price FROM 
       product_transaction AS t 
       JOIN transaction_detail AS td 
       ON t.transaction_id = td.transaction_id 
       JOIN product AS p
       ON td.sku = p.sku
-      WHERE type = ? AND created_at >= ? AND created_at <= ? 
+      WHERE type = ? AND created_at >= ? AND created_at <= ? AND t.division = ?
       GROUP BY td.sku
       ORDER BY total DESC
     ''';
-    final result = await db.rawQuery(sql, [type, dateStart, dateEnd]);
+      whereArgs = [type, dateStart, dateEnd, division];
+    } else {
+      sql = '''
+      SELECT p.sku, p.name, SUM(td.quantity) AS total, p.uom, p.barcode, p.category, p.price FROM 
+      product_transaction AS t 
+      JOIN transaction_detail AS td 
+      ON t.transaction_id = td.transaction_id 
+      JOIN product AS p
+      ON td.sku = p.sku
+      WHERE type = ? AND created_at >= ? AND created_at <= ?
+      GROUP BY td.sku
+      ORDER BY total DESC
+    ''';
+      whereArgs = [type, dateStart, dateEnd];
+    }
+    final result = await db.rawQuery(sql, whereArgs);
     return result;
   }
 
@@ -227,6 +240,18 @@ class TransactionService {
   ''';
     mapObject = await db.rawQuery(sql, [transactionId]);
     return mapObject;
+  }
+
+  Future<Map<String, Object?>?> getProductTransactionById(
+      String transactionId) async {
+    Database db = await database.database;
+    List<Map<String, Object?>> mapObject;
+    var sql = '''
+    SELECT * FROM 
+    product_transaction WHERE transaction_id = ? 
+  ''';
+    mapObject = await db.rawQuery(sql, [transactionId]);
+    return mapObject[0];
   }
 
   Future<bool> deleteTransaction(String transactionId) async {
@@ -398,62 +423,4 @@ class TransactionService {
     return await db.rawQuery(sql, whereArgs);
   }
 
-  Future<List<Map<String, Object?>>> getProductTransaction(
-      String sku, int startDate, int endDate,
-      {String? filter}) async {
-    Database db = await database.database;
-    List<Map<String, Object?>> mapObject;
-    String sql;
-    List<dynamic> whereArgs;
-    if (filter == null || filter == 'all') {
-      sql = '''
-        SELECT 
-        p.uom,
-        t.created_at, 
-        t.created_by, 
-        t.transaction_id, 
-        t.type, 
-        t.distributor, 
-        t.warehouse, 
-        t.take_in_by, 
-        t.division, 
-        td.quantity,
-        td.stock
-        FROM transaction_detail as td
-        JOIN product_transaction as t
-        ON td.transaction_id = t.transaction_id
-        JOIN product as p
-        ON p.sku = td.sku
-        WHERE td.sku = ? AND t.status = ? AND t.created_at >= ? AND t.created_at <= ? 
-        ORDER BY t.created_at DESC
-      ''';
-      whereArgs = [sku, "finished", startDate, endDate];
-    } else {
-      sql = '''
-        SELECT 
-        p.uom,
-        t.created_at, 
-        t.created_by, 
-        t.transaction_id, 
-        t.type, 
-        t.distributor, 
-        t.warehouse, 
-        t.take_in_by, 
-        t.division, 
-        td.quantity,
-        td.stock
-        FROM transaction_detail as td
-        JOIN product_transaction as t
-        ON td.transaction_id = t.transaction_id
-        JOIN product as p
-        ON p.sku = td.sku
-        WHERE td.sku = ? AND t.status = ? AND t.created_at >= ? AND t.created_at <= ? AND t.type = ?
-        ORDER BY t.created_at DESC
-      ''';
-      whereArgs = [sku, "finished", startDate, endDate, filter];
-    }
-
-    mapObject = await db.rawQuery(sql, whereArgs);
-    return mapObject;
-  }
 }

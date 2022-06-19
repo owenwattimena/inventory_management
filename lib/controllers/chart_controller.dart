@@ -10,14 +10,12 @@ class ChartController extends GetxController{
   Rx<int> percentageColor = Rx<int>(0);
 
 
-  void getChartData(int dateStart, int dateEnd){
-    TransactionRepository.groupTransactionProduct(dateStart: dateStart,
-        dateEnd: dateEnd).then((value) {
-      pieData.value = value;
-
-      for (var element in value) {
+  Future<void> getChartData(int dateStart, int dateEnd, {String? division})async{
+    final products = await TransactionRepository.groupTransactionProduct(dateStart: dateStart,
+        dateEnd: dateEnd, division: division);
+      pieData.value = products;
+      for (var element in products) {
         total += element.stock!;
       }
-    });
   }
 }

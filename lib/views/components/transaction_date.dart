@@ -15,7 +15,7 @@ class TransactionDate extends StatelessWidget {
         children: [
           Text(DateFormat('E dd-MM-yyyy').format(dateTime)),
           const SizedBox(width: 10),
-          Text('$total Transaksi'),
+          Text('$total Transaction(s)'),
         ],
       ),
     );

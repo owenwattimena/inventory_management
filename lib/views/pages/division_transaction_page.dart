@@ -73,6 +73,14 @@ class _DivisionTransactionPageState extends State<DivisionTransactionPage> {
               ],
             ),
             actions: [
+              IconButton(
+                onPressed: () async {
+                  await Navigator.pushNamed(context, '/chart',
+                      arguments: {"showChart" : true, "division" : widget.division});
+                  Get.delete<ChartController>();
+                },
+                icon: const Icon(Icons.pie_chart),
+              ),
               Obx(
                 () => (divisionController.selectedLayout.value ==
                         divisionController.layout[1])
@@ -109,7 +117,9 @@ class _DivisionTransactionPageState extends State<DivisionTransactionPage> {
                           const Icon(Icons.file_copy_sharp, color: Colors.grey),
                           Text(
                             'Export',
-                            style: primaryTextStyle.copyWith(color: Colors.black, fontWeight: FontWeight.w400),
+                            style: primaryTextStyle.copyWith(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w400),
                           ),
                         ],
                       ),
@@ -149,26 +159,28 @@ class _DivisionTransactionPageState extends State<DivisionTransactionPage> {
             ),
             Expanded(
               child: Obx(
-                () => divisionController.outTransactionList.value.isNotEmpty ? ListView.builder(
-                  itemCount: (divisionController.selectedLayout.value ==
-                          divisionController.layout[0])
-                      ? divisionController.outTransactionList.value.length
-                      : divisionController
-                          .outTransactionProductList.value.length,
-                  itemBuilder: (context, index) {
-                    return (divisionController.selectedLayout.value ==
-                            divisionController.layout[0])
-                        ? TransactionTile(
-                            transactionList: divisionController
-                                .outTransactionList.value[index]!,
-                          )
-                        : ProductHistory(
-                            showProduct: true,
-                            transaction: divisionController
-                                .outTransactionProductList.value[index]!,
-                          );
-                  },
-                ) : const Center(child: Text('No Data')),
+                () => divisionController.outTransactionList.value.isNotEmpty
+                    ? ListView.builder(
+                        itemCount: (divisionController.selectedLayout.value ==
+                                divisionController.layout[0])
+                            ? divisionController.outTransactionList.value.length
+                            : divisionController
+                                .outTransactionProductList.value.length,
+                        itemBuilder: (context, index) {
+                          return (divisionController.selectedLayout.value ==
+                                  divisionController.layout[0])
+                              ? TransactionTile(
+                                  transactionList: divisionController
+                                      .outTransactionList.value[index]!,
+                                )
+                              : ProductHistory(
+                                  showProduct: true,
+                                  transaction: divisionController
+                                      .outTransactionProductList.value[index]!,
+                                );
+                        },
+                      )
+                    : const Center(child: Text('No Data')),
               ),
             )
           ],

@@ -7,7 +7,6 @@ import 'package:inventory_management/models/transaction.dart';
 import 'package:path_provider/path_provider.dart';
 import '../models/product.dart';
 import '../services/product_service.dart';
-import '../services/transaction_service.dart';
 
 class ProductRepository {
   static Future<List<String>> getCategory({String? query}) async {
@@ -88,7 +87,7 @@ class ProductRepository {
   static Future<List<Transaction>> getProductTransaction(
       String sku, int startDate, int endDate,
       {String? filter}) async {
-    final result = await TransactionService()
+    final result = await ProductService()
         .getProductTransaction(sku, startDate, endDate, filter: filter);
     List<Transaction> data = [];
     for (var i = 0; i < result.length; i++) {

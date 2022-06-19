@@ -78,9 +78,9 @@ class TransactionRepository {
   }
 
   static Future<List<Product>> groupTransactionProduct(
-      {int? dateStart, int? dateEnd}) async {
+      {int? dateStart, int? dateEnd, String? division}) async {
     final result = await TransactionService()
-        .groupTransactionProduct(dateStart: dateStart, dateEnd: dateEnd);
+        .groupTransactionProduct(dateStart: dateStart, dateEnd: dateEnd, division:division);
     List<Product> data = [];
     for (var item in result) {
       data.add(
@@ -93,12 +93,6 @@ class TransactionRepository {
           price: int.parse(item['price'].toString()),
           category: item['category'].toString(),
         )
-        // PieChart(
-        //   item['name'].toString(),
-        //   int.parse(item['total'].toString()),
-        //   item['name'].toString(),
-        //   item['uom'].toString(),
-        // ),
       );
     }
     return data;

@@ -25,6 +25,7 @@ import '../../controllers/chart_controller.dart';
 import '../../controllers/division_controller.dart';
 import '../../controllers/passcode_controller.dart';
 import '../../controllers/product_controller.dart';
+import '../../controllers/pc_manager_controller.dart';
 import '../../controllers/product_transaction_controller.dart';
 import '../components/components.dart';
 
@@ -37,3 +38,4 @@ part 'division_transaction_page.dart';
 part 'more_page.dart';
 part 'backup_page.dart';
 part 'chart_page.dart';
+part 'pc_manager_page.dart';

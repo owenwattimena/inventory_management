@@ -593,7 +593,7 @@ class ImageOverlay extends ModalRoute<void> {
   ImageOverlay(this.path);
 
   @override
-  Duration get transitionDuration => Duration(milliseconds: 500);
+  Duration get transitionDuration => const Duration(milliseconds: 500);
 
   @override
   bool get opaque => false;
@@ -627,7 +627,7 @@ class ImageOverlay extends ModalRoute<void> {
   }
 
   Widget _buildOverlayContent(BuildContext context) {
-    return Container(
+    return SizedBox(
           width: MediaQuery.of(context).size.height,
           height: MediaQuery.of(context).size.width,
           child: Image.file(

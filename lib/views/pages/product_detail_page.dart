@@ -3,7 +3,8 @@ part of "pages.dart";
 class ProductDetailPage extends StatefulWidget {
   final Product product;
   final String? selectedTransaction;
-  const ProductDetailPage(this.product, {Key? key, this.selectedTransaction }) : super(key: key);
+  final bool showTypeButton;
+  const ProductDetailPage(this.product, {Key? key, this.selectedTransaction, this.showTypeButton = true }) : super(key: key);
 
   @override
   State<ProductDetailPage> createState() => _ProductDetailPageState();
@@ -121,7 +122,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Obx(()=>DropdownButton<String>(
+                  widget.showTypeButton ? Obx(()=>DropdownButton<String>(
                     value: productTransactionController.selectedTransaction.value,
                       // ignore: prefer_const_literals_to_create_immutables
                       items: [
@@ -149,7 +150,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             _homeController.getDateStart(),
                             _homeController.getDateEnd());
                       
-                      }),),
+                      }),) : const SizedBox(),
                   Obx(() => FilterDateButton(
                         foreground: Colors.black,
                         onPrevMonthPressed: () {

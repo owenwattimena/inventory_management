@@ -31,17 +31,47 @@ class ProductService {
     return mapObject;
   }
 
-  Future<List<Map<String, Object?>>> getProducts({String? category})async{
+  Future<List<Map<String, Object?>>> getProducts({String? sku, String? category}) async {
     Database db = await database.database;
 
-    if(category != null){
+    if (category != null) {
       String sql = '''
-        SELECT * FROM product WHERE category = ?
+        SELECT * FROM product AS p
+         INNER JOIN (
+          SELECT * FROM transaction_detail 
+          WHERE id IN (
+            SELECT MAX(id) FROM transaction_detail GROUP BY sku
+          )
+        ) as td 
+        ON p.sku = td.sku 
+        WHERE category = ?
       ''';
       return await db.rawQuery(sql, [category]);
-    }else{
+    }
+    else if (sku != null) {
       String sql = '''
-        SELECT * FROM product
+        SELECT * FROM product AS p
+         INNER JOIN (
+          SELECT * FROM transaction_detail 
+          WHERE id IN (
+            SELECT MAX(id) FROM transaction_detail GROUP BY sku
+          )
+        ) as td 
+        ON p.sku = td.sku 
+        WHERE p.sku = ?
+      ''';
+      return await db.rawQuery(sql, [sku]);
+    } 
+     else {
+      String sql = '''
+        SELECT * FROM product as p
+        INNER JOIN (
+          SELECT * FROM transaction_detail 
+          WHERE id IN (
+            SELECT MAX(id) FROM transaction_detail GROUP BY sku
+          )
+        ) as td 
+        ON p.sku = td.sku 
       ''';
       return await db.rawQuery(sql);
     }
@@ -49,7 +79,6 @@ class ProductService {
 
   Future<List<Map<String, Object?>>> getProduct(
       {String? query, String? category, int page = 1}) async {
-
     int itemPerPage = 20;
 
     int offset = (page - 1) * itemPerPage;
@@ -147,5 +176,82 @@ class ProductService {
       result = await db.rawUpdate(sql);
     }
     return result > 0;
+  }
+
+  Future<List<Map<String, Object?>>> getProductTransaction(
+      String sku, int startDate, int endDate,
+      {String? filter}) async {
+    Database db = await database.database;
+    List<Map<String, Object?>> mapObject;
+    String sql;
+    List<dynamic> whereArgs;
+    if (filter == null || filter == 'all') {
+      sql = '''
+        SELECT 
+        p.uom,
+        t.created_at, 
+        t.created_by, 
+        t.transaction_id, 
+        t.type, 
+        t.distributor, 
+        t.warehouse, 
+        t.take_in_by, 
+        t.division, 
+        td.quantity,
+        td.stock
+        FROM transaction_detail as td
+        JOIN product_transaction as t
+        ON td.transaction_id = t.transaction_id
+        JOIN product as p
+        ON p.sku = td.sku
+        WHERE td.sku = ? AND t.status = ? AND t.created_at >= ? AND t.created_at <= ? 
+        ORDER BY t.created_at DESC
+      ''';
+      whereArgs = [sku, "finished", startDate, endDate];
+    } else {
+      sql = '''
+        SELECT 
+        p.uom,
+        t.created_at, 
+        t.created_by, 
+        t.transaction_id, 
+        t.type, 
+        t.distributor, 
+        t.warehouse, 
+        t.take_in_by, 
+        t.division, 
+        td.quantity,
+        td.stock
+        FROM transaction_detail as td
+        JOIN product_transaction as t
+        ON td.transaction_id = t.transaction_id
+        JOIN product as p
+        ON p.sku = td.sku
+        WHERE td.sku = ? AND t.status = ? AND t.created_at >= ? AND t.created_at <= ? AND t.type = ?
+        ORDER BY t.created_at DESC
+      ''';
+      whereArgs = [sku, "finished", startDate, endDate, filter];
+    }
+
+    mapObject = await db.rawQuery(sql, whereArgs);
+    return mapObject;
+  }
+
+  Future<List> statistic(String type, String sku, int start, int end) async {
+    Database db = await database.database;
+
+    String sql = '''
+    SELECT   SUM(td.quantity) as quantity
+    FROM     transaction_detail AS td
+    JOIN     product_transaction AS t
+    ON       td.transaction_id = t.transaction_id
+    WHERE    t.type = ? 
+    AND      t.status = 'finished'
+    AND      td.sku = ?
+    AND      t.created_at >= ?
+    AND      t.created_at <= ?
+  ''';
+    var mapObject = await db.rawQuery(sql, [type, sku, start, end]);
+    return mapObject;
   }
 }
