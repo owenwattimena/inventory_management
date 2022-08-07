@@ -9,8 +9,21 @@ class TransactionItem extends StatelessWidget {
   final String? createdBy;
   final String? takeBy;
   final String? distributor;
+  final TransactionStatus transactionStatus;
   final Function() onTap;
-  const TransactionItem({Key? key, required this.onTap, this.transactionType, this.transactionId, this.division, this.warehouse, this.totalItem, this.createdBy, this.takeBy, this.distributor}) : super(key: key);
+  const TransactionItem(
+      {Key? key,
+      required this.onTap,
+      this.transactionType,
+      this.transactionId,
+      this.division,
+      this.warehouse,
+      this.totalItem,
+      this.createdBy,
+      this.takeBy,
+      this.distributor,
+      required this.transactionStatus})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -18,31 +31,55 @@ class TransactionItem extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         width: double.infinity,
-        child: Row(
+        color: transactionStatus == TransactionStatus.pending ? const Color(0xfffbe9c5) : Colors.white,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   '#$transactionId',
                   style: primaryTextStyleBold,
                 ),
-                (transactionType == TransactionType.out)
-                    ? Text('$division')
-                    : /*(transactionType == TransactionType.audit)
-                        ? Text('$warehouse')
-                        : */const SizedBox()
+                Text('$totalItem item(s)'),
               ],
             ),
-            Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              Text('$totalItem item(s)'),
-              (transactionType == TransactionType.out)
-                  ? Text('$takeBy')
-                  : (transactionType == TransactionType.audit)
-                      ? Text('$createdBy')
-                      : Text('$distributor')
-            ])
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  (transactionType == TransactionType.out)
+                      ? Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                              child: Text('$division',
+                                  overflow: TextOverflow.ellipsis))
+                      : /*(transactionType == TransactionType.audit)
+                        ? Text('$warehouse')
+                        : */
+                      const SizedBox(),
+                  (transactionType == TransactionType.audit)
+                      ? Text(
+                          '$createdBy',
+                          overflow: TextOverflow.ellipsis,
+                        )
+                      : const SizedBox(),
+                  (transactionType == TransactionType.entry)
+                      ? Text(
+                          '$distributor',
+                          overflow: TextOverflow.ellipsis,
+                        )
+                      : const SizedBox(),
+                ]),
+            (transactionType == TransactionType.out)
+                ? Text(
+                    '$takeBy',
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                    maxLines: 1,
+                  )
+                : const SizedBox(),
           ],
         ),
       ),

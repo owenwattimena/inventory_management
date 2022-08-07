@@ -150,11 +150,11 @@ class TransactionService {
     String? where;
     List<dynamic>? whereArgs;
     if (division != null && status != null) {
-      where = 'division = ? AND status = ?';
-      whereArgs = [division, status];
+      where = 'division LIKE ? AND status = ?';
+      whereArgs = ["%$division%", status];
     } else if (division != null) {
-      where = 'division = ?';
-      whereArgs = [division];
+      where = 'division LIKE ?';
+      whereArgs = ["%$division%"];
     } else if (type != null) {
       where = 'type = ?';
       whereArgs = [type];
@@ -196,11 +196,11 @@ class TransactionService {
       ON t.transaction_id = td.transaction_id 
       JOIN product AS p
       ON td.sku = p.sku
-      WHERE type = ? AND created_at >= ? AND created_at <= ? AND t.division = ?
+      WHERE type = ? AND created_at >= ? AND created_at <= ? AND t.division LIKE ?
       GROUP BY td.sku
       ORDER BY total DESC
     ''';
-      whereArgs = [type, dateStart, dateEnd, division];
+      whereArgs = [type, dateStart, dateEnd, "%$division%"];
     } else {
       sql = '''
       SELECT p.sku, p.name, SUM(td.quantity) AS total, p.uom, p.barcode, p.category, p.price FROM 

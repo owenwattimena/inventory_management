@@ -29,7 +29,7 @@ class _PcManagerPageState extends State<PcManagerPage> {
               RichText(text:TextSpan(
                 children:[
                   TextSpan(text: "Server running on ", style: primaryTextStyle),
-                  TextSpan(text: "${pcManagerController.host}", style: primaryTextStyleBold)
+                  TextSpan(text: "${pcManagerController.host.value}", style: primaryTextStyleBold)
                 ]
               )),
             ]
@@ -41,9 +41,16 @@ class _PcManagerPageState extends State<PcManagerPage> {
           ])),
           const SizedBox(height: 12,),
           Obx(()=>ElevatedButton(
-            onPressed: (){
+            onPressed: ()async{
               if(pcManagerController.host.value == null){
-                pcManagerController.serve();
+                String string = await pcManagerController.serve();
+                if(string!= 'true'){
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text("Failed to start server. Please check your wifi connection."),
+              // content: Text(string),
+              duration: Duration(seconds: 2),
+                  ));
+                }
               }else{
                 pcManagerController.serverDown();
               }

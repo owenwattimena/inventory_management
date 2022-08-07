@@ -33,68 +33,140 @@
         table.dataTable tbody th, table.dataTable tbody td {
             padding: 3px 10px; /* e.g. change 8x to 4px here */
         }
+        body{
+                padding-top: 50px!important;
+            }
+        /* aside .active{
+            background-color: #212529!important;    
+            border: none;
+        } */
+        .sidebar {
+        margin: 0;
+        padding: 0;
+        width: 200px;
+        background-color: #f1f1f1;
+        position: fixed;
+        height: 100%;
+        overflow: auto;
+      }
+
+      .sidebar a {
+        display: block;
+        color: white;
+        padding: 16px;
+        text-decoration: none;
+      }
+
+      .sidebar a.active {
+        background-color: #04aa6d;
+        color: white;
+      }
+
+      .sidebar a:hover:not(.active) {
+        background-color: #555;
+        color: white;
+      }
+
+      div.content {
+        margin-left: 200px;
+        padding: 1px 16px;
+        height: 1000px;
+      }
+
+      @media screen and (max-width: 700px) {
+        .sidebar {
+          width: 100%;
+          height: auto;
+          position: relative;
+        }
+        .sidebar a {
+          float: left;
+        }
+        div.content {
+          margin-left: 0;
+        }
+      }
+
+      @media screen and (max-width: 400px) {
+        .sidebar a {
+          text-align: center;
+          float: none;
+        }
+      }
     </style>
     </head>
     <body>
         <!-- As a heading -->
-        <nav class="navbar bg-dark">
+        <nav class="navbar bg-dark fixed-top">
             <div class="container-fluid">
                 <span class="navbar-brand mb-0 text-light h1 font-weight">Inventory
                     Management</span>
             </div>
         </nav>
-        <div class="row">
-            <aside class="col-sm-3 p-5">
-                <div class="list-group rounded-0">
-                    <a
-                        href="#"
-                        class="list-group-item list-group-item-action active"
-                        aria-current="true">
-                        Transaction
-                    </a>
-                    <a href="#" class="list-group-item list-group-item-action"
-                        id="productLink">Product</a>
-                    <a href="#" class="list-group-item list-group-item-action">Division</a>
-                </div>
-            </aside>
-            <section class="col-sm-9 py-3">
-                <div class="container">
-                    <!-- content title -->
-                    <h1 class="h3" id="trans-id"></h1>
-                    <h6 class="mb-1" id="date"></h6>
-                    <h6 id="source"></h6>
-                    <p id="desc"></p>
-                    <div class="card mt-3">
-                        <div class="card-body">
-                            <div class="row justify-content-center">
-                                <!-- <div class="col-sm-4 d-none" id="image">
+        <div class="sidebar bg-black">
+            <a
+                href="#"
+                class="active"
+                aria-current="true" id="transactionLink">
+                Transaction
+            </a>
+            <a href="#" class=""
+                id="productLink">Product</a>
+            <a href="#" class=""
+                id="divisionLink">Division</a>
+        </div>
+        <div class="content py-5">
+            <div class="container">
+                <!-- content title -->
+                <h1 class="h3" id="trans-id"></h1>
+                <h6 class="mb-1"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-calendar-check-fill" viewBox="0 0 16 16">
+                  <path d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4V.5zM16 14V5H0v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2zm-5.146-5.146-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708.708z"/>
+                  </svg> <span id="date"></span>
+                </h6>
+                <h6>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-building" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M14.763.075A.5.5 0 0 1 15 .5v15a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5V14h-1v1.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V10a.5.5 0 0 1 .342-.474L6 7.64V4.5a.5.5 0 0 1 .276-.447l8-4a.5.5 0 0 1 .487.022zM6 8.694 1 10.36V15h5V8.694zM7 15h2v-1.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5V15h2V1.309l-7 3.5V15z"/>
+                    <path d="M2 11h1v1H2v-1zm2 0h1v1H4v-1zm-2 2h1v1H2v-1zm2 0h1v1H4v-1zm4-4h1v1H8V9zm2 0h1v1h-1V9zm-2 2h1v1H8v-1zm2 0h1v1h-1v-1zm2-2h1v1h-1V9zm0 2h1v1h-1v-1zM8 7h1v1H8V7zm2 0h1v1h-1V7zm2 0h1v1h-1V7zM8 5h1v1H8V5zm2 0h1v1h-1V5zm2 0h1v1h-1V5zm0-2h1v1h-1V3z"/>
+                  </svg>
+                  <span id="source"></span>
+                </h6>
+                <p>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-check-fill" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M15.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                    <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                  </svg>
+                  <span id="desc"></span>
+                </p>
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <div class="row justify-content-center">
+                            <!-- <div class="col-sm-4 d-none" id="image">
                                     <img
                                         src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png"
                                         class="img-fluid"
                                         alt="..."
                                         />
                                 </div> -->
-                                <div class="col-sm-12">
-                                    <div class="table-responsive py-3">
-                                        <table class="table table-sm"
-                                            id="table">
-                                            <thead>
-                                                <tr>
-                                                    <th>SKU</th>
-                                                    <th>Product</th>
-                                                    <th>Quantity</th>
-                                                    <th>UOM</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody></tbody>
-                                        </table>
-                                    </div>
+                            <div class="col-sm-12">
+                                <div class="table-responsive py-3">
+                                    <table class="table table-sm"
+                                        id="table">
+                                        <thead>
+                                            <tr>
+                                                <th>SKU</th>
+                                                <th>Product</th>
+                                                <th>Quantity</th>
+                                                <th>UOM</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
         </div>
         <script
             src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
@@ -118,7 +190,9 @@
 
       let url = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
       let productLink = document.getElementById('productLink');
-    productLink.setAttribute('href', url + '/product');
+        productLink.setAttribute('href', url + '/product');
+        let divisionLink = document.getElementById('divisionLink');
+    divisionLink.setAttribute('href', url + '/division');
       let path = window.location.pathname;
 
       let arrPath = path.split('/');

@@ -197,6 +197,7 @@ class ProductService {
         t.warehouse, 
         t.take_in_by, 
         t.division, 
+        td.last_stock,
         td.quantity,
         td.stock
         FROM transaction_detail as td
@@ -241,16 +242,16 @@ class ProductService {
     Database db = await database.database;
 
     String sql = '''
-    SELECT   SUM(td.quantity) as quantity
-    FROM     transaction_detail AS td
-    JOIN     product_transaction AS t
-    ON       td.transaction_id = t.transaction_id
-    WHERE    t.type = ? 
-    AND      t.status = 'finished'
-    AND      td.sku = ?
-    AND      t.created_at >= ?
-    AND      t.created_at <= ?
-  ''';
+      SELECT   SUM(td.quantity) as quantity
+      FROM     transaction_detail AS td
+      JOIN     product_transaction AS t
+      ON       td.transaction_id = t.transaction_id
+      WHERE    t.type = ? 
+      AND      t.status = 'finished'
+      AND      td.sku = ?
+      AND      t.created_at >= ?
+      AND      t.created_at <= ?
+    ''';
     var mapObject = await db.rawQuery(sql, [type, sku, start, end]);
     return mapObject;
   }

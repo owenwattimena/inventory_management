@@ -35,10 +35,10 @@
                 padding: 3px 10px; /* e.g. change 8x to 4px here */
             }
             /* aside .active{
-                background-color: #212529!important;    
-                border: none;
-            } */
-            .sidebar {
+            background-color: #212529!important;    
+            border: none;
+        } */
+        .sidebar {
         margin: 0;
         padding: 0;
         width: 200px;
@@ -104,18 +104,23 @@
         <div class="sidebar bg-black">
             <a
                 href="#"
-                class="active"
-                aria-current="true">
+                class=""
+                aria-current="true" id="transactionLink">
                 Transaction
             </a>
             <a href="#" class=""
                 id="productLink">Product</a>
-            <a href="#" class=""
+            <a href="#" class="active"
                 id="divisionLink">Division</a>
         </div>
         <div class="content py-5">
             <div class="container">
-                <h1 class="h3">Transaction</h1>
+                <h3 class="h3">Division History</h3>
+                <div class="row">
+                    <div class="col-sm-6 py-3">
+                        <h4 class="h5 fw-bold" id="division"></h4>
+                    </div>
+                </div>
                 <div class="float-end">
                     <input id="jsuites-calendar" />
                     <!-- <jsuites-calendar value="2020-01-20"></jsuites-calendar> -->
@@ -132,7 +137,7 @@
                             role="tab"
                             aria-controls="out-tab-pane"
                             aria-selected="true">
-                            OUT
+                            Transaction
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
@@ -145,20 +150,7 @@
                             role="tab"
                             aria-controls="entry-tab-pane"
                             aria-selected="false">
-                            ENTRY
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button
-                            class="nav-link"
-                            id="audit-tab"
-                            data-bs-toggle="tab"
-                            data-bs-target="#audit-tab-pane"
-                            type="button"
-                            role="tab"
-                            aria-controls="audit-tab-pane"
-                            aria-selected="false">
-                            AUDIT
+                            Statistic
                         </button>
                     </li>
                 </ul>
@@ -169,11 +161,7 @@
                         role="tabpanel"
                         aria-labelledby="out-tab"
                         tabindex="0">
-                        <a href="" id="transactionItemLink" class="btn btn-secondary btn-sm mt-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-arrow-down-fill" viewBox="0 0 16 16">
-                                <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zm-1 4v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 11.293V7.5a.5.5 0 0 1 1 0z"/>
-                            </svg> Transaction Item</a>
-                        <div class="table-responsive py-3">
+                        <div class="table-responsive mt-5 py-3">
                             <table class="table table-sm w-100"
                                 id="outTable">
                                 <thead>
@@ -194,34 +182,20 @@
                         role="tabpanel"
                         aria-labelledby="entry-tab"
                         tabindex="0">
-                        <div class="table-responsive py-3">
-                            <table class="table table-sm w-100"
-                                id="entryTable">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>ID</th>
-                                        <th>Distributor</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
+
+                        <div class="container text-center">
+                            <div
+                                id="chartContainer"
+                                style="height: 370px; width: 100%;"></div>
                         </div>
-                    </div>
-                    <div
-                        class="tab-pane fade"
-                        id="audit-tab-pane"
-                        role="tabpanel"
-                        aria-labelledby="audit-tab"
-                        tabindex="0">
                         <div class="table-responsive py-3">
                             <table class="table table-sm w-100"
-                                id="auditTable">
+                                id="statTable">
                                 <thead>
                                     <tr>
-                                        <th>Date</th>
-                                        <th>ID</th>
-                                        <th>Auditor</th>
+                                        <th>Total</th>
+                                        <th>Product</th>
+                                        <th>Category</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -244,45 +218,24 @@
             src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
         <script src="https://jsuites.net/v4/jsuites.js"></script>
         <script src="https://jsuites.net/v4/jsuites.webcomponents.js"></script>
+        <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
         <script>
-     var monthName = new Array(
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec"
-      );
-
     let url = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
+    let path = window.location.pathname;
+
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const division = urlParams.get('division');
+
     let productLink = document.getElementById('productLink');
+    let transactionLink = document.getElementById('transactionLink');
     productLink.setAttribute('href', url + '/product');
     let divisionLink = document.getElementById('divisionLink');
+    transactionLink.setAttribute('href', url);
     divisionLink.setAttribute('href', url + '/division');
-    let transactionItemLink = document.getElementById('transactionItemLink');
     let date =  new Date();
-    var month = date.getUTCMonth(); //months from 1-12
-    var year = date.getUTCFullYear();
-    transactionItemLink.setAttribute('href', url + '/transaction-item?month=' + monthName[month] + "-" + year);
     let firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
     let lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-
-    if (!Date.prototype.toISODate) {
-            Date.prototype.toISODate = function() {
-                return this.getFullYear() + '-' +
-                    ('0'+ (this.getMonth()+1)).slice(-2) + '-' +
-                    ('0'+ this.getDate()).slice(-2);
-            }
-        }
-    
-    firstDay = firstDay.toISODate();
-    lastDay = lastDay.toISODate();
     
     let jsuitesCalendar = jSuites.calendar(document.getElementById("jsuites-calendar"), {
         type: "year-month-picker",
@@ -291,62 +244,96 @@
         onchange: function(instance, value) {
             date = new Date(value);
             if(date != 'Invalid Date'){
-                transactionItemLink.setAttribute('href', url + '/transaction-item?month=' + monthName[date.getMonth()] + "-" + date.getFullYear());
                 firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
                 lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-                getOutTransaction(firstDay.toISODate(), lastDay.toISODate());
-                getEntryTransaction(firstDay.toISODate(), lastDay.toISODate());
-                getAuditTransaction(firstDay.toISODate(), lastDay.toISODate());
+                getOutTransaction(firstDay, lastDay);
+                productStatistic(firstDay, lastDay, division)
+                // getEntryTransaction(firstDay, lastDay);
             }
         }
     });
 
-   
+    var chart = new CanvasJS.Chart("chartContainer", {
+            theme: "light2", // "light1", "light2", "dark1", "dark2"
+            exportEnabled: true,
+            animationEnabled: true,
+            data: [
+              {
+                type: "pie",
+                startAngle: 25,
+                toolTipContent: "<b>{label}</b>: {y}%",
+                showInLegend: false,
+                legendText: "{label}",
+                indexLabelFontSize: 16,
+                indexLabel: "{label} - {y}%",
+                dataPoints: []
+              }
+            ]
+          });
+          chart.render();
+    let fullDivision = '';
     let outTable = $("#outTable").DataTable({
-                ajax: {
-                    url : url + "/api/transaction?type=out&start=" + firstDay + "&end=" + lastDay,
-                    dataSrc: ''
+        "order": [[ 1, 'desc' ]],
+        data:[],
+        columns: [
+            { data: 'created_at' },
+            { data: 'transaction_id' },
+            { data: 'division' },
+            { data: 'take_in_by' }
+        ],
+        columnDefs: [
+            {
+                "targets": '_all',
+                "defaultContent": ""
+            },
+            {
+                render: function (data, type, row) {
+                    var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                    var d = new Date(data)
+                    return d.toLocaleDateString('id-ID', options);
                 },
-                "order": [[ 1, 'desc' ]],
-                // data:data,
-                columns: [
-                { data: 'created_at' },
-                { data: 'transaction_id' },
-                { data: 'division' },
-                { data: 'take_in_by' }
-                ],
-                columnDefs: [
-                {
-                    "targets": '_all',
-                    "defaultContent": ""
+                targets: 0,
+            },
+            {
+                render: function (data, type, row) {
+                    return "<a href='" + url + "/transaction/" + data + "' >" + data + "</a>";
                 },
-                {
-                    render: function (data, type, row) {
-                        var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                        var d = new Date(data)
-                        return d.toLocaleDateString('id-ID', options);
-                    },
-                    targets: 0,
+                targets: 1,
+            },
+            {
+                render: function (data, type, row) {
+                    if(fullDivision == ''){
+                        fullDivision = data;
+                        document.getElementById('division').innerHTML = fullDivision;
+                    }
+                    return data;
                 },
-                {
-                    render: function (data, type, row) {
-                        return "<a href='" + url + "/transaction/" + data + "' >" + data + "</a>";
-                    },
-                    targets: 1,
-                }
-                ],
-                pageLength: -1,
-                lengthMenu: [
-                [10, 25, 50, -1],
-                [10, 25, 50, "All"]
-                ]
-            });
+                targets: 2,
+            }
+        ],
+        pageLength: -1,
+        lengthMenu: [
+            [10, 25, 50, -1],
+            [10, 25, 50, "All"]
+        ]
+    });
+    getOutTransaction(firstDay, lastDay);
+    productStatistic(firstDay, lastDay, division)
+   
     
     function getOutTransaction(_firstDay, _lastDay) {
-        
+        // console.log(_lastDay.toLocaleDateString());
+        if (!Date.prototype.toISODate) {
+            Date.prototype.toISODate = function() {
+                return this.getFullYear() + '-' +
+                    ('0'+ (this.getMonth()+1)).slice(-2) + '-' +
+                    ('0'+ this.getDate()).slice(-2);
+            }
+        }
         $.ajax({
-            "url": url + "/api/transaction?type=out&start=" + _firstDay + "&end=" + _lastDay,
-            "type": "GET",
+            "url": url + "/api/division-history?type=out&start=" + _firstDay.toISODate() + "&end=" + _lastDay.toISODate(),
+            "type": "POST",
+            "data": JSON.stringify({"division":division}),
             "datatype": 'json',
             "success": function (data) {
                 outTable.clear();
@@ -356,32 +343,27 @@
         });
     }
 
-    let entryTable = $("#entryTable").DataTable({
-                ajax: {
-                    url : url + "/api/transaction?type=entry&start=" + firstDay + "&end=" + lastDay,
-                    dataSrc: ''
-                },
-                "order": [[ 1, 'desc' ]],
+    let statTable = $("#statTable").DataTable({
+                "order": [[ 0, 'desc' ]],
+                data:[],
                 columns: [
-                { data: 'created_at' },
-                { data: 'transaction_id' },
-                { data: 'distributor' }
+                { data: 'total' },
+                { data: 'name' },
+                { data: 'category' }
                 ],
                 columnDefs: [
                 {
-                    render: function (data, type, row) {
-                        var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                        var d = new Date(data)
-                        return d.toLocaleDateString('id-ID', options);
+                    render: function (data, type, row, meta) {
+                        return data;
                     },
                     targets: 0,
                 },
-                {
-                    render: function (data, type, row) {
-                        return "<a href='" + url + "/transaction/" + data + "' >" + data + "</a>";
-                    },
-                    targets: 1,
-                }
+                // {
+                //     render: function (data, type, row) {
+                //         return "<a href='" + url + "/transaction/" + data + "' >" + data + "</a>";
+                //     },
+                //     targets: 1,
+                // }
                 ],
                 pageLength: -1,
                 lengthMenu: [
@@ -389,64 +371,43 @@
                 [10, 25, 50, "All"]
                 ]
             });
-    function getEntryTransaction(_firstDay, _lastDay) {
+
+
+    productStatistic(firstDay, lastDay, division)
+
+
+    function productStatistic(_firstDay, _lastDay, _division) {
+        if (!Date.prototype.toISODate) {
+            Date.prototype.toISODate = function() {
+                return this.getFullYear() + '-' +
+                    ('0'+ (this.getMonth()+1)).slice(-2) + '-' +
+                    ('0'+ this.getDate()).slice(-2);
+            }
+        }
         $.ajax({
-            "url": url + "/api/transaction?type=entry&start=" + _firstDay + "&end=" + _lastDay,
-            "type": "GET",
+            "url": url + "/api/product-statistic?start=" + _firstDay.toISODate() + "&end=" + _lastDay.toISODate(),
+            "type": "POST",
+            "data": JSON.stringify({"division":division}),
             "datatype": 'json',
             "success": function (data) {
-                entryTable.clear();
-                entryTable.rows.add(data);
-                entryTable.draw();
+                var _data = []; 
+                var total = 0;
+                for (var i=0; i<data.length; i++) {
+                    total += data[i].total;
+                }
+                for (var i=0; i<data.length; i++) {
+                    _data.push({ y: data[i].total / total * 100, label: data[i].name });
+                }
+                chart.options.data[0].dataPoints = _data;
+                chart.render();
+
+                statTable.clear();
+                statTable.rows.add(data);
+                statTable.draw();
             }
         });
     }
 
-    let auditTable = $("#auditTable").DataTable({
-                ajax: {
-                    url : url + "/api/transaction?type=audit&start=" + firstDay + "&end=" + lastDay,
-                    dataSrc: ''
-                },
-                "order": [[ 1, 'desc' ]],
-                columns: [
-                { data: 'created_at' },
-                { data: 'transaction_id' },
-                { data: 'created_by' }
-                ],
-                columnDefs: [
-                {
-                    render: function (data, type, row) {
-                        var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                        var d = new Date(data)
-                        return d.toLocaleDateString('id-ID', options);
-                    },
-                    targets: 0,
-                },
-                {
-                    render: function (data, type, row) {
-                        return "<a href='" + url + "/transaction/" + data + "' >" + data + "</a>";
-                    },
-                    targets: 1,
-                }
-                ],
-                pageLength: -1,
-                lengthMenu: [
-                [10, 25, 50, -1],
-                [10, 25, 50, "All"]
-                ]
-            });
-    function getAuditTransaction(_firstDay, _lastDay) {
-        $.ajax({
-            "url": url + "/api/transaction?type=audit&start=" + _firstDay + "&end=" + _lastDay,
-            "type": "GET",
-            "datatype": 'json',
-            "success": function (data) {
-                auditTable.clear();
-                auditTable.rows.add(data);
-                auditTable.draw();
-            }
-        });
-    }
 </script>
     </body>
 </html>

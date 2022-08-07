@@ -108,6 +108,9 @@ class _ProductPageState extends State<ProductPage> {
                           ]);
                       Get.delete<ProductTransactionController>();
                     },
+                    onLongPress: (){
+                      _showCreateProductDialog(product:productController.listProduct.value[index]);
+                    },
                     child: ProductTile(
                       product: productController.listProduct.value[index],
                     ),
@@ -145,7 +148,7 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
-  Future<void> _showCreateProductDialog() async {
+  Future<void> _showCreateProductDialog({Product? product}) async {
     final formGlobalKey = GlobalKey<FormState>();
     final skuTextController = TextEditingController();
     final nameTextController = TextEditingController();
@@ -153,18 +156,30 @@ class _ProductPageState extends State<ProductPage> {
     final categoryTextController = TextEditingController();
     final uomTextController = TextEditingController();
     final priceTextController = TextEditingController();
+
+    if(product != null)
+    {
+      skuTextController.text = product.sku ?? '';
+      nameTextController.text = product.name ?? '';
+      barcodeTextController.text = product.barcode ?? '';
+      categoryTextController.text = product.category ?? '';
+      uomTextController.text = product.uom ?? '';
+      priceTextController.text = product.price.toString();
+    }
+
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Create New Product'),
+          title: Text( product != null ? 'Edit Product' : 'Create New Product'),
           content: SingleChildScrollView(
             child: Form(
               key: formGlobalKey,
               child: ListBody(
                 children: <Widget>[
                   TextFormField(
+                    enabled: product != null ? false : true,
                     controller: skuTextController,
                     decoration: const InputDecoration(
                       labelText: 'SKU',

@@ -25,25 +25,28 @@ class TransactionTile extends StatelessWidget {
                 transactionList.timestemp! * 1000),
             total: transactionList.transaction!.length,
           ),
-          Column(
-            children: transactionList.transaction!.map((transaction) {
-              return TransactionItem(
-                onTap: () async {
-                  await Navigator.pushNamed(context, '/transaction-detail',
-                      arguments: transaction);
-                  homeController.getAllTransactionList();
-                  Get.delete<TransactionController>();
-                },
-                transactionType: transaction.type,
-                transactionId: transaction.transactionId,
-                division: transaction.division,
-                totalItem: transaction.totalItem,
-                takeBy: transaction.takeBy,
-                distributor: transaction.distributor,
-                createdBy: transaction.createdBy,
-                warehouse: transaction.warehouse,
-              );
-            }).toList(),
+          IntrinsicHeight(
+            child: Column(
+              children: transactionList.transaction!.map((transaction) {
+                return TransactionItem(
+                  onTap: () async {
+                    await Navigator.pushNamed(context, '/transaction-detail',
+                        arguments: transaction);
+                    homeController.getAllTransactionList();
+                    Get.delete<TransactionController>();
+                  },
+                  transactionType: transaction.type,
+                  transactionId: transaction.transactionId,
+                  division: transaction.division,
+                  totalItem: transaction.totalItem,
+                  takeBy: transaction.takeBy,
+                  distributor: transaction.distributor,
+                  createdBy: transaction.createdBy,
+                  warehouse: transaction.warehouse,
+                  transactionStatus: transaction.status!
+                );
+              }).toList(),
+            ),
           ),
         ],
       ),

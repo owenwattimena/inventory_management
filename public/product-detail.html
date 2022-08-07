@@ -32,133 +32,257 @@
             font-family: "Poppins", sans-serif;
             font-weight: 100;
         }
+        body{
+                padding-top: 50px!important;
+            }
         table.dataTable tbody th, table.dataTable tbody td {
             padding: 3px 10px; /* e.g. change 8x to 4px here */
         }
+    .sidebar {
+        margin: 0;
+        padding: 0;
+        width: 200px;
+        background-color: #f1f1f1;
+        position: fixed;
+        height: 100%;
+        overflow: auto;
+      }
+
+      .sidebar a {
+        display: block;
+        color: white;
+        padding: 16px;
+        text-decoration: none;
+      }
+
+      .sidebar a.active {
+        background-color: #04aa6d;
+        color: white;
+      }
+
+      .sidebar a:hover:not(.active) {
+        background-color: #555;
+        color: white;
+      }
+
+      div.content {
+        margin-left: 200px;
+        padding: 1px 16px;
+        height: 1000px;
+      }
+
+      @media screen and (max-width: 700px) {
+        .sidebar {
+          width: 100%;
+          height: auto;
+          position: relative;
+        }
+        .sidebar a {
+          float: left;
+        }
+        div.content {
+          margin-left: 0;
+        }
+      }
+
+      @media screen and (max-width: 400px) {
+        .sidebar a {
+          text-align: center;
+          float: none;
+        }
+      }
     </style>
     </head>
     <body>
         <!-- As a heading -->
-        <nav class="navbar bg-dark">
+        <nav class="navbar bg-dark fixed-top">
             <div class="container-fluid">
                 <span class="navbar-brand mb-0 text-light h1 font-weight">Inventory
                     Management
                 </span>
             </div>
         </nav>
-        <div class="row">
-            <aside class="col-sm-3 p-5">
-                <div class="list-group rounded-0">
-                    <a
-                        href="#"
-                        class="list-group-item list-group-item-action"
-                        aria-current="true" id="transactionLink">
-                        Transaction
-                    </a>
-                    <a href="#" class="list-group-item list-group-item-action
-                        active">Product</a>
-                    <a href="#" class="list-group-item list-group-item-action">Division</a>
-                </div>
-            </aside>
-            <section class="col-sm-9 py-3">
-                <div class="container">
-                    <h1 class="h3">Product Detail</h1>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <h4 class="h4" id="product"></h4>
-                        </div>
-                        <div class="col-sm-6">
-                            <h5 class="h5 text-end text-secondary" id="stock"></h5>
-                        </div>
+        <div class="sidebar bg-black">
+            <a
+                href="#"
+                class=""
+                aria-current="true" id="transactionLink">
+                Transaction
+            </a>
+            <a href="#" class="active"
+                id="productLink">Product</a>
+            <a href="#" class=""
+                id="divisionLink">Division</a>
+        </div>
+        <div class="content py-5">
+            <div class="container">
+                <h1 class="h3">Product History</h1>
+                <div class="row">
+                    <div class="col-sm-6 py-3">
+                        <h4 class="h5 fw-bold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-boxes" viewBox="0 0 16 16">
+                            <path d="M7.752.066a.5.5 0 0 1 .496 0l3.75 2.143a.5.5 0 0 1 .252.434v3.995l3.498 2A.5.5 0 0 1 16 9.07v4.286a.5.5 0 0 1-.252.434l-3.75 2.143a.5.5 0 0 1-.496 0l-3.502-2-3.502 2.001a.5.5 0 0 1-.496 0l-3.75-2.143A.5.5 0 0 1 0 13.357V9.071a.5.5 0 0 1 .252-.434L3.75 6.638V2.643a.5.5 0 0 1 .252-.434L7.752.066ZM4.25 7.504 1.508 9.071l2.742 1.567 2.742-1.567L4.25 7.504ZM7.5 9.933l-2.75 1.571v3.134l2.75-1.571V9.933Zm1 3.134 2.75 1.571v-3.134L8.5 9.933v3.134Zm.508-3.996 2.742 1.567 2.742-1.567-2.742-1.567-2.742 1.567Zm2.242-2.433V3.504L8.5 5.076V8.21l2.75-1.572ZM7.5 8.21V5.076L4.75 3.504v3.134L7.5 8.21ZM5.258 2.643 8 4.21l2.742-1.567L8 1.076 5.258 2.643ZM15 9.933l-2.75 1.571v3.134L15 13.067V9.933ZM3.75 14.638v-3.134L1 9.933v3.134l2.75 1.571Z"/>
+                          </svg> <span  id="product"></span></h4>
                     </div>
-                    <div style="position: relative; height: 50vh;">
-                        <canvas id="myChart"></canvas>
+                    <div class="col-sm-6 py-3">
+                        <h5 class="h5 fw-bold text-end text-primary" id="stock"></h5>
                     </div>
-                    <div class="row mt-3">
-                        <div class="col-md-4">
-                            <div class="input-group mb-3 rounded-0">
-                                <span class="input-group-text rounded-0"
-                                    id="basic-addon1">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="16"
-                                        height="16"
-                                        fill="currentColor"
-                                        class="bi bi-calendar-event"
-                                        viewBox="0 0 16 16">
-                                        <path
-                                            d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0
-                                            0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0
-                                            0 1-.5-.5v-1z"
-                                            />
-                                            <path
-                                                d="M3.5 0a.5.5 0 0 1
-                                                .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2
-                                                2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2
-                                                2 0 0 1-2-2V3a2 2 0 0 1
-                                                2-2h1V.5a.5.5 0 0 1 .5-.5zM1
-                                                4v10a1 1 0 0 0 1 1h12a1 1 0 0 0
-                                                1-1V4H1z"
-                                                />
-                                            </svg>
-                                        </span>
-                                        <input
-                                            type="text"
-                                            class="form-control rounded-0"
-                                            name="daterange"
-                                            />
-                                    </div>
+                    <div class="col-sm-6">
+                        <div class="card border-0" style="background-color:
+                            #cfe1e9;">
+                            <div class="card-body">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    width="50" height="50"
+                                    fill="currentColor" class="bi
+                                    bi-graph-up" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M0
+                                        0h1v15h15v1H0V0Zm14.817 3.113a.5.5 0
+                                        0 1 .07.704l-4.5 5.5a.5.5 0 0
+                                        1-.74.037L7.06 6.767l-3.656
+                                        5.027a.5.5 0 0
+                                        1-.808-.588l4-5.5a.5.5 0 0 1
+                                        .758-.06l2.609 2.61 4.15-5.073a.5.5
+                                        0 0 1 .704-.07Z" />
+                                    </svg>
+                                    <h6 class="h6 mt-2 fw-bold"
+                                        id="average-usage"></h6>
+                                    <span>Average monthly usage</span>
                                 </div>
                             </div>
-
-                            <div class="card">
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="card border-0" style="background-color:
+                                #cfe1e9;">
                                 <div class="card-body">
-
-                                    <div class="table-responsive py-3">
-                                        <table class="table table-sm"
-                                            id="table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Date</th>
-                                                    <th>Type</th>
-                                                    <th>Transaction ID</th>
-                                                    <th>Out/Entry/Audit</th>
-                                                    <th>Take
-                                                        In/Distributor/Auditor</th>
-                                                    <th>Quantity</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                            </tbody>
-                                        </table>
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        width="50" height="50"
+                                        fill="currentColor" class="bi
+                                        bi-calendar-x" viewBox="0 0 16 16">
+                                        <path d="M6.146 7.146a.5.5 0 0 1
+                                            .708 0L8 8.293l1.146-1.147a.5.5
+                                            0 1 1 .708.708L8.707 9l1.147
+                                            1.146a.5.5 0 0 1-.708.708L8
+                                            9.707l-1.146 1.147a.5.5 0 0
+                                            1-.708-.708L7.293 9 6.146
+                                            7.854a.5.5 0 0 1 0-.708z" />
+                                            <path d="M3.5 0a.5.5 0 0 1
+                                                .5.5V1h8V.5a.5.5 0 0 1 1
+                                                0V1h1a2 2 0 0 1 2 2v11a2 2 0
+                                                0 1-2 2H2a2 2 0 0 1-2-2V3a2
+                                                2 0 0 1 2-2h1V.5a.5.5 0 0 1
+                                                .5-.5zM1 4v10a1 1 0 0 0 1
+                                                1h12a1 1 0 0 0 1-1V4H1z" />
+                                            </svg>
+                                            <h5 class="h6 mt-2 fw-bold"
+                                                id="estimated"></h5>
+                                            <span>Estimated out of stock</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </section>
-                </div>
-                <script
-                    src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
-                    integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
-                    crossorigin="anonymous"></script>
-                <script
-                    src="https://code.jquery.com/jquery-3.6.0.min.js"
-                    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="crossorigin="anonymous"></script>
-                <script
-                    type="text/javascript"
-                    charset="utf8"
-                    src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
-                <script
-                    type="text/javascript"
-                    src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-                <script
-                    type="text/javascript"
-                    src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-                <script
-                    src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js"
-                    integrity="sha512-sW/w8s4RWTdFFSduOTGtk4isV1+190E/GghVffMA9XczdJ2MDzSzLEubKAs5h0wzgSJOQTRYyaz73L3d6RtJSg=="crossorigin="anonymous"
-                    referrerpolicy="no-referrer"></script>
-                <script>
+                            <div class="card mt-3">
+                                <div class="card-body">
+                                    <div style="position: relative; height: 50vh;">
+                                        <canvas id="myChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-4">
+                                    <div class="input-group mb-3 rounded-0">
+                                        <span class="input-group-text
+                                            rounded-0"
+                                            id="basic-addon1">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="16"
+                                                height="16"
+                                                fill="currentColor"
+                                                class="bi bi-calendar-event"
+                                                viewBox="0 0 16 16">
+                                                <path
+                                                    d="M11 6.5a.5.5 0 0 1
+                                                    .5-.5h1a.5.5 0
+                                                    0 1 .5.5v1a.5.5 0 0
+                                                    1-.5.5h-1a.5.5 0
+                                                    0 1-.5-.5v-1z"
+                                                    />
+                                                    <path
+                                                        d="M3.5 0a.5.5 0 0 1
+                                                        .5.5V1h8V.5a.5.5 0 0
+                                                        1 1 0V1h1a2
+                                                        2 0 0 1 2 2v11a2 2 0
+                                                        0 1-2 2H2a2
+                                                        2 0 0 1-2-2V3a2 2 0
+                                                        0 1
+                                                        2-2h1V.5a.5.5 0 0 1
+                                                        .5-.5zM1
+                                                        4v10a1 1 0 0 0 1
+                                                        1h12a1 1 0 0 0
+                                                        1-1V4H1z"
+                                                        />
+                                                    </svg>
+                                                </span>
+                                                <input
+                                                    type="text"
+                                                    class="form-control
+                                                    rounded-0"
+                                                    name="daterange"
+                                                    />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card">
+                                        <div class="card-body">
+
+                                            <div class="table-responsive
+                                                py-3">
+                                                <table class="table
+                                                    table-sm"
+                                                    id="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Date</th>
+                                                            <th>Type</th>
+                                                            <th>Transaction
+                                                                ID</th>
+                                                            <th>Out/Entry/Audit</th>
+                                                            <th>Take
+                                                                In/Distributor/Auditor</th>
+                                                            <th>Quantity</th>
+                                                            <th>Stock</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <script
+                                src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+                                integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+                                crossorigin="anonymous"></script>
+                            <script
+                                src="https://code.jquery.com/jquery-3.6.0.min.js"
+                                integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="crossorigin="anonymous"></script>
+                            <script
+                                type="text/javascript"
+                                charset="utf8"
+                                src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
+                            <script
+                                type="text/javascript"
+                                src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+                            <script
+                                type="text/javascript"
+                                src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+                            <script
+                                src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js"
+                                integrity="sha512-sW/w8s4RWTdFFSduOTGtk4isV1+190E/GghVffMA9XczdJ2MDzSzLEubKAs5h0wzgSJOQTRYyaz73L3d6RtJSg=="crossorigin="anonymous"
+                                referrerpolicy="no-referrer"></script>
+                            <script>
 
 
 
@@ -183,18 +307,23 @@ function formatDate(date) {
     let path = window.location.pathname;
     
     document.getElementById('transactionLink').setAttribute('href', url);
+    let divisionLink = document.getElementById('divisionLink');
+    divisionLink.setAttribute('href', url + '/division');
 
     let arrPath = path.split('/');
     let sku = arrPath[arrPath.length - 1];
-
+    let totalStock = 0;
+    let uom = '';
     $.ajax({
             "url": url + '/api/product/' + sku,
             "method": 'GET',
             "dataType": 'json',
             "success": function(data) {
                 data = data[0];
+                totalStock = data.stock;
+                uom = data.uom;
                 $('#product').text(data.sku + ' - ' + data.name);
-                $('#stock').text(data.stock + ' - ' + data.uom);
+                $('#stock').text(data.stock + ' ' + data.uom);
             }
         });
 
@@ -270,6 +399,13 @@ function formatDate(date) {
         });
     });
 
+    const averageUsage = document.getElementById("average-usage");
+    const estimated = document.getElementById("estimated");
+    
+    var totalData = 0;
+    var countData = 0;
+    var average = 0;
+    var estimateMonth = 0;
     
     setTimeout(()=>{
         labelData.sort(function(a,b){
@@ -278,9 +414,27 @@ function formatDate(date) {
             return new Date(a.date) - new Date(b.date);
         });
         labelData.forEach(data => {
+            if(data.data > 0){
+                totalData += data.data;
+                ++countData;
+            }
             myChart.data.datasets[0].data.push(data.data);
             myChart.update();
         });
+
+        average = totalData / countData;
+        estimateMonth = totalStock/average;
+        estimateDay = estimateMonth * 30;
+        var date = moment().add(estimateDay, 'days').format('MMMM YYYY');
+
+        if(isNaN(average)){
+            average = 0;
+            estimateMonth = 0;
+        }
+
+        averageUsage.innerHTML = average +  " " + uom;
+        estimated.innerHTML = Math.floor(estimateMonth) + " Months from Now (± " + date +")";
+
     }, 3000);
 
 
@@ -296,6 +450,7 @@ function formatDate(date) {
                     { data: 'division' },
                     { data: 'take_in_by' },
                     { data: 'quantity' },
+                    { data: 'stock' },
                     ],
             columnDefs:[
                 {
@@ -367,7 +522,8 @@ function formatDate(date) {
                     render: function (data, type, row) {
                         switch (row.type) {
                             case "audit":
-                            return "<span class='text-primary'>"  + data + "</span>";
+                                // return row.last_stock;
+                            return row.last_stock;
                                 break;
                             case "entry":
                             return "<span class='text-success'>"  + data + "</span>";
@@ -380,8 +536,23 @@ function formatDate(date) {
                     },
                     targets: 5,
                 },
+                {
+                    render: function (data, type, row) {
+                        switch (row.type) {
+                            case "audit":
+                            return "<span class='text-primary'>" + data + "</span>";
+                                break;
+                            default:
+                                return data;
+                                break;
+                        }
+                        
+                    },
+                    targets: 6,
+                },
             ],
-            "order": [[ 2, 'desc' ]],
+            ordering:false,
+            // "order": [[ 2, 'desc' ]],
             pageLength: -1,
             lengthMenu: [
             [10, 25, 50, -1],
@@ -413,5 +584,5 @@ function formatDate(date) {
     }
 
 </script>
-            </body>
-        </html>
+                        </body>
+                    </html>

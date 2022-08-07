@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:intl/intl.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf/shelf.dart' as shelf;
 
@@ -22,6 +23,8 @@ class ApiRouter {
       final result = json.decode(await request.readAsString());
       DateTime? date = DateTime.tryParse(result['date']);
       DateTime? lastday = DateTime(date!.year, date.month + 1, 0);
+      lastday =
+          DateTime.parse(DateFormat('yyyy-MM-dd 23:59:59').format(lastday));
 
       final data = await PcManagerRepository.statistic('out', sku,
           date.millisecondsSinceEpoch, lastday.millisecondsSinceEpoch);
@@ -44,6 +47,72 @@ class ApiRouter {
       }
       return shelf.Response.notFound('No data');
     });
+    router.get('/division', (shelf.Request request) async {
+      final data = await PcManagerRepository.getDivision();
+      if (data.isNotEmpty) {
+        return shelf.Response.ok(
+          json.encode(data),
+          headers: {'Content-Type': 'application/json'},
+        );
+      }
+      return shelf.Response.notFound('No data');
+    });
+
+    router.post('/product-statistic', (shelf.Request request) async {
+      String? start = request.url.queryParameters['start'];
+      String? end = request.url.queryParameters['end'];
+      final result = json.decode(await request.readAsString());
+      String? division;
+      if (result != null) {
+        division = result['division'];
+      }
+      int dateStartInt = 0;
+      int dateEndInt = 0;
+      if (start != null && end != null) {
+        DateTime dateStart = DateTime.parse(start);
+        DateTime dateEnd = DateTime.parse(end);
+        dateEnd =
+            DateTime.parse(DateFormat('yyyy-MM-dd 23:59:59').format(dateEnd));
+        dateStartInt = dateStart.millisecondsSinceEpoch;
+        dateEndInt = dateEnd.millisecondsSinceEpoch;
+      }
+      final data = await PcManagerRepository.groupTransactionProduct(
+          dateStartInt, dateEndInt,
+          division: division);
+      return shelf.Response.ok(
+        json.encode(data),
+        headers: {'Content-Type': 'application/json'},
+      );
+    });
+
+    router.post('/division-history', (shelf.Request request) async {
+      String type = "out";
+      String? start = request.url.queryParameters['start'];
+      String? end = request.url.queryParameters['end'];
+
+      final result = json.decode(await request.readAsString());
+      String division = result['division'];
+      int? dateStartInt;
+      int? dateEndInt;
+
+      if (start != null && end != null) {
+        DateTime dateStart = DateTime.parse(start);
+        DateTime dateEnd = DateTime.parse(end);
+        dateEnd =
+            DateTime.parse(DateFormat('yyyy-MM-dd 23:59:59').format(dateEnd));
+        dateStartInt = dateStart.millisecondsSinceEpoch;
+        dateEndInt = dateEnd.millisecondsSinceEpoch;
+      }
+
+      final data = await PcManagerRepository.getTransaction(type,
+          dateStart: dateStartInt, dateEnd: dateEndInt, division: division);
+      return shelf.Response.ok(
+        json.encode(data),
+        headers: {'Content-Type': 'application/json'},
+      );
+      // return shelf.Response.notFound('No data');
+    });
+
     router.get('/product-transaction/<sku>',
         (shelf.Request request, String sku) async {
       if (sku.isNotEmpty) {
@@ -56,6 +125,8 @@ class ApiRouter {
         if (start != null && end != null) {
           DateTime dateStart = DateTime.parse(start);
           DateTime dateEnd = DateTime.parse(end);
+          dateEnd =
+              DateTime.parse(DateFormat('yyyy-MM-dd 23:59:59').format(dateEnd));
           dateStartInt = dateStart.millisecondsSinceEpoch;
           dateEndInt = dateEnd.millisecondsSinceEpoch;
         }
@@ -85,6 +156,9 @@ class ApiRouter {
       if (start != null && end != null) {
         DateTime dateStart = DateTime.parse(start);
         DateTime dateEnd = DateTime.parse(end);
+        dateEnd =
+            DateTime.parse(DateFormat('yyyy-MM-dd 23:59:59').format(dateEnd));
+        print(dateEnd);
         dateStartInt = dateStart.millisecondsSinceEpoch;
         dateEndInt = dateEnd.millisecondsSinceEpoch;
       }
