@@ -222,6 +222,7 @@
             "data":JSON.stringify({}),
             "datatype": 'json',
             "success": function (data) {
+                console.log(data);
                 var table = $("#table").DataTable({
                     dom: 'Bfrtip',
                     buttons: [
@@ -235,7 +236,7 @@
                         { data: 'uom' },
                         { data: 'price' },
                         { data: 'price' }
-                        ],
+                    ],
                         columnDefs: [
                     {
                         render: function (data, type, row) {
@@ -295,6 +296,10 @@
                     }
                 });
                 // console.log(table.column(6).data().sum());
+            },
+            "error": function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status);
+                alert(thrownError);
             }
         });
 

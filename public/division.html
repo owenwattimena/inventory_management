@@ -183,7 +183,7 @@
                     },
                     {
                         render: function (data, type, row) {
-                            return '<a href="' + url + '/division-history?division=' + data + '">' + data + '</a>';
+                            return '<a href="' + url + '/division-history?division=' + btoa(data) + '">' + data + '</a>';
                         },
                         targets: 1,
                     }

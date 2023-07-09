@@ -112,6 +112,8 @@
                 id="productLink">Product</a>
             <a href="#" class=""
                 id="divisionLink">Division</a>
+            <a href="#" class=""
+                id="inventoryPlanningLink">Stock Plan</a>
         </div>
         <div class="content py-5">
             <div class="container">
@@ -272,6 +274,9 @@
     transactionItemLink.setAttribute('href', url + '/transaction-item?month=' + monthName[month] + "-" + year);
     let firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
     let lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+    let inventoryPlanningLink = document.getElementById('inventoryPlanningLink');
+    inventoryPlanningLink.setAttribute('href', url + '/inventory-planning');
 
     if (!Date.prototype.toISODate) {
             Date.prototype.toISODate = function() {

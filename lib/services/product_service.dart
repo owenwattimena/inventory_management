@@ -13,10 +13,10 @@ class ProductService {
   Future<List<Map<String, Object?>>> getCategory({String? query}) async {
     final db = await database.database;
     if (query == null) {
-      return await db.rawQuery('SELECT DISTINCT category FROM product');
+      return await db.rawQuery('SELECT DISTINCT category FROM product ORDER BY category ASC');
     } else {
       var sql = '''
-      SELECT DISTINCT category FROM product WHERE category LIKE '%$query%'
+      SELECT DISTINCT category FROM product WHERE category LIKE '%$query%' ORDER BY category ASC
     ''';
       return await db.rawQuery(sql);
     }
@@ -254,5 +254,39 @@ class ProductService {
     ''';
     var mapObject = await db.rawQuery(sql, [type, sku, start, end]);
     return mapObject;
+  }
+
+  Future<List> totalTransaction(String sku, {String type = 'out', DateTime? start, DateTime? end}) async {
+    Database db = await database.database;
+    
+    if(start != null && end != null)
+    {
+      var sql = '''
+        SELECT 
+          SUM(quantity) AS total_transaction 
+        FROM transaction_detail AS td
+          JOIN product_transaction AS pt 
+            ON td.transaction_id = pt.transaction_id
+        WHERE 
+        created_at BETWEEN ? AND ?
+        AND td.sku = ?
+        AND pt.type = ?
+      ''';
+      var mapObject = await db.rawQuery(sql, [start.millisecondsSinceEpoch, end.millisecondsSinceEpoch,  sku, type ]);
+      return mapObject;
+    }else{
+      var sql = '''
+        SELECT 
+          SUM(quantity) AS total_transaction 
+        FROM transaction_detail AS td
+          JOIN product_transaction AS pt 
+            ON td.transaction_id = pt.transaction_id
+        WHERE 
+        AND td.sku = ?
+        AND pt.type = ?
+      ''';
+      var mapObject = await db.rawQuery(sql, [sku, type ]);
+      return mapObject;
+    }
   }
 }

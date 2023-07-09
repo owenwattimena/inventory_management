@@ -61,10 +61,16 @@ class ApiRouter {
     router.post('/product-statistic', (shelf.Request request) async {
       String? start = request.url.queryParameters['start'];
       String? end = request.url.queryParameters['end'];
+
       final result = json.decode(await request.readAsString());
       String? division;
       if (result != null) {
+        // Codec<String, String> stringToBase64 = utf8.fuse(base64);
+        // division = stringToBase64.decode(result['division']);
         division = result['division'];
+        Codec<String, String> stringToBase64 = utf8.fuse(base64);
+        division = stringToBase64.decode(result['division']);
+        print(division);
       }
       int dateStartInt = 0;
       int dateEndInt = 0;
@@ -79,6 +85,7 @@ class ApiRouter {
       final data = await PcManagerRepository.groupTransactionProduct(
           dateStartInt, dateEndInt,
           division: division);
+      // print(data);
       return shelf.Response.ok(
         json.encode(data),
         headers: {'Content-Type': 'application/json'},
@@ -91,7 +98,8 @@ class ApiRouter {
       String? end = request.url.queryParameters['end'];
 
       final result = json.decode(await request.readAsString());
-      String division = result['division'];
+      Codec<String, String> stringToBase64 = utf8.fuse(base64);
+      String division = stringToBase64.decode(result['division']);
       int? dateStartInt;
       int? dateEndInt;
 
@@ -158,7 +166,7 @@ class ApiRouter {
         DateTime dateEnd = DateTime.parse(end);
         dateEnd =
             DateTime.parse(DateFormat('yyyy-MM-dd 23:59:59').format(dateEnd));
-        print(dateEnd);
+        // print(dateEnd);
         dateStartInt = dateStart.millisecondsSinceEpoch;
         dateEndInt = dateEnd.millisecondsSinceEpoch;
       }
@@ -194,6 +202,23 @@ class ApiRouter {
         }
       }
       return shelf.Response.notFound('No data');
+    });
+
+    router.get('/category', (shelf.Request request) async {
+      String? category = request.url.queryParameters['category'];
+      final data = await PcManagerRepository.getCategory(category: category);
+      return shelf.Response.ok(json.encode(data),
+                headers: {'Content-Type': 'application/json'});
+    });
+
+    router.get('/inventory-planning', (shelf.Request request) async {
+      String? category = request.url.queryParameters['category'];
+      String? monthPlanning = request.url.queryParameters['month_planning'] ;
+      if(category != null && monthPlanning != null)
+      {
+        final data = await PcManagerRepository.getInventoryPlanning(category, int.parse(monthPlanning));
+        return shelf.Response.ok(json.encode(data), headers: {'Content-Type' : 'application/json'});
+      }
     });
 
     return router;

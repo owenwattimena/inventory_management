@@ -44,7 +44,8 @@ class DatabaseService {
       )
       ''');
 
-      await db.execute('''CREATE TABLE product_transaction (
+      await db.execute('''
+      CREATE TABLE product_transaction (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         created_at INTEGER,
         transaction_id TEXT,
@@ -55,7 +56,8 @@ class DatabaseService {
         photo TEXT,
         division TEXT,
         created_by TEXT,
-        status TEXT)''');
+        status TEXT)
+      ''');
 
       /// Transaction Detail Table
       /// last_stock : last stock of product before this transaction

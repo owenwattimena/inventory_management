@@ -336,9 +336,14 @@
             "data": JSON.stringify({"division":division}),
             "datatype": 'json',
             "success": function (data) {
+                console.log("Data : " + data); 
                 outTable.clear();
                 outTable.rows.add(data);
                 outTable.draw();
+            },
+            "error": function (xhr, status, error) {
+                console.log("Error:", error); // Menampilkan pesan error di konsol
+                // Lakukan penanganan kesalahan sesuai kebutuhan Anda
             }
         });
     }
@@ -390,6 +395,8 @@
             "data": JSON.stringify({"division":division}),
             "datatype": 'json',
             "success": function (data) {
+                console.log("Data");
+                console.log(data);
                 var _data = []; 
                 var total = 0;
                 for (var i=0; i<data.length; i++) {
@@ -404,6 +411,10 @@
                 statTable.clear();
                 statTable.rows.add(data);
                 statTable.draw();
+            },
+            "error": function (xhr, status, error) {
+                console.log("Error:", error); // Menampilkan pesan error di konsol
+                // Lakukan penanganan kesalahan sesuai kebutuhan Anda
             }
         });
     }

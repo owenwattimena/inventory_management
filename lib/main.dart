@@ -1,10 +1,26 @@
 import 'package:flutter/material.dart';
+// import 'package:inventory_management/services/background_service.dart';
+// import 'package:workmanager/workmanager.dart';
 
 import 'models/product.dart';
 import 'models/transaction.dart';
 import 'views/pages/pages.dart';
 
+// void callbackDispatcher() {
+//   Workmanager().executeTask((task, inputData) async {
+//     // print(TAG + "callbackDispatcher");
+//     await BackgroundService.startServer();
+//     // BackGroundWork.instance._loadCounterValue(value + 1);
+//     return Future.value(true);
+//   });
+// }
+  
 void main() {
+  // WidgetsFlutterBinding.ensureInitialized();
+  // Workmanager().initialize(
+  //   callbackDispatcher, // The top level function, aka callbackDispatcher
+  //   isInDebugMode: false // This should be false
+  // );
   runApp(const MyApp());
 }
 
@@ -34,7 +50,7 @@ class MyApp extends StatelessWidget {
         '/product': (context) => const ProductPage(),
         '/division': (context) => const DivisionPage(),
         '/more': (context) => const MorePage(),
-        '/backup' : (context) => const BackupPage(),
+        '/backup': (context) => const BackupPage(),
         // '/chart' : (context) => const ChartPage(),
         '/pc-manager': (context) => const PcManagerPage(),
         // '/transaction-detail': (context) => const TransactionDetailPage(),
@@ -42,22 +58,28 @@ class MyApp extends StatelessWidget {
       onGenerateRoute: (settings) {
         if (settings.name == '/transaction-detail') {
           return MaterialPageRoute(
-            builder: (context) => TransactionDetailPage(settings.arguments as Transaction),
+            builder: (context) =>
+                TransactionDetailPage(settings.arguments as Transaction),
           );
-        } 
-        else if(settings.name == '/product-detail') {
+        } else if (settings.name == '/product-detail') {
           return MaterialPageRoute(
-            builder: (context) => ProductDetailPage((settings.arguments as List)[0] as Product, selectedTransaction: (settings.arguments as List)[1] as String, showTypeButton: (settings.arguments as List).length > 2 ?(settings.arguments as List)[2] : true),
+            builder: (context) => ProductDetailPage(
+                (settings.arguments as List)[0] as Product,
+                selectedTransaction: (settings.arguments as List)[1] as String,
+                showTypeButton: (settings.arguments as List).length > 2
+                    ? (settings.arguments as List)[2]
+                    : true),
           );
-        }
-        else if(settings.name == '/division-transaction') {
+        } else if (settings.name == '/division-transaction') {
           return MaterialPageRoute(
-            builder: (context) => DivisionTransactionPage(settings.arguments as String),
+            builder: (context) =>
+                DivisionTransactionPage(settings.arguments as String),
           );
-        }
-        else if(settings.name == '/chart') {
+        } else if (settings.name == '/chart') {
           return MaterialPageRoute(
-            builder: (context) => ChartPage(showChart: (settings.arguments as Map)["showChart"] as bool, division: (settings.arguments as Map)["division"] as String?),
+            builder: (context) => ChartPage(
+                showChart: (settings.arguments as Map)["showChart"] as bool,
+                division: (settings.arguments as Map)["division"] as String?),
           );
         }
         return null;

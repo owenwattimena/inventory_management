@@ -150,11 +150,12 @@ class TransactionService {
     String? where;
     List<dynamic>? whereArgs;
     if (division != null && status != null) {
-      where = 'division LIKE ? AND status = ?';
-      whereArgs = ["%$division%", status];
+      where = 'division = ? AND status = ?';
+      whereArgs = [division, status];
     } else if (division != null) {
-      where = 'division LIKE ?';
-      whereArgs = ["%$division%"];
+      where = 'division = ?';
+      whereArgs = [division];
+      // whereArgs = ["%$division%"];
     } else if (type != null) {
       where = 'type = ?';
       whereArgs = [type];

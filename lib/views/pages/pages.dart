@@ -27,6 +27,7 @@ import '../../controllers/passcode_controller.dart';
 import '../../controllers/product_controller.dart';
 import '../../controllers/pc_manager_controller.dart';
 import '../../controllers/product_transaction_controller.dart';
+import '../../services/background_service.dart';
 import '../components/components.dart';
 
 part 'home_page.dart';

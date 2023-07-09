@@ -9,6 +9,7 @@ import '../models/product.dart';
 import '../services/product_service.dart';
 
 class ProductRepository {
+
   static Future<List<String>> getCategory({String? query}) async {
     final result = await ProductService().getCategory(query: query);
     List<String> category = [];
