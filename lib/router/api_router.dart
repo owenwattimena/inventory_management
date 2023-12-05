@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:intl/intl.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf/shelf.dart' as shelf;
@@ -59,37 +61,47 @@ class ApiRouter {
     });
 
     router.post('/product-statistic', (shelf.Request request) async {
-      String? start = request.url.queryParameters['start'];
-      String? end = request.url.queryParameters['end'];
+      try {
+        String? start = request.url.queryParameters['start'];
+        String? end = request.url.queryParameters['end'];
 
-      final result = json.decode(await request.readAsString());
-      String? division;
-      if (result != null) {
-        // Codec<String, String> stringToBase64 = utf8.fuse(base64);
-        // division = stringToBase64.decode(result['division']);
-        division = result['division'];
-        Codec<String, String> stringToBase64 = utf8.fuse(base64);
-        division = stringToBase64.decode(result['division']);
-        print(division);
+        final result = json.decode(await request.readAsString());
+        String? division;
+        if (result != null) {
+          // Codec<String, String> stringToBase64 = utf8.fuse(base64);
+          // division = stringToBase64.decode(result['division']);
+          if (result is Map) {
+            if (result.isNotEmpty) {
+              division = result['division'];
+              Codec<String, String> stringToBase64 = utf8.fuse(base64);
+              division = stringToBase64.decode(result['division']);
+            }
+          }
+        }
+        int dateStartInt = 0;
+        int dateEndInt = 0;
+        if (start != null && end != null) {
+          DateTime dateStart = DateTime.parse(start);
+          DateTime dateEnd = DateTime.parse(end);
+          dateEnd =
+              DateTime.parse(DateFormat('yyyy-MM-dd 23:59:59').format(dateEnd));
+          dateStartInt = dateStart.millisecondsSinceEpoch;
+          dateEndInt = dateEnd.millisecondsSinceEpoch;
+        }
+        final data = await PcManagerRepository.groupTransactionProduct(
+            dateStartInt, dateEndInt,
+            division: division);
+        // print(data);
+        return shelf.Response.ok(
+          json.encode(data),
+          headers: {'Content-Type': 'application/json'},
+        );
+      } on Exception catch (e) {
+        return shelf.Response.internalServerError(
+          body: e.toString(),
+          headers: {'Content-Type': 'application/json'},
+        );
       }
-      int dateStartInt = 0;
-      int dateEndInt = 0;
-      if (start != null && end != null) {
-        DateTime dateStart = DateTime.parse(start);
-        DateTime dateEnd = DateTime.parse(end);
-        dateEnd =
-            DateTime.parse(DateFormat('yyyy-MM-dd 23:59:59').format(dateEnd));
-        dateStartInt = dateStart.millisecondsSinceEpoch;
-        dateEndInt = dateEnd.millisecondsSinceEpoch;
-      }
-      final data = await PcManagerRepository.groupTransactionProduct(
-          dateStartInt, dateEndInt,
-          division: division);
-      // print(data);
-      return shelf.Response.ok(
-        json.encode(data),
-        headers: {'Content-Type': 'application/json'},
-      );
     });
 
     router.post('/division-history', (shelf.Request request) async {
@@ -204,20 +216,40 @@ class ApiRouter {
       return shelf.Response.notFound('No data');
     });
 
+    router.post('/transaction/<id>/image',
+        (shelf.Request request, String id) async {
+      final result = json.decode(await request.readAsString());
+      String? imagePath = result['photo_path'];
+      if(imagePath == null)
+      {
+        return shelf.Response.notFound('');
+      }
+      try {
+        final file = File(imagePath);
+        Uint8List bytes = await file.readAsBytes();
+        String base64string = base64.encode(bytes);
+        return shelf.Response.ok(json.encode(base64string),
+                  headers: {'Content-Type': 'application/json'});
+      } catch (e) {
+        return shelf.Response.notFound('');
+      }
+    });
+
     router.get('/category', (shelf.Request request) async {
       String? category = request.url.queryParameters['category'];
       final data = await PcManagerRepository.getCategory(category: category);
       return shelf.Response.ok(json.encode(data),
-                headers: {'Content-Type': 'application/json'});
+          headers: {'Content-Type': 'application/json'});
     });
 
     router.get('/inventory-planning', (shelf.Request request) async {
       String? category = request.url.queryParameters['category'];
-      String? monthPlanning = request.url.queryParameters['month_planning'] ;
-      if(category != null && monthPlanning != null)
-      {
-        final data = await PcManagerRepository.getInventoryPlanning(category, int.parse(monthPlanning));
-        return shelf.Response.ok(json.encode(data), headers: {'Content-Type' : 'application/json'});
+      String? monthPlanning = request.url.queryParameters['month_planning'];
+      if (category != null && monthPlanning != null) {
+        final data = await PcManagerRepository.getInventoryPlanning(
+            category, int.parse(monthPlanning));
+        return shelf.Response.ok(json.encode(data),
+            headers: {'Content-Type': 'application/json'});
       }
     });
 

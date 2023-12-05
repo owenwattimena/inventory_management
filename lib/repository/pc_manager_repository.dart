@@ -74,8 +74,14 @@ class PcManagerRepository {
           if(updatedItem['planning_stock'] < 0){
             continue;
           }
-          updatedItem['twenty_percent'] = (20/100 * updatedItem['planning_stock']).ceil();
-          updatedItem['planning'] = updatedItem['twenty_percent'] + updatedItem['planning_stock'];
+          if(updatedItem['planning_stock'] == 0){
+            updatedItem['twenty_percent'] = (20/100 * updatedItem['total_transaction']).ceil();
+            updatedItem['planning'] = updatedItem['twenty_percent'] + updatedItem['total_transaction'];
+          }else{
+            updatedItem['twenty_percent'] = (20/100 * updatedItem['planning_stock']).ceil();
+            updatedItem['planning'] = updatedItem['twenty_percent'] + updatedItem['planning_stock'];
+          }
+
           // if(updatedItem['planning_stock'] > 0)
           // {
           //   planning.add(updatedItem);

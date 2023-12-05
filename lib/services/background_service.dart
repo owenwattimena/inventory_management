@@ -3,11 +3,16 @@ import 'package:shelf/shelf.dart' as shelf;
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:flutter/services.dart';
-import '../api/api_router.dart';
+import '../router/api_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
 
+import '../router/script_router.dart';
+import '../router/style_router.dart';
+import '../router/template_router.dart';
 
-class BackgroundService{
+class BackgroundService {
+  static HttpServer? server;
   // BackgroundService._privateConstructor();
 
   // static final BackgroundService _instance =
@@ -15,10 +20,14 @@ class BackgroundService{
 
   // static BackgroundService get instance => _instance;
 
-   static Future<bool> startServer() async {
+  static Future<bool> startServer() async {
     var app = Router();
     app.get('/', (shelf.Request request) async {
       var file = await rootBundle.loadString('public/index.html');
+      return shelf.Response.ok(file, headers: {'content-type': 'text/html'});
+    });
+    app.get('/transaction', (shelf.Request request) async {
+      var file = await rootBundle.loadString('public/transaction.html');
       return shelf.Response.ok(file, headers: {'content-type': 'text/html'});
     });
     app.get('/product', (shelf.Request request) async {
@@ -60,13 +69,16 @@ class BackgroundService{
 
     // API
     app.mount('/api', ApiRouter().router);
+    app.mount('/css', StyleRouter().router);
+    app.mount('/template', TemplateRouter().router);
+    app.mount('/script', ScriptRouter().router);
 
     try {
       String? wifiIP = await NetworkInfo().getWifiIP();
 
       if (wifiIP != null) {
-        var server = await io.serve(app, wifiIP, 8080);
-        var host = "http://${server.address.host}:${server.port}";
+        server = await io.serve(app, wifiIP, 8080);
+        var host = "http://${server!.address.host}:${server!.port}";
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('host', host);
         // return "true";
@@ -79,9 +91,17 @@ class BackgroundService{
     }
   }
 
-  static Future<String?> getHost()async{
+  static serverDown() async {
+    if (server != null) {
+      server!.close();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('host', '');
+    }
+  }
+
+  static Future<String?> getHost() async {
     final prefs = await SharedPreferences.getInstance();
-    String? host =  prefs.getString('host');
+    String? host = prefs.getString('host');
     return host;
   }
 }

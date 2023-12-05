@@ -8,13 +8,13 @@ class BackupController extends GetxController {
   Rx<PlatformFile> file = Rx<PlatformFile>(PlatformFile(name: '', size: 0));
   Future<bool> saveBackup() async {
     final id = DateFormat('yyyyMMddhhmmss').format(DateTime.now());
-    await BackupRepository.saveBackup(fileName: id + '_backup');
+    await BackupRepository.saveBackup(fileName: id + '_backup', isEncript: false);
     return true;
   }
 
   void shareBackup() async {
     final id = DateFormat('yyyyMMddhhmmss').format(DateTime.now());
-    final _backup = await BackupRepository.backup(fileName: id + '_backup');
+    final _backup = await BackupRepository.backup(fileName: id + '_backup', isEncript: false);
     Share.shareFiles([_backup]);
   }
 
@@ -28,7 +28,7 @@ class BackupController extends GetxController {
   }
 
   Future<bool> restoreBackup() async {
-    final result = await BackupRepository.restoreBackup(file.value);
+    final result = await BackupRepository.restoreBackup(file.value, isEncrypted: false);
     return result;
   }
 }

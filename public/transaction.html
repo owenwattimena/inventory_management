@@ -18,9 +18,10 @@
         <link
             rel="stylesheet"
             type="text/css"
-            href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.css" />
+            href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.css"
+            />
         <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css"
-            type="text/css" />
+        type="text/css" />
         <link rel="stylesheet" href="../css/style.css">
         <!-- Custom styles for this template -->
     </head>
@@ -36,13 +37,7 @@
                 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                     <div
                         class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                        <h1 class="h2">Division History</h1>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-sm-6 py-3">
-                            <h4 class="h5 fw-bold" id="division"></h4>
-                        </div>
+                        <h1 class="h2">Transaction</h1>
                     </div>
                     <div class="float-end">
                         <input id="jsuites-calendar" />
@@ -60,7 +55,7 @@
                                 role="tab"
                                 aria-controls="out-tab-pane"
                                 aria-selected="true">
-                                Transaction
+                                OUT
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
@@ -73,7 +68,20 @@
                                 role="tab"
                                 aria-controls="entry-tab-pane"
                                 aria-selected="false">
-                                Statistic
+                                ENTRY
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button
+                                class="nav-link"
+                                id="audit-tab"
+                                data-bs-toggle="tab"
+                                data-bs-target="#audit-tab-pane"
+                                type="button"
+                                role="tab"
+                                aria-controls="audit-tab-pane"
+                                aria-selected="false">
+                                AUDIT
                             </button>
                         </li>
                     </ul>
@@ -84,7 +92,16 @@
                             role="tabpanel"
                             aria-labelledby="out-tab"
                             tabindex="0">
-                            <div class="table-responsive mt-5 py-3">
+                            <a href id="transactionItemLink"
+                                class="btn btn-secondary btn-sm mt-3">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    width="16" height="16" fill="currentColor"
+                                    class="bi bi-file-earmark-arrow-down-fill"
+                                    viewBox="0 0 16 16">
+                                    <path
+                                        d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zm-1 4v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 11.293V7.5a.5.5 0 0 1 1 0z" />
+                                </svg> Transaction Item</a>
+                            <div class="table-responsive py-3">
                                 <table class="table table-sm w-100"
                                     id="outTable">
                                     <thead>
@@ -105,20 +122,34 @@
                             role="tabpanel"
                             aria-labelledby="entry-tab"
                             tabindex="0">
-
-                            <div class="container text-center">
-                                <div
-                                    id="chartContainer"
-                                    style="height: 370px; width: 100%;"></div>
-                            </div>
                             <div class="table-responsive py-3">
                                 <table class="table table-sm w-100"
-                                    id="statTable">
+                                    id="entryTable">
                                     <thead>
                                         <tr>
-                                            <th>Total</th>
-                                            <th>Product</th>
-                                            <th>Category</th>
+                                            <th>Date</th>
+                                            <th>ID</th>
+                                            <th>Distributor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div
+                            class="tab-pane fade"
+                            id="audit-tab-pane"
+                            role="tabpanel"
+                            aria-labelledby="audit-tab"
+                            tabindex="0">
+                            <div class="table-responsive py-3">
+                                <table class="table table-sm w-100"
+                                    id="auditTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>ID</th>
+                                            <th>Auditor</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
@@ -143,15 +174,14 @@
             integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE"
             crossorigin="anonymous"></script>
         <script
-            type="text/javascript"
-            charset="utf8"
+        type="text/javascript"
+        charset="utf8"
             src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
         <script src="https://jsuites.net/v4/jsuites.js"></script>
         <script src="https://jsuites.net/v4/jsuites.webcomponents.js"></script>
-        <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
         <script src="../script/config.js"></script>
         <script src="../script/main-controller.js"></script>
-        <script src="../script/division-history-controller.js"></script>
+        <script src="../script/transaction-controller.js"></script>
 
     </body>
 </html>

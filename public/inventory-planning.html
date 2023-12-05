@@ -1,300 +1,117 @@
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="en">
     <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Inventory Management | PC Manager</title>
-        <!-- Bootstrap -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content>
+        <meta name="author"
+            content="Owen Wattimena">
+        <title>Inventor Management · PC Manager </title>
+
+        <!-- Bootstrap core CSS -->
         <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
             rel="stylesheet"
-            integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
-            crossorigin="anonymous" />
-        <!-- JQuery -->
+            integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+            crossorigin="anonymous">
         <link
             rel="stylesheet"
             type="text/css"
             href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.css" />
-        <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css"
-            type="text/css" />
-
-        <!--    <link rel="stylesheet" href="css/reset.css" />-->
-        <style>
-            @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,500;1,200&display=swap");
-            html,
-            body {
-                font-family: "Poppins", sans-serif;
-                font-weight: 100;
-            }
-            body{
-                padding-top: 50px!important;
-            }
-            table.dataTable tbody th, table.dataTable tbody td {
-                padding: 3px 10px; /* e.g. change 8x to 4px here */
-            }
-            /* aside .active{
-                background-color: #212529!important;    
-                border: none;
-            } */
-            .sidebar {
-                margin: 0;
-                padding: 0;
-                width: 200px;
-                background-color: #f1f1f1;
-                position: fixed;
-                height: 100%;
-                overflow: auto;
-            }
-
-            .sidebar a {
-                display: block;
-                color: white;
-                padding: 16px;
-                text-decoration: none;
-            }
-
-            .sidebar a.active {
-                background-color: #04aa6d;
-                color: white;
-            }
-
-            .sidebar a:hover:not(.active) {
-                background-color: #555;
-                color: white;
-            }
-
-            div.content {
-                margin-left: 200px;
-                padding: 1px 16px;
-                height: 1000px;
-            }
-
-            @media screen and (max-width: 700px) {
-                .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                }
-                .sidebar a {
-                float: left;
-                }
-                div.content {
-                margin-left: 0;
-                }
-            }
-
-            @media screen and (max-width: 400px) {
-                .sidebar a {
-                text-align: center;
-                float: none;
-                }
-            }
-        </style>
+        <link rel="stylesheet" href="../css/style.css">
+        <!-- Custom styles for this template -->
     </head>
     <body>
-        <!-- As a heading -->
-        <nav class="navbar bg-dark fixed-top">
-            <div class="container-fluid">
-                <span class="navbar-brand mb-0 text-light h1 font-weight">Inventory
-                    Management</span>
-            </div>
-        </nav>
-        <div class="sidebar bg-black">
-            <a
-                href="#"
-                class
-                id="transactionLink"
-                aria-current="true">
-                Transaction
-            </a>
-            <a href="#" class
-                id="productLink">Product</a>
-            <a href="#" class
-                id="divisionLink">Division</a>
-            <a href="#" class="active"
-                id="inventoryPlanningLink">Stock Plan</a>
-        </div>
-        <div class="content py-5">
-            <div class="container">
-                <h1 class="h3">Stock Plan</h1>
-                <div id="analityc-form">
-                    <form id="form" action method="post">
-                        <div class="row">
-                            <div class="mb-3 col-md-3">
-                                <label for="exampleInputEmail1"
-                                    class="form-label">Category</label>
-                                <select class="form-control" id="categoryEl"></select>
+        <header
+            class="navbar navbar-dark sticky-top bg-blue flex-md-nowrap p-0 shadow"
+            id="header"></header>
+        <div class="container-fluid">
+            <div class="row">
+                <nav id="sidebarMenu"
+                    class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></nav>
+
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                    <div
+                        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">Inventory Planning</h1>
+                    </div>
+                    <p>Plan stock for the next few months based on transaction history.</p>
+                    <div id="analityc-form">
+                        <form id="form" action method="post">
+                            <div class="row">
+                                <div class="mb-3 col-md-3">
+                                    <label for="exampleInputEmail1"
+                                        class="form-label">Category</label>
+                                    <select class="form-control" id="categoryEl"></select>
+                                </div>
+                                <div class="mb-3 col-md-3">
+                                    <label for
+                                        class="form-label">Monthly Plan</label>
+                                    <select class="form-control"
+                                        id="monthPlanningEl">
+                                        <option value="12">12 Month</option>
+                                        <option value="6">6 Month</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3 col-md-3">
+                                    <label for="exampleInputEmail1"
+                                        class="form-label">_</label>
+                                    <button id="btn-planning" type="submit"
+                                        class="form-control text-light btn bg-info">Planning</button>
+                                </div>
                             </div>
-                            <div class="mb-3 col-md-3">
-                                <label for
-                                    class="form-label">Monthly Plan</label>
-                                <select class="form-control"
-                                    id="monthPlanningEl">
-                                    <option value="12">12 Month</option>
-                                    <option value="6">6 Month</option>
-                                </select>
+                        </form>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="table"
+                                    class="table table-striped table-xs">
+                                    <thead>
+                                        <tr>
+                                            <th>SKU</th>
+                                            <th style="width: 300px;">Name</th>
+                                            <th>Current Stock (S)</th>
+                                            <th>Total Transaction (T)</th>
+                                            <th>T-S</th>
+                                            <th>20%(T-S)</th>
+                                            <th>Stock Plan
+                                                <span style="font-size: 8pt;">((T-S)+20%)</span>
+                                            </th>
+                                            <th>UOM</th>
+                                            <th>Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
                             </div>
-                            <div class="mb-3 col-md-3">
-                                <label for="exampleInputEmail1"
-                                    class="form-label">_</label>
-                                <button id="btn-planning" type="submit"
-                                    class="form-control text-light btn bg-success">Planning</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table id="table" class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>SKU</th>
-                                        <th style="width: 300px;">Name</th>
-                                        <th>Current Stock (S)</th>
-                                        <th>Total Transaction (T)</th>
-                                        <th>T-S</th>
-                                        <th>20%(T-S)</th>
-                                        <th>Stock Plan</th>
-                                        <th>UOM</th>
-                                        <th>Price</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
                         </div>
                     </div>
-                </div>
+                </main>
             </div>
         </div>
+
         <script
-            src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
             crossorigin="anonymous"></script>
         <script
             src="https://code.jquery.com/jquery-3.6.0.min.js"
             integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
             crossorigin="anonymous"></script>
         <script
+            src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js"
+            integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE"
+            crossorigin="anonymous"></script>
+        <script
             type="text/javascript"
             charset="utf8"
             src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
-        <script
-            src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
-        <script
-            src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-        <script
-            src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
-        <script
-            src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
-        <script src="//cdn.datatables.net/plug-ins/1.12.1/api/sum().js"></script>
-        <script src="https://jsuites.net/v4/jsuites.js"></script>
-        <script src="https://jsuites.net/v4/jsuites.webcomponents.js"></script>
-        <script>
-            let url = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
-            let transactionLink = document.getElementById('transactionLink');
-            transactionLink.setAttribute('href', url);
-            let productLink = document.getElementById('productLink');
-            productLink.setAttribute('href', url + '/product');
-            let divisionLink = document.getElementById('divisionLink');
-            divisionLink.setAttribute('href', url + '/division');
-            
-            var table = $("#table").DataTable({
-                dom: 'Bfrtip',
-                buttons: [
-                    'print','excel', 
-                ],
-                pageLength: -1,
-                columns: [
-                    { data: 'sku' },
-                    { data: 'name' },
-                    { data: 'stock' },
-                    { data: 'total_transaction' },
-                    { data: 'planning_stock' },
-                    { data: 'twenty_percent' },
-                    { data: 'planning' },
-                    { data: 'uom' },
-                    { data: 'price' },
-                ],
-            });
-            getCategory();
+            <script src="https://cdn.datatables.net/fixedcolumns/4.3.0/js/dataTables.fixedColumns.min.js"></script>
+        <script src="../script/config.js"></script>
+        <script src="../script/main-controller.js"></script>
+        <script src="../script/inventory-planning-controller.js"></script>
 
-            document.getElementById('form').addEventListener('submit', function(event) {
-                event.preventDefault(); 
-                setOnLoading(true);
-
-                let categoryEl = document.getElementById('categoryEl');
-                let monthPlanningEl = document.getElementById('monthPlanningEl');
-
-                let categoryValue = categoryEl.value;
-                let monthPlanningValue = monthPlanningEl.value;
-                getInventoryPlanning(categoryValue, monthPlanningValue);
-            });
-
-            function setOnLoading(status)
-            {
-                let btnPlnningEl = document.getElementById('btn-planning');
-                btnPlnningEl.disabled = status;
-                if(status)
-                {
-                    btnPlnningEl.textContent = "Analyzing... Please wait.";
-                }else{
-                    btnPlnningEl.textContent = "Planning";
-                }
-            }
-
-            function setCategoryToEl(data) {
-                let categoryEl = document.getElementById('categoryEl');
-
-                for (let i = 0; i < data.length; i++) {
-                // Get the value and text of each option
-                    const newOption = document.createElement("option");
-                    newOption.value = data[i]['category'];
-                    newOption.textContent = data[i]['category'];
-                    categoryEl.appendChild(newOption);
-                }
-            }
-
-            function getCategory() {
-                $.ajax({
-                    "url": url + "/api/category",
-                    "type": "GET",
-                    "datatype": 'json',
-                    "success": function (data) {
-                        setCategoryToEl(data);
-                    },
-                    "error": function (xhr, status, error) {
-                        console.log("Error:", error); // Menampilkan pesan error di konsol
-                        // Lakukan penanganan kesalahan sesuai kebutuhan Anda
-                    }
-                });
-            }
-
-            function setTableData(data)
-            {
-                table.clear().draw();
-                table.rows.add(data).draw();
-            }
-
-            function getInventoryPlanning(category, monthPlaning)
-            {
-                // clearTableData();
-                $.ajax({
-                    "url": url + "/api/inventory-planning?category=" + encodeURIComponent(category) + "&month_planning=" + monthPlaning,
-                    "type": "GET",
-                    "datatype": 'json',
-                    "success": function (data) {
-                        console.log(data)
-                        setTableData(data)
-                        setOnLoading(false);
-                    },
-                    "error": function (xhr, status, error) {
-                        console.log("Error:", error); // Menampilkan pesan error di konsol
-                        // Lakukan penanganan kesalahan sesuai kebutuhan Anda
-                        setOnLoading(false);
-                    }
-                });
-            }
-        </script>
     </body>
 </html>

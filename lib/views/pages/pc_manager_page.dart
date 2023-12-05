@@ -65,7 +65,8 @@ class _PcManagerPageState extends State<PcManagerPage> {
                         ));
                       }
                     } else {
-                      pcManagerController.serverDown();
+                      await BackgroundService.serverDown();
+                      pcManagerController.host.value = null;
                     }
                   },
                   child: Text(pcManagerController.host.value == null

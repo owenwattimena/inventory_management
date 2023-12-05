@@ -85,18 +85,24 @@ class _BackupPageState extends State<BackupPage> {
           ElevatedButton(
             child: const Text('YES'),
             onPressed: () async {
-              if (await backupController.restoreBackup()) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text('Backup file has been restored.'),
-                ));
-                _homeController.getAllTransactionList(
-                    dateStart: _homeController.getDateStart(),
-                    dateEnd: _homeController.getDateEnd());
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text('Backup file has not been restored.'),
-                ));
+              try{
+                if (await backupController.restoreBackup()) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Backup file has been restored.'),
+                  ));
+                  _homeController.getAllTransactionList(
+                      dateStart: _homeController.getDateStart(),
+                      dateEnd: _homeController.getDateEnd());
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Backup file has not been restored.'),
+                  ));
+                }
+              }on Exception catch(e)
+              {
+                print(e.toString());
               }
+
               Navigator.pop(context);
             },
           ),

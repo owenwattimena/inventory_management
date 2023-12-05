@@ -6,7 +6,8 @@ import 'package:shelf/shelf_io.dart' as io;
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:flutter/services.dart';
 
-import '../api/api_router.dart';
+import '../router/api_router.dart';
+import '../router/style_router.dart';
 
 class PcManagerController extends GetxController {
   Rx<String?> host = Rx<String?>(null);
@@ -53,6 +54,8 @@ class PcManagerController extends GetxController {
       return shelf.Response.ok(file, headers: {'content-type': 'text/html'});
     });
 
+    // CSS STYLE
+    app.mount('/style', StyleRouter().router);
     // API
     app.mount('/api', ApiRouter().router);
 
@@ -60,7 +63,7 @@ class PcManagerController extends GetxController {
       String? wifiIP = await NetworkInfo().getWifiIP();
 
       if (wifiIP != null) {
-        server = await io.serve(app, wifiIP, 8080);
+        server = await io.serve(app, wifiIP, 8888);
         host.value = "http://${server.address.host}:${server.port}";
         return "true";
       }

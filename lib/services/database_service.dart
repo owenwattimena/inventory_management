@@ -1,3 +1,4 @@
+import 'package:encrypt/encrypt.dart';
 import 'package:sqflite/sqflite.dart';
 // import 'package:flutter/services.dart';
 import 'dart:convert' as convert;
@@ -116,7 +117,7 @@ class DatabaseService {
 
     var key = encrypt.Key.fromUtf8(secretKey);
     var iv = encrypt.IV.fromLength(16);
-    var encrypter = encrypt.Encrypter(encrypt.AES(key));
+    var encrypter = encrypt.Encrypter(encrypt.AES(key, mode: AESMode.cbc, padding: "PKCS7"));
 
     List json = convert
         .jsonDecode(isEncrypted ? encrypter.decrypt64(backup, iv: iv) : backup);

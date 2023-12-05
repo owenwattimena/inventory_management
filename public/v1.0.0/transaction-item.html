@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Inventory Management | PC Manager</title>
+        <!-- Bootstrap -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+            crossorigin="anonymous"
+            />
+        <!-- JQuery -->
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.css"
+            />
+        <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
+        <link
+            rel="stylesheet"
+            href="https://jsuites.net/v4/jsuites.css"
+            type="text/css"
+            />
+
+        <style>
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,500;1,200&display=swap");
+        html,
+        body {
+            font-family: "Poppins", sans-serif;
+            font-weight: 100;
+        }
+        table.dataTable tbody th, table.dataTable tbody td {
+            padding: 3px 10px; /* e.g. change 8x to 4px here */
+        }
+        body{
+                padding-top: 50px!important;
+            }
+        /* aside .active{
+            background-color: #212529!important;    
+            border: none;
+        } */
+        .sidebar {
+        margin: 0;
+        padding: 0;
+        width: 200px;
+        background-color: #f1f1f1;
+        position: fixed;
+        height: 100%;
+        overflow: auto;
+      }
+
+      .sidebar a {
+        display: block;
+        color: white;
+        padding: 16px;
+        text-decoration: none;
+      }
+
+      .sidebar a.active {
+        background-color: #04aa6d;
+        color: white;
+      }
+
+      .sidebar a:hover:not(.active) {
+        background-color: #555;
+        color: white;
+      }
+
+      div.content {
+        margin-left: 200px;
+        padding: 1px 16px;
+        height: 1000px;
+      }
+
+      @media screen and (max-width: 700px) {
+        .sidebar {
+          width: 100%;
+          height: auto;
+          position: relative;
+        }
+        .sidebar a {
+          float: left;
+        }
+        div.content {
+          margin-left: 0;
+        }
+      }
+
+      @media screen and (max-width: 400px) {
+        .sidebar a {
+          text-align: center;
+          float: none;
+        }
+      }
+    </style>
+    </head>
+    <body>
+        <!-- As a heading -->
+        <nav class="navbar bg-dark fixed-top">
+            <div class="container-fluid">
+                <span class="navbar-brand mb-0 text-light h1 font-weight">Inventory
+                    Management</span>
+            </div>
+        </nav>
+        <div class="sidebar bg-black">
+            <a
+                href="#"
+                class="active"
+                aria-current="true" id="transactionLink">
+                Transaction
+            </a>
+            <a href="#" class=""
+                id="productLink">Product</a>
+            <a href="#" class=""
+                id="divisionLink">Division</a>
+        </div>
+        <div class="content py-5">
+            <div class="container">
+                <!-- content title -->
+                <h1 class="h3 mb-2">Monthly Request</h1>
+                <h6 class="mb-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-calendar-x" viewBox="0 0 16 16">
+                        <path d="M6.146 7.146a.5.5 0 0 1 .708 0L8 8.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 9l1.147 1.146a.5.5 0 0 1-.708.708L8 9.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 9 6.146 7.854a.5.5 0 0 1 0-.708z"/>
+                        <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                      </svg>
+                    <span id="monthEl"></span>    
+                </h6>
+                <h6>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cash-stack" viewBox="0 0 16 16">
+                        <path d="M1 3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1H1zm7 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
+                        <path d="M0 5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V5zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V7a2 2 0 0 1-2-2H3z"/>
+                      </svg>
+                      <span id="grandTotal"></span>
+                </h6>
+                
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <div class="row justify-content-center">
+                            <div class="col-sm-12">
+                                <div class="table-responsive py-3">
+                                    <table class="table table-sm"
+                                        id="table">
+                                        <thead>
+                                            <tr>
+                                                <th>SKU</th>
+                                                <th>Product</th>
+                                                <th>Quantity</th>
+                                                <th>UOM</th>
+                                                <th>Price</th>
+                                                <th>Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+            crossorigin="anonymous"></script>
+        <script
+            src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="crossorigin="anonymous"></script>
+        <script
+            type="text/javascript"
+            charset="utf8"
+            src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
+        <script src="//cdn.datatables.net/plug-ins/1.12.1/api/sum().js"></script>
+        <script src="https://jsuites.net/v4/jsuites.js"></script>
+
+        <script>
+
+    let url = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
+    let productLink = document.getElementById('productLink');
+    productLink.setAttribute('href', url + '/product');
+    let divisionLink = document.getElementById('divisionLink');
+    divisionLink.setAttribute('href', url + '/division');
+
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const month = urlParams.get('month');
+    document.getElementById("monthEl").innerHTML = month;
+
+    let thatMonth = month.split('-');
+
+    let monthName = thatMonth[0];
+
+    let date = new Date(monthName + "01, " + thatMonth[1] + " 00:00:00");
+
+    let firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+    let lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+
+    if (!Date.prototype.toISODate) {
+        Date.prototype.toISODate = function() {
+            return this.getFullYear() + '-' +
+                ('0'+ (this.getMonth()+1)).slice(-2) + '-' +
+                ('0'+ this.getDate()).slice(-2);
+        }
+    }
+
+    firstDay = firstDay.toISODate();
+    lastDay = lastDay.toISODate();
+
+
+    $(document).ready(function () {
+        let currency = Intl.NumberFormat('en-EN');
+
+        $.ajax({
+            "url": url + "/api/product-statistic?start=" + firstDay + "&end=" + lastDay,
+            "type": "POST",
+            "data":JSON.stringify({}),
+            "datatype": 'json',
+            "success": function (data) {
+                // console.log(data);
+                var table = $("#table").DataTable({
+                    dom: 'Bfrtip',
+                    buttons: [
+                        'print','excel', 
+                    ],
+                    data : data,
+                    columns: [
+                        { data: 'sku' },
+                        { data: 'name' },
+                        { data: 'total' },
+                        { data: 'uom' },
+                        { data: 'price' },
+                        { data: 'price' }
+                    ],
+                        columnDefs: [
+                    {
+                        render: function (data, type, row) {
+                            return currency.format(data);
+                        },
+                        targets: 2,
+                    },
+                    {
+                        render: function (data, type, row) {
+                            return currency.format(data);
+                        },
+                        targets: 4,
+                    },
+                    {
+                        render: function (data, type, row) {
+                            var total = row.total * row.price;
+                            return currency.format(total);
+                        },
+                        targets: 5,
+                    }
+                    ],
+                    pageLength: -1,
+                    lengthMenu: [
+                        [10, 25, 50, -1],
+                        [10, 25, 50, "All"]
+                    ],
+                    drawCallback: function () {
+                        var api = this.api();
+                        // Remove the formatting to get integer data for summation
+                        var intVal = function ( i ) {
+                            return typeof i === 'string' ?
+                                // (i.replace(/[\$,]/g, ''))*1 :
+                                0:
+                                typeof i === 'number' ?
+                                    i : 0;
+                        };
+                        // Total over all pages
+                        // var sum = api
+                        //     .column( 5 )
+                        //     .data()
+                        //     .reduce( function (a, b) {
+                        //         // console.log(`A : ${a}`)
+                        //         // console.log(`B : ${intVal(b)}`)
+                        //         return intVal(a) + intVal(b);
+                        //     }, 0 );
+                        var quantity = $('#table').DataTable().column(2).data();
+                        var price = $('#table').DataTable().column(4).data();
+                        let grandTotal = 0;
+                        for(var i = 0; i<quantity.length; i++ ){
+                            grandTotal = grandTotal + (quantity[i] * price[i]);
+                        }
+                        document.getElementById("grandTotal").innerHTML = "Rp " + currency.format(grandTotal);
+
+                        // console.log(
+                        //     grandTotal
+                        // );
+                    }
+                });
+                // console.log(table.column(6).data().sum());
+            },
+            "error": function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status);
+                console.log(xhr);
+                console.log(thrownError);
+            }
+        });
+
+        // $.ajax({
+        //     "url": url + "/api/transaction/" + transId,
+        //     "type": "GET",
+        //     "datatype": 'json',
+        //     "success": function (data) {
+                
+        //     }
+        // });
+      });
+
+      function capitalizeFirstLetter(string) {
+          return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+    </script>
+    </body>
+</html>
