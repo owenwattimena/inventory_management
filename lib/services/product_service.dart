@@ -37,7 +37,7 @@ class ProductService {
     if (category != null) {
       String sql = '''
         SELECT * FROM product AS p
-         INNER JOIN (
+        INNER JOIN (
           SELECT * FROM transaction_detail 
           WHERE id IN (
             SELECT MAX(id) FROM transaction_detail GROUP BY sku
@@ -288,5 +288,22 @@ class ProductService {
       var mapObject = await db.rawQuery(sql, [sku, type ]);
       return mapObject;
     }
+  }
+
+  Future<List<Map<String, Object?>>> getTotalProduct() async {
+    Database db = await database.database;
+    var sql = '''
+      SELECT COUNT(*) AS total FROM product AS p
+        INNER JOIN (
+          SELECT * FROM transaction_detail 
+          WHERE id IN (
+            SELECT MAX(id) FROM transaction_detail GROUP BY sku
+          )
+        ) as td 
+        ON p.sku = td.sku 
+        WHERE td.stock > 0
+    ''';
+    var mapObject = await db.rawQuery(sql);
+    return mapObject;
   }
 }

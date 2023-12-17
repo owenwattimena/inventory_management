@@ -69,6 +69,14 @@ class TransactionService {
     return mapObject;
   }
 
+  Future<List<Map<String, Object?>>> getTotalDivision() async {
+    final db = await database.database;
+    var sql =
+        'SELECT COUNT(DISTINCT division) as total FROM product_transaction';
+    List<Map<String, Object?>> mapObject = await db.rawQuery(sql);
+    return mapObject;
+  }
+
   Future<List<Map<String, Object?>>> getTakeBy(String query) async {
     final db = await database.database;
     var sql = '''

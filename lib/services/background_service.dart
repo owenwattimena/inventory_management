@@ -69,8 +69,11 @@ class BackgroundService {
 
     // API
     app.mount('/api', ApiRouter().router);
+    // STYLE
     app.mount('/css', StyleRouter().router);
+    // HTML TEMPLATE
     app.mount('/template', TemplateRouter().router);
+    // SCRIPT
     app.mount('/script', ScriptRouter().router);
 
     try {

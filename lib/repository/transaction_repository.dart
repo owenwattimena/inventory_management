@@ -255,8 +255,8 @@ class TransactionRepository {
               stock = int.parse(rows[i][2]!.value);
             }
             Product product = Product(
-              sku: rows[i][0]?.value,
-              name: rows[i][1]?.value,
+              sku: rows[i][0]?.value.toString(),
+              name: rows[i][1]?.value.toString(),
               stock: stock,
             );
             await TransactionService()

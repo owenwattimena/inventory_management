@@ -16,6 +16,11 @@ class ScriptRouter {
         // Kembalikan respons
         return shelf.Response.ok(file, headers: {'content-type': 'text/javascript'});
     });
+    route.get('/dashboard-controller.js', (shelf.Request request) async {
+        var file = await rootBundle.loadString('public/js/dashboard-controller.js');
+        // Kembalikan respons
+        return shelf.Response.ok(file, headers: {'content-type': 'text/javascript'});
+    });
     route.get('/transaction-controller.js', (shelf.Request request) async {
         var file = await rootBundle.loadString('public/js/transaction-controller.js');
         return shelf.Response.ok(file, headers: {'content-type': 'text/javascript'});

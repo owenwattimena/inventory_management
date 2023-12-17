@@ -24,6 +24,7 @@ var MainController = function(){
                 "datatype": 'json',
                 "success": function (data) {
                     document.getElementById("sidebarMenu").innerHTML = data;
+                    feather.replace({ 'aria-hidden': 'true' })
                     MainController.setSidebarLink();
                 },
                 "error": function (xhr, status, error) {

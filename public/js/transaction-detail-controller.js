@@ -4,6 +4,7 @@ var TransactionDetailController = function(){
             let trans_id = document.getElementById("trans-id");
             let data = document.getElementById("data");
             let source = document.getElementById("source");
+            let el_grand_total = document.getElementById("grand-total");
             let desc = document.getElementById("desc");
             let image = document.getElementById("image");
 
@@ -57,14 +58,47 @@ var TransactionDetailController = function(){
                     { data: 'sku' },
                     { data: 'name' },
                     { data: 'quantity' },
-                    { data: 'uom' }
+                    { data: 'uom' },
+                    { data: 'price' },
+                    { data: 'price' }
                     ],
+                    columnDefs: [
+                      {
+                          render: function (data, type, row) {
+                              var total = row.price * row.quantity;
+                              return total.toLocaleString('id-ID');
+                          },
+                          targets: 5,
+                      },
+                  ],
                   pageLength: -1,
                   lengthMenu: [
                     [10, 25, 50, -1],
                     [10, 25, 50, "All"]
-                  ]
+                  ],
+                  drawCallback: function () {
+                    // Remove the formatting to get integer data for summation
+                    var intVal = function ( i ) {
+                        return typeof i === 'string' ?
+                            // (i.replace(/[\$,]/g, ''))*1 :
+                            0:
+                            typeof i === 'number' ?
+                                i : 0;
+                    };
+                    var quantity = $('#table').DataTable().column(2).data();
+                    var price = $('#table').DataTable().column(4).data();
+                    let grandTotal = 0;
+                    for(var i = 0; i<quantity.length; i++ ){
+                        grandTotal = grandTotal + (quantity[i] * price[i]);
+                    }
+                    el_grand_total.innerText = grandTotal.toLocaleString('id-ID');
+
+                    // console.log(
+                    //     grandTotal
+                    // );
+                }
                 });
+
             }
         });
         function getPhoto(path)

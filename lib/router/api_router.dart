@@ -20,6 +20,12 @@ class ApiRouter {
       return shelf.Response.notFound('No data');
     });
 
+    router.get('/product-total', (shelf.Request request) async {
+      final data = await PcManagerRepository.getTotalProduct();
+      return shelf.Response.ok(json.encode(data),
+          headers: {'Content-Type': 'application/json'});
+    });
+
     router.post('/product-chart/<sku>',
         (shelf.Request request, String sku) async {
       final result = json.decode(await request.readAsString());
@@ -58,6 +64,13 @@ class ApiRouter {
         );
       }
       return shelf.Response.notFound('No data');
+    });
+    router.get('/division-total', (shelf.Request request) async {
+      final data = await PcManagerRepository.getTotalDivision();
+      return shelf.Response.ok(
+        json.encode(data),
+        headers: {'Content-Type': 'application/json'},
+      );
     });
 
     router.post('/product-statistic', (shelf.Request request) async {
@@ -220,8 +233,7 @@ class ApiRouter {
         (shelf.Request request, String id) async {
       final result = json.decode(await request.readAsString());
       String? imagePath = result['photo_path'];
-      if(imagePath == null)
-      {
+      if (imagePath == null) {
         return shelf.Response.notFound('');
       }
       try {
@@ -229,7 +241,7 @@ class ApiRouter {
         Uint8List bytes = await file.readAsBytes();
         String base64string = base64.encode(bytes);
         return shelf.Response.ok(json.encode(base64string),
-                  headers: {'Content-Type': 'application/json'});
+            headers: {'Content-Type': 'application/json'});
       } catch (e) {
         return shelf.Response.notFound('');
       }
@@ -251,6 +263,11 @@ class ApiRouter {
         return shelf.Response.ok(json.encode(data),
             headers: {'Content-Type': 'application/json'});
       }
+    });
+    router.get('/inventory-value', (shelf.Request request) async {
+        final data = await PcManagerRepository.getInventoryValue();
+        return shelf.Response.ok(json.encode(data),
+            headers: {'Content-Type': 'application/json'});
     });
 
     return router;

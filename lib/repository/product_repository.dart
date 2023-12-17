@@ -179,17 +179,42 @@ class ProductRepository {
 
   static Future<void> importFile(PlatformFile file) async {
     var bytes = File(file.path!).readAsBytesSync();
-    var excel = Excel.decodeBytes(bytes);
-    for (var table in excel.tables.keys) {
-      var rows = excel.tables[table]?.rows;
-      if (rows != null) {
-        for (var i = 0; i < rows.length; i++) {
-          if (i > 0) {
-            int j = 1 + i;
-            await ProductService().storeProduct(Product.fromArray(rows[i], j));
+    try {
+      var excel = Excel.decodeBytes(bytes);
+      for (var table in excel.tables.keys) {
+        // print(table); //sheet Name
+        // print(excel.tables[table].maxColumns);
+        // print(excel.tables[table].maxRows);
+        var sheet = excel.tables[table];
+        var rows = sheet?.rows;
+        if(rows != null)
+        {
+          // Loop through each row and access its cells
+          for (var i = 0; i < rows.length; i++) {
+            if(i > 0)
+            {
+              List data = [];
+              for (var cell in rows[i]) {
+                data.add(cell?.value);
+              }
+              await ProductService().storeProduct(Product.fromArrayData(data));
+            }
           }
         }
+        // var rows = excel.tables[table]?.rows;
+        // if (rows != null) {
+        //   for (var i = 0; i < rows.length; i++) {
+        //   print("$rows[i]");
+        //     if (i > 0) {
+        //       int j = 1 + i;
+        //       await ProductService().storeProduct(Product.fromArray(rows[i], j));
+        //     }
+        //   }
+        // }
       }
+      
+    } catch (e) {
+      print(e.toString());
     }
   }
 

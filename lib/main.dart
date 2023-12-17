@@ -14,7 +14,6 @@ import 'views/pages/pages.dart';
 //     return Future.value(true);
 //   });
 // }
-  
 void main() {
   // WidgetsFlutterBinding.ensureInitialized();
   // Workmanager().initialize(

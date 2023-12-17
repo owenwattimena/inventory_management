@@ -50,8 +50,24 @@ class Product {
         price: price ?? this.price,
       );
 
-  factory Product.fromArray(List<Data?> array, int id) => Product(
-        id: id,
+  factory Product.fromArrayData(List array) {
+    return Product(
+        // id: id,
+        sku: array[0].toString(),
+        barcode: array[1].toString(),
+        name: array[2].toString(),
+        uom: array[3].toString(),
+        category: array[4].toString(),
+        price: array[5] is String
+            ? int.parse(array[5])
+            : (array[5] is double
+                ? array[5].round()
+                : array[5]),
+      );
+  }
+  factory Product.fromArray(List<Data?> array, int id) {
+    return Product(
+        // id: id,
         sku: array[0]?.value,
         barcode: array[1]?.value,
         name: array[2]?.value,
@@ -63,6 +79,7 @@ class Product {
                 ? array[5]?.value.round()
                 : array[5]?.value),
       );
+  }
 }
 
 List<Product> products = [

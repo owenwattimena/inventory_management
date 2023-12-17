@@ -27,9 +27,19 @@ class PcManagerRepository {
     return data;
   }
 
+  static Future<Map> getTotalProduct() async {
+    var data = await ProductService().getTotalProduct();
+    return data[0];
+  }
+
   static Future<List> getDivision({String division = ''}) async {
     var data = await TransactionService().getDivision(division);
     return data;
+  }
+
+  static Future<Map> getTotalDivision() async {
+    var data = await TransactionService().getTotalDivision();
+    return data[0];
   }
 
   static Future<List> getProductTransaction(
@@ -62,24 +72,32 @@ class PcManagerRepository {
     List<Map<String, dynamic>> planning = [];
     List<Map<String, dynamic>> productStock = await InventoryPlanningService()
         .getInventoryPlanning(category, monthPlaning);
-    for (final Map<String, dynamic> item in productStock ) {
-      final totalTransaction = await ProductService().totalTransaction(item['sku'], start: DateTime.now().subtract(Duration(days: monthPlaning * 30)), end: DateTime.now());
+    for (final Map<String, dynamic> item in productStock) {
+      final totalTransaction = await ProductService().totalTransaction(
+          item['sku'],
+          start: DateTime.now().subtract(Duration(days: monthPlaning * 30)),
+          end: DateTime.now());
       if (totalTransaction.isNotEmpty) {
-         final Map<String, dynamic> updatedItem = Map<String, dynamic>.from(item);
+        final Map<String, dynamic> updatedItem =
+            Map<String, dynamic>.from(item);
         // print(totalTransaction[0]['total_transaction']);
         var total = totalTransaction[0]['total_transaction'];
         if (total != null) {
           updatedItem['total_transaction'] = total;
           updatedItem['planning_stock'] = total - updatedItem['stock'];
-          if(updatedItem['planning_stock'] < 0){
+          if (updatedItem['planning_stock'] < 0) {
             continue;
           }
-          if(updatedItem['planning_stock'] == 0){
-            updatedItem['twenty_percent'] = (20/100 * updatedItem['total_transaction']).ceil();
-            updatedItem['planning'] = updatedItem['twenty_percent'] + updatedItem['total_transaction'];
-          }else{
-            updatedItem['twenty_percent'] = (20/100 * updatedItem['planning_stock']).ceil();
-            updatedItem['planning'] = updatedItem['twenty_percent'] + updatedItem['planning_stock'];
+          if (updatedItem['planning_stock'] == 0) {
+            updatedItem['twenty_percent'] =
+                (20 / 100 * updatedItem['total_transaction']).ceil();
+            updatedItem['planning'] = updatedItem['twenty_percent'] +
+                updatedItem['total_transaction'];
+          } else {
+            updatedItem['twenty_percent'] =
+                (20 / 100 * updatedItem['planning_stock']).ceil();
+            updatedItem['planning'] =
+                updatedItem['twenty_percent'] + updatedItem['planning_stock'];
           }
 
           // if(updatedItem['planning_stock'] > 0)
@@ -91,12 +109,32 @@ class PcManagerRepository {
         // else{
         //   updatedItem['total_transaction'] = 0;
         //   updatedItem['planning_stock'] = 0;
-          // productStock[i]['total_transaction'] = 0;
+        // productStock[i]['total_transaction'] = 0;
         // }
         // planning.add(updatedItem);
       }
     }
     // print(productStock);
     return planning;
+  }
+
+  static Future<Map> getInventoryValue() async {
+    List products = await ProductService().getProducts();
+    double total = 0;
+    for(final Map<String, Object?> product in products)
+    {
+
+      if(product['stock'] is! int)
+      {
+        continue;
+      }
+      if(product['price'] is! int)
+      {
+        continue;
+      }
+      total += (product['stock'] as int) * (product['price'] as int);
+    }
+    
+    return {'total' : total};
   }
 }
