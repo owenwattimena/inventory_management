@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:intl/intl.dart';
+import 'package:inventory_management/repository/passcode_repository.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf/shelf.dart' as shelf;
 
@@ -10,6 +11,34 @@ import '../repository/pc_manager_repository.dart';
 class ApiRouter {
   Router get router {
     var router = Router();
+
+    router.get('/passcode', (shelf.Request request) async {
+      String? passcode =await PasscodeRepository.passcode();
+      bool lock = false;
+      if(passcode != null){
+        lock = true;
+      }
+      return shelf.Response.ok(json.encode(lock),
+            headers: {'Content-Type': 'application/json'});
+    });
+
+    router.post('/passcode', (shelf.Request request) async {
+      String? passcode =await PasscodeRepository.passcode();
+      final result = json.decode(await request.readAsString());
+      bool status = false;
+      if(passcode != null)
+      {
+        if(result['passcode'] == passcode){
+          status = true;
+        }else{
+          status = false;
+        }
+      }else{
+        status = true;
+      }
+      return shelf.Response.ok(json.encode(status),
+            headers: {'Content-Type': 'application/json'});
+    });
 
     router.get('/product', (shelf.Request request) async {
       final data = await PcManagerRepository.getProduct();

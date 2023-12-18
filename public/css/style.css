@@ -85,9 +85,10 @@ right: 0;
 /*
 * Navbar
 */
-header{
+header {
     background-color: #2297F3;
 }
+
 .navbar-brand {
     padding-top: .75rem;
     padding-bottom: .75rem;
@@ -118,4 +119,24 @@ header{
     box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
 }
 
-tbody>tr>td{ padding: 5px!important; }
+tbody>tr>td {
+    padding: 5px !important;
+}
+
+.modal-backdrop {
+    opacity:0.99 !important;
+    backdrop-filter: blur(8px)!important;
+    background-color: whitesmoke;
+    /* Adjust the blur intensity as needed */
+}
+
+/* body.modal-open > :not(.modal) {
+    -webkit-filter: blur(1px);
+    -moz-filter: blur(1px);
+    -o-filter: blur(1px);
+    -ms-filter: blur(1px);
+    filter: blur(1px);
+}
+.modal{
+    z-index: 10000;
+} */
